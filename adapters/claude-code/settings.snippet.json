@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "SessionStart":       [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-session-start.sh" } ] } ],
+    "UserPromptSubmit":   [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-prompt.sh" } ] } ],
+    "PostToolUse":        [ { "matcher": "Edit|MultiEdit|Write|Bash|Read|Grep|Glob|Task", "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-tool.sh" } ] } ],
+    "PostToolUseFailure": [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-tool.sh" } ] } ],
+    "Stop":               [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-stop.sh" } ] } ],
+    "SessionEnd":         [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-session-end.sh" } ] } ]
+  }
+}

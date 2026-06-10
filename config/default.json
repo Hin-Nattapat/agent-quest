@@ -1,0 +1,5 @@
+{
+  "home": "~/.agentrpg",
+  "source_default": "claude-code",
+  "adapters": { "claude-code": { "enabled": true } }
+}

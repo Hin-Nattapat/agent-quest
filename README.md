@@ -20,6 +20,9 @@ bun ~/.agentrpg/tools/inspect.ts
 ```
 Expect a summary with session_start / prompt / action / turn_end / session_end events.
 
+After merging the `statusLine` from the snippet into `~/.claude/settings.json`, the bottom
+of Claude Code shows `Lv.N ███░░ %  |  model  $cost  ·  ctx %`, updating as you work.
+
 ## Known limitations
 - `--continue`/`--resume` replays recorded hook stdout and does not re-run hooks, so
   resumed spans may be sparse. (Hooks emit no stdout, so no stale data is injected.)

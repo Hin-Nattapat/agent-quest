@@ -6,5 +6,6 @@
     "PostToolUseFailure": [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-tool.sh" } ] } ],
     "Stop":               [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-stop.sh" } ] } ],
     "SessionEnd":         [ { "hooks": [ { "type": "command", "command": "~/.agentrpg/adapters/claude-code/hooks/on-session-end.sh" } ] } ]
-  }
+  },
+  "statusLine": { "type": "command", "command": "bun ~/.agentrpg/hud/statusline.ts", "padding": 0 }
 }

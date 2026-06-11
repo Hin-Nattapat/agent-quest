@@ -16,6 +16,7 @@ deploy() {  # $1 = dir name under repo root
 deploy adapters
 deploy tools
 deploy core
+deploy hud
 
 # config: copy default only if absent — never overwrite the user's tuning.
 [ -f "$RPG_HOME/config.json" ] || cp "$SRC/config/default.json" "$RPG_HOME/config.json"

@@ -68,3 +68,12 @@ test("status prints a suggested line", async () => {
   expect(r.code).toBe(0);
   expect(r.stdout).toContain("suggested line");
 });
+
+test("status shows the passive percentage once a class is set", async () => {
+  const home = makeHome();
+  seedLevel(home, 60); // Lv.5
+  await rpg(home, "class", "mage");
+  const r = await rpg(home, "status");
+  expect(r.code).toBe(0);
+  expect(r.stdout).toContain("passive: +20%");
+});

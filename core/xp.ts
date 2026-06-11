@@ -82,3 +82,11 @@ export function levelProgress(
   const ceil = xpForLevel(level + 1, d);
   return { level, xp_in_level: xp - floor, xp_to_next: ceil - xp };
 }
+
+export type TPassiveRates = Record<number, number>;
+
+export const DEFAULT_PASSIVE: TPassiveRates = { 1: 0.2, 2: 0.3, 3: 0.4, 4: 0.5 };
+
+export function basePct(tier: number, rates: TPassiveRates = DEFAULT_PASSIVE): number {
+  return rates[tier] ?? 0;
+}

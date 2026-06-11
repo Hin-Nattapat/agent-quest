@@ -10,7 +10,7 @@ function hasExt(file: string | undefined, exts: string[]): boolean {
 }
 
 // Each event contributes to at most one line (delegate wins over a failed delegate, etc.).
-function lineOf(e: INormalizedEvent): ClassLine | null {
+export function lineForEvent(e: INormalizedEvent): ClassLine | null {
   if (e.action === AgentAction.Delegate) {
     return ClassLine.Sage;
   }
@@ -49,7 +49,7 @@ export function computeAffinity(events: INormalizedEvent[]): Record<ClassLine, n
   };
   let total = 0;
   for (const e of events) {
-    const line = lineOf(e);
+    const line = lineForEvent(e);
     if (line) {
       counts[line]++;
       total++;

@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { reduceThrottled } from "../core/reduce";
 import { levelProgress, DEFAULT_DIFFICULTY } from "../core/xp";
+import { defaultHome } from "../core/config";
 import type { IState } from "../core/state";
 
 export interface ITail {
@@ -18,10 +19,11 @@ export function renderHud(state: IState, tail: ITail): string {
   const model = tail.model || "?";
   const cost = tail.cost == null ? "0.00" : tail.cost.toFixed(2);
   const ctx = tail.ctx == null ? 0 : Math.round(tail.ctx);
-  return `Lv.${state.level} ${bar}${maxed} ${Math.round(pct * 100)}%  |  ${model}  $${cost}  ·  ctx ${ctx}%`;
+  const fire = state.streak && state.streak.current_days >= 1 ? ` 🔥${state.streak.current_days}d` : "";
+  return `Lv.${state.level} ${bar}${maxed} ${Math.round(pct * 100)}%${fire}  |  ${model}  $${cost}  ·  ctx ${ctx}%`;
 }
 
-const HOME = process.env.AGENTRPG_HOME || join(process.env.HOME ?? "", ".agentrpg");
+const HOME = defaultHome();
 
 function readState(home: string): IState {
   const p = join(home, "state.json");

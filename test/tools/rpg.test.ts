@@ -77,3 +77,60 @@ test("status shows the passive percentage once a class is set", async () => {
   expect(r.code).toBe(0);
   expect(r.stdout).toContain("passive: +20%");
 });
+
+import { rollDrop, LOOT_TABLE, LootKind } from "../../core/loot";
+
+// a zero-weight config so a session_end is the only trigger (one deterministic clean drop)
+function seedOneClean(home: string) {
+  writeFileSync(
+    join(home, "config.json"),
+    JSON.stringify({
+      xp: {
+        weights: {
+          prompt: 0,
+          turn_end: 0,
+          session_end: 0,
+          actions: {
+            edit: 0,
+            write: 0,
+            run: 0,
+            read: 0,
+            search: 0,
+            delegate: 0,
+            other: 0,
+          },
+        },
+      },
+    }),
+  );
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, "s.ndjson"),
+    `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"session_end","repo":"cq"}\n`,
+  );
+}
+
+test("inventory lists owned items after a clean session", async () => {
+  const home = makeHome();
+  seedOneClean(home);
+  const r = await rpg(home, "inventory");
+  expect(r.code).toBe(0);
+  expect(r.stdout).not.toContain("empty");
+});
+
+test("equipping an owned item succeeds; an unowned one errors", async () => {
+  const home = makeHome();
+  seedOneClean(home);
+  const droppedId = rollDrop({ table: "clean", seed: "clean:s" })!;
+  const kind = LOOT_TABLE[droppedId].kind;
+  if (kind !== LootKind.Skin) {
+    const ok = await rpg(home, kind, droppedId);
+    expect(ok.code).toBe(0);
+  }
+  const unowned = Object.keys(LOOT_TABLE).find(
+    id => id !== droppedId && LOOT_TABLE[id].kind === LootKind.Title,
+  )!;
+  const bad = await rpg(home, "title", unowned);
+  expect(bad.code).toBe(1);
+});

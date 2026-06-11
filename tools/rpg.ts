@@ -1,8 +1,9 @@
 // Player command-line for character identity. Writes profile.json, refreshes state.json.
-import { defaultHome } from "../core/config";
+import { defaultHome, loadConfig } from "../core/config";
 import { loadProfile, saveProfile, type IProfile } from "../core/profile";
 import { reduceToFile } from "../core/reduce";
 import { ClassLine, CLASS_TREE } from "../core/classes";
+import { LOOT_TABLE, LootKind } from "../core/loot";
 
 const HOME = defaultHome();
 const LINES = Object.values(ClassLine) as string[];
@@ -85,6 +86,39 @@ function status(profile: IProfile): string {
   );
 }
 
+function lootTable() {
+  return loadConfig(HOME).loot ?? LOOT_TABLE;
+}
+
+function inventory(): string {
+  const inv = reduceToFile(HOME).inventory ?? [];
+  if (inv.length === 0) {
+    return "Inventory empty.";
+  }
+  const table = lootTable();
+  return inv
+    .map(i => `${i.rarity.padEnd(9)} ${table[i.id]?.name ?? i.id}  ×${i.count}`)
+    .join("\n");
+}
+
+function equip(profile: IProfile, kind: LootKind, id: string): string {
+  const item = lootTable()[id];
+  if (!item || item.kind !== kind) {
+    fail(`Unknown ${kind} "${id}".`);
+  }
+  const owned = new Set((reduceToFile(HOME).inventory ?? []).map(i => i.id));
+  if (!owned.has(id)) {
+    fail(`You don't own "${id}".`);
+  }
+  if (kind === LootKind.Title) {
+    profile.title = id;
+  } else {
+    profile.theme = id;
+  }
+  persist(profile);
+  return `Equipped ${kind}: ${item.name}.`;
+}
+
 function main(): void {
   const [cmd, ...args] = process.argv.slice(2);
   const profile = loadProfile(HOME);
@@ -105,8 +139,17 @@ function main(): void {
     case "status":
       out = status(profile);
       break;
+    case "inventory":
+      out = inventory();
+      break;
+    case "title":
+      out = equip(profile, LootKind.Title, args[0] ?? "");
+      break;
+    case "theme":
+      out = equip(profile, LootKind.Theme, args[0] ?? "");
+      break;
     default:
-      fail("Usage: rpg <name|class|branch|respec|status> …");
+      fail("Usage: rpg <name|class|branch|respec|status|inventory|title|theme> …");
   }
   console.log(out);
 }

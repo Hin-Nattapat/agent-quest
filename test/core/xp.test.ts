@@ -53,3 +53,14 @@ test("defaults are present", () => {
   expect(DEFAULT_WEIGHTS.actions.delegate).toBe(8);
   expect(DEFAULT_DIFFICULTY.curve_exp).toBe(2.5);
 });
+
+import { basePct, DEFAULT_PASSIVE } from "../../core/xp";
+
+test("basePct returns the tier rate, 0 for tier 0 / unknown, and honors overrides", () => {
+  expect(basePct(0)).toBe(0);
+  expect(basePct(1)).toBe(0.2);
+  expect(basePct(4)).toBe(0.5);
+  expect(basePct(99)).toBe(0);
+  expect(basePct(1, { 1: 0.5 })).toBe(0.5);
+  expect(DEFAULT_PASSIVE[3]).toBe(0.4);
+});

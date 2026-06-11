@@ -3,8 +3,10 @@ import { join } from "path";
 import {
   DEFAULT_WEIGHTS,
   DEFAULT_DIFFICULTY,
+  DEFAULT_PASSIVE,
   type IWeights,
   type IDifficulty,
+  type TPassiveRates,
 } from "./xp";
 import { DEFAULT_ACHIEVEMENTS, type IAchievementDef } from "./achievements";
 
@@ -12,6 +14,7 @@ export interface IConfig {
   weights: IWeights;
   difficulty: IDifficulty;
   achievements?: Record<string, IAchievementDef>; // optional so pre-2a reduce(events, cfg) callers still type-check
+  passive?: TPassiveRates;
 }
 
 // The runtime home (`$AGENTRPG_HOME`, else `~/.agentrpg`). Shared by the CLI entry points.
@@ -24,6 +27,7 @@ export function loadConfig(home: string): IConfig {
     weights: DEFAULT_WEIGHTS,
     difficulty: DEFAULT_DIFFICULTY,
     achievements: DEFAULT_ACHIEVEMENTS,
+    passive: DEFAULT_PASSIVE,
   };
   const p = join(home, "config.json");
   if (!existsSync(p)) {
@@ -39,6 +43,7 @@ export function loadConfig(home: string): IConfig {
       },
       difficulty: { ...DEFAULT_DIFFICULTY, ...(raw?.difficulty ?? {}) },
       achievements: { ...DEFAULT_ACHIEVEMENTS, ...(raw?.achievements ?? {}) },
+      passive: { ...DEFAULT_PASSIVE, ...(raw?.passive ?? {}) },
     };
   } catch {
     return base;

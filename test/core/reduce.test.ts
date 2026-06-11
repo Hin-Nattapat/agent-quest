@@ -110,3 +110,63 @@ test("a chosen line resolves to its tier form + name", () => {
   expect(s.class?.form).toBe(ClassForm.BackendMage);
   expect(s.class?.advancement_pending).toBe(null);
 });
+
+import { basePct } from "../../core/xp";
+
+const at = (sec: string, o: object) =>
+  ({
+    ts: `2026-06-11T12:00:${sec}Z`,
+    source: "claude-code",
+    session_id: "s",
+    ...o,
+  }) as any;
+
+const microCfg = {
+  weights: {
+    prompt: 1,
+    turn_end: 1,
+    session_end: 1,
+    actions: { edit: 1, write: 1, run: 1, read: 1, search: 1, delegate: 1, other: 1 },
+  },
+  difficulty: { curve_k: 1, curve_exp: 1, level_cap: 50 },
+  passive: { 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0 },
+};
+
+const microEvents = [
+  at("01", { type: "prompt", repo: "cq" }),
+  at("02", { type: "prompt", repo: "cq" }),
+  at("03", { type: "prompt", repo: "cq" }),
+  at("04", { type: "prompt", repo: "cq" }),
+  at("05", { type: "action", action: "run", repo: "cq" }),
+  at("06", { type: "action", action: "run", repo: "cq" }),
+  at("07", { type: "action", action: "run", repo: "cq" }),
+];
+
+test("base passive multiplies line-signal XP past Lv.5 (micro-case)", () => {
+  const classed = reduce(microEvents, microCfg, "2026-06-11", { line: ClassLine.Mage });
+  expect(classed.xp_total).toBe(10);
+  const novice = reduce(microEvents, microCfg, "2026-06-11");
+  expect(novice.xp_total).toBe(7);
+});
+
+test("xp_total is independent of input order (the reducer sorts by ts)", () => {
+  const shuffled = [
+    microEvents[6],
+    microEvents[0],
+    microEvents[4],
+    microEvents[2],
+    microEvents[5],
+    microEvents[1],
+    microEvents[3],
+  ];
+  const ordered = reduce(microEvents, microCfg, "2026-06-11", { line: ClassLine.Mage });
+  const out = reduce(shuffled, microCfg, "2026-06-11", { line: ClassLine.Mage });
+  expect(out.xp_total).toBe(ordered.xp_total);
+  expect(out).toEqual(ordered);
+});
+
+test("base_passive_pct reflects the resolved tier", () => {
+  const s = reduce(promptsTo5, cfgA, "2026-06-11", { name: "G", line: ClassLine.Mage });
+  expect(s.class?.tier).toBe(1);
+  expect(s.class?.base_passive_pct).toBe(basePct(1));
+});

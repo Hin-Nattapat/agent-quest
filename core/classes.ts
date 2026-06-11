@@ -71,6 +71,7 @@ export interface IClassState {
   branch: "a" | "b" | null;
   affinity: Record<string, number>;
   advancement_pending: "class" | "branch" | null;
+  base_passive_pct: number;
 }
 
 export function tierForLevel(level: number): number {

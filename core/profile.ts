@@ -6,6 +6,8 @@ export interface IProfile {
   name?: string;
   line?: ClassLine;
   branch?: "a" | "b";
+  title?: string;
+  theme?: string;
 }
 
 export function loadProfile(home: string): IProfile {

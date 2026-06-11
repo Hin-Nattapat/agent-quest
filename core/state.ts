@@ -1,5 +1,6 @@
 import type { IStreak } from "./streak";
 import type { IClassState } from "./classes";
+import type { IInventoryItem, ICosmetics } from "./loot";
 
 export interface IGroupStat {
   xp: number;
@@ -30,4 +31,6 @@ export interface IState {
   achievements?: IAchievementsState;
   name?: string;
   class?: IClassState;
+  inventory?: IInventoryItem[];
+  cosmetics?: ICosmetics;
 }

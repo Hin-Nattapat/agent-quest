@@ -170,3 +170,41 @@ test("base_passive_pct reflects the resolved tier", () => {
   expect(s.class?.tier).toBe(1);
   expect(s.class?.base_passive_pct).toBe(basePct(1));
 });
+
+const zeroCfg = {
+  weights: {
+    prompt: 0,
+    turn_end: 0,
+    session_end: 0,
+    actions: { edit: 0, write: 0, run: 0, read: 0, search: 0, delegate: 0, other: 0 },
+  },
+  difficulty: DEFAULT_DIFFICULTY,
+};
+
+test("a clean session drops loot; a session with a fail does not", () => {
+  const clean = [
+    at("01", { session_id: "s1", type: "action", action: "edit", repo: "cq" }),
+    at("02", { session_id: "s1", type: "session_end", repo: "cq" }),
+  ];
+  expect(reduce(clean, zeroCfg, "2026-06-11").inventory?.length).toBe(1);
+
+  const failed = [
+    at("01", { session_id: "s2", type: "action_fail", action: "run", repo: "cq" }),
+    at("02", { session_id: "s2", type: "session_end", repo: "cq" }),
+  ];
+  expect(reduce(failed, zeroCfg, "2026-06-11").inventory).toEqual([]);
+});
+
+test("loot is idempotent", () => {
+  const ev = [at("01", { session_id: "s1", type: "session_end", repo: "cq" })];
+  expect(reduce(ev, zeroCfg, "2026-06-11").inventory).toEqual(
+    reduce(ev, zeroCfg, "2026-06-11").inventory,
+  );
+});
+
+test("cosmetics resolve only when the equipped item is owned", () => {
+  const ev = [at("01", { session_id: "s1", type: "action", action: "edit", repo: "cq" })];
+  const s = reduce(ev, zeroCfg, "2026-06-11", { title: "archmage_title" });
+  expect(s.inventory).toEqual([]);
+  expect(s.cosmetics?.title).toBe(null);
+});

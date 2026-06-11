@@ -87,3 +87,55 @@ test("shows the fire streak when current_days >= 1, hidden at 0", () => {
   };
   expect(renderHud(cold, tail)).not.toContain("🔥");
 });
+
+test("loot cosmetics + rate limits render; null rates are omitted", () => {
+  const s = {
+    ...state({ level: 5, xp_in_level: 0, xp_to_next: 100 }),
+    cosmetics: { title: "Codeweaver", theme_color: "36" },
+    inventory: [{ id: "x", rarity: "rare", count: 3 }],
+  } as any;
+  const out = renderHud(s, {
+    model: "Opus",
+    cost: 0.5,
+    ctx: 8,
+    five_hour: 23,
+    seven_day: 41,
+  });
+  expect(out).toContain("Adventurer the Codeweaver");
+  expect(out).toContain("\x1b[36m");
+  expect(out).toContain("🎒3");
+  expect(out).toContain("5h 23%");
+  expect(out).toContain("7d 41%");
+
+  const bare = renderHud(state({ level: 5, xp_in_level: 0, xp_to_next: 100 }), {
+    model: "M",
+    cost: 0,
+    ctx: 0,
+    five_hour: null,
+    seven_day: null,
+  });
+  expect(bare).not.toContain("5h");
+  expect(bare).not.toContain("7d");
+});
+
+test("space-between right-aligns the CC group when cols is wide", () => {
+  const s = state({ level: 5, xp_in_level: 0, xp_to_next: 100 });
+  const out = renderHud(s, { model: "M", cost: 0, ctx: 0 }, 200);
+  expect(out.endsWith("ctx 0%")).toBe(true);
+  expect(out).not.toContain("|");
+  expect(out.length).toBe(196); // padded to cols, reserving a 4-col right safety gap
+});
+
+test("emoji are counted as two columns so the right group never clips", () => {
+  const s = {
+    ...state({ level: 5, xp_in_level: 0, xp_to_next: 100 }),
+    streak: { current_days: 1, best_days: 1, last_active: "2026-06-11" },
+    inventory: [{ id: "x", rarity: "rare", count: 22 }],
+  } as any;
+  const out = renderHud(
+    s,
+    { model: "M", cost: 0, ctx: 0, five_hour: 37, seven_day: 41 },
+    120,
+  );
+  expect(out.endsWith("7d 41%")).toBe(true); // full right group, not truncated
+});

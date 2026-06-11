@@ -1,4 +1,5 @@
 import type { IStreak } from "./streak";
+import type { IClassState } from "./classes";
 
 export interface IGroupStat {
   xp: number;
@@ -27,4 +28,6 @@ export interface IState {
   };
   streak?: IStreak;
   achievements?: IAchievementsState;
+  name?: string;
+  class?: IClassState;
 }

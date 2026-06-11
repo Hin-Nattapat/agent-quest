@@ -8,10 +8,14 @@ test("loadEvents reads all files, skips malformed, counts session files", () => 
   const home = makeHome();
   const dir = join(home, "journal");
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "a.ndjson"),
-    `{"ts":"t","source":"claude-code","session_id":"a","type":"prompt"}\nbroken\n`);
-  writeFileSync(join(dir, "b.ndjson"),
-    `{"ts":"t","source":"claude-code","session_id":"b","type":"action","action":"edit"}\n`);
+  writeFileSync(
+    join(dir, "a.ndjson"),
+    `{"ts":"t","source":"claude-code","session_id":"a","type":"prompt"}\nbroken\n`,
+  );
+  writeFileSync(
+    join(dir, "b.ndjson"),
+    `{"ts":"t","source":"claude-code","session_id":"b","type":"action","action":"edit"}\n`,
+  );
   const { events, sessions } = loadEvents(home);
   expect(events.length).toBe(2);
   expect(sessions).toBe(2);

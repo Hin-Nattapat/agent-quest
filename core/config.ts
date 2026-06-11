@@ -1,6 +1,11 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { DEFAULT_WEIGHTS, DEFAULT_DIFFICULTY, type IWeights, type IDifficulty } from "./xp";
+import {
+  DEFAULT_WEIGHTS,
+  DEFAULT_DIFFICULTY,
+  type IWeights,
+  type IDifficulty,
+} from "./xp";
 import { DEFAULT_ACHIEVEMENTS, type IAchievementDef } from "./achievements";
 
 export interface IConfig {
@@ -15,9 +20,15 @@ export function defaultHome(): string {
 }
 
 export function loadConfig(home: string): IConfig {
-  const base: IConfig = { weights: DEFAULT_WEIGHTS, difficulty: DEFAULT_DIFFICULTY, achievements: DEFAULT_ACHIEVEMENTS };
+  const base: IConfig = {
+    weights: DEFAULT_WEIGHTS,
+    difficulty: DEFAULT_DIFFICULTY,
+    achievements: DEFAULT_ACHIEVEMENTS,
+  };
   const p = join(home, "config.json");
-  if (!existsSync(p)) return base;
+  if (!existsSync(p)) {
+    return base;
+  }
   try {
     const raw = JSON.parse(readFileSync(p, "utf8"));
     return {

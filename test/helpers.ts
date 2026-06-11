@@ -32,7 +32,11 @@ export async function runHook(
 export function journalLines(home: string, sid: string): any[] {
   const p = join(home, "journal", `${sid}.ndjson`);
   if (!existsSync(p)) return [];
-  return readFileSync(p, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  return readFileSync(p, "utf8")
+    .trim()
+    .split("\n")
+    .filter(Boolean)
+    .map(l => JSON.parse(l));
 }
 
 export function repoCache(home: string, sid: string): string | null {

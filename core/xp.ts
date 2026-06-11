@@ -28,15 +28,24 @@ export const DEFAULT_WEIGHTS: IWeights = {
   },
 };
 
-export const DEFAULT_DIFFICULTY: IDifficulty = { curve_k: 7, curve_exp: 2.5, level_cap: 50 };
+export const DEFAULT_DIFFICULTY: IDifficulty = {
+  curve_k: 7,
+  curve_exp: 2.5,
+  level_cap: 50,
+};
 
 export function xpFor(e: INormalizedEvent, w: IWeights = DEFAULT_WEIGHTS): number {
   switch (e.type) {
-    case EventType.Prompt: return w.prompt;
-    case EventType.TurnEnd: return w.turn_end;
-    case EventType.SessionEnd: return w.session_end;
-    case EventType.Action: return w.actions[e.action ?? AgentAction.Other];
-    default: return 0; // session_start, action_fail
+    case EventType.Prompt:
+      return w.prompt;
+    case EventType.TurnEnd:
+      return w.turn_end;
+    case EventType.SessionEnd:
+      return w.session_end;
+    case EventType.Action:
+      return w.actions[e.action ?? AgentAction.Other];
+    default:
+      return 0; // session_start, action_fail
   }
 }
 
@@ -47,8 +56,10 @@ export function xpForLevel(L: number, d: IDifficulty = DEFAULT_DIFFICULTY): numb
 export function levelFor(xp: number, d: IDifficulty = DEFAULT_DIFFICULTY): number {
   let level = 1;
   for (let L = 2; L <= d.level_cap; L++) {
-    if (xp >= xpForLevel(L, d)) level = L;
-    else break;
+    if (xp < xpForLevel(L, d)) {
+      break;
+    }
+    level = L;
   }
   return level;
 }
@@ -59,7 +70,10 @@ export interface IProgress {
   xp_to_next: number;
 }
 
-export function levelProgress(xp: number, d: IDifficulty = DEFAULT_DIFFICULTY): IProgress {
+export function levelProgress(
+  xp: number,
+  d: IDifficulty = DEFAULT_DIFFICULTY,
+): IProgress {
   const level = levelFor(xp, d);
   if (level >= d.level_cap) {
     return { level, xp_in_level: xp - xpForLevel(level, d), xp_to_next: 0 };

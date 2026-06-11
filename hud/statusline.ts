@@ -12,15 +12,25 @@ export interface ITail {
 }
 
 export function renderHud(state: IState, tail: ITail): string {
-  const pct = state.xp_to_next === 0 ? 1 : state.xp_in_level / (state.xp_in_level + state.xp_to_next);
+  const pct =
+    state.xp_to_next === 0
+      ? 1
+      : state.xp_in_level / (state.xp_in_level + state.xp_to_next);
   const filled = Math.round(pct * 10);
   const bar = "█".repeat(filled) + "░".repeat(10 - filled);
   const maxed = state.xp_to_next === 0 ? " MAX" : "";
   const model = tail.model || "?";
   const cost = tail.cost == null ? "0.00" : tail.cost.toFixed(2);
   const ctx = tail.ctx == null ? 0 : Math.round(tail.ctx);
-  const fire = state.streak && state.streak.current_days >= 1 ? ` 🔥${state.streak.current_days}d` : "";
-  return `Lv.${state.level} ${bar}${maxed} ${Math.round(pct * 100)}%${fire}  |  ${model}  $${cost}  ·  ctx ${ctx}%`;
+  const fire =
+    state.streak && state.streak.current_days >= 1
+      ? ` 🔥${state.streak.current_days}d`
+      : "";
+  const name = state.name || "Adventurer";
+  const cls = state.class;
+  const label = cls && cls.line ? `${cls.icon} ${cls.form}` : "Novice";
+  const pending = cls?.advancement_pending ? " ✨" : "";
+  return `${name} · ${label}${pending}  Lv.${state.level} ${bar}${maxed} ${Math.round(pct * 100)}%${fire}  |  ${model}  $${cost}  ·  ctx ${ctx}%`;
 }
 
 const HOME = defaultHome();
@@ -36,8 +46,12 @@ function readState(home: string): IState {
   }
   const prog = levelProgress(0, DEFAULT_DIFFICULTY);
   return {
-    version: 1, updated_at: "", xp_total: 0,
-    level: prog.level, xp_in_level: prog.xp_in_level, xp_to_next: prog.xp_to_next,
+    version: 1,
+    updated_at: "",
+    xp_total: 0,
+    level: prog.level,
+    xp_in_level: prog.xp_in_level,
+    xp_to_next: prog.xp_to_next,
     stats: { prompts: 0, actions: {}, sessions: 0, by_source: {}, by_repo: {} },
   };
 }

@@ -7,7 +7,15 @@
       "prompt": 5,
       "turn_end": 10,
       "session_end": 20,
-      "actions": { "edit": 4, "write": 4, "run": 3, "read": 1, "search": 1, "delegate": 8, "other": 1 }
+      "actions": {
+        "edit": 4,
+        "write": 4,
+        "run": 3,
+        "read": 1,
+        "search": 1,
+        "delegate": 8,
+        "other": 1
+      }
     }
   },
   "difficulty": { "curve_k": 7, "curve_exp": 2.5, "level_cap": 50 }

@@ -11,8 +11,12 @@ test("journal -> reduceToFile -> renderHud produces a coherent line", () => {
   mkdirSync(dir, { recursive: true });
   // 5 prompts (25) + 4 edits (16) = 41 xp -> level 3 (>=40)
   const lines = [
-    ...Array(5).fill(`{"ts":"t","source":"claude-code","session_id":"s","type":"prompt","repo":"cq"}`),
-    ...Array(4).fill(`{"ts":"t","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}`),
+    ...Array(5).fill(
+      `{"ts":"t","source":"claude-code","session_id":"s","type":"prompt","repo":"cq"}`,
+    ),
+    ...Array(4).fill(
+      `{"ts":"t","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}`,
+    ),
   ];
   writeFileSync(join(dir, "s.ndjson"), lines.join("\n") + "\n");
 

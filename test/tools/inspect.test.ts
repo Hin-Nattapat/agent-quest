@@ -7,14 +7,18 @@ import { join } from "path";
 function seed(home: string) {
   const dir = join(home, "journal");
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "s1.ndjson"),
+  writeFileSync(
+    join(dir, "s1.ndjson"),
     [
       `{"ts":"2026-06-11T00:00:00Z","source":"claude-code","session_id":"s1","type":"session_start","repo":"commit-quest"}`,
       `{"ts":"2026-06-11T00:00:01Z","source":"claude-code","session_id":"s1","type":"action","action":"edit","repo":"commit-quest","file":"a.ts"}`,
       `not valid json`, // must be skipped
-    ].join("\n") + "\n");
-  writeFileSync(join(dir, "s2.ndjson"),
-    `{"ts":"2026-06-11T00:00:02Z","source":"claude-code","session_id":"s2","type":"prompt","repo":"pos"}\n`);
+    ].join("\n") + "\n",
+  );
+  writeFileSync(
+    join(dir, "s2.ndjson"),
+    `{"ts":"2026-06-11T00:00:02Z","source":"claude-code","session_id":"s2","type":"prompt","repo":"pos"}\n`,
+  );
 }
 
 test("summarize reports totals and groupings", () => {
@@ -38,9 +42,22 @@ test("summary headline shows level, xp, streak, achievements", () => {
   const home = makeHome();
   const dir = join(home, "journal");
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "s.ndjson"),
-    `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}\n`);
+  writeFileSync(
+    join(dir, "s.ndjson"),
+    `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}\n`,
+  );
   const out = summarize(home);
   expect(out).toContain("level:");
   expect(out).toContain("achievements:");
+});
+
+test("headline includes the class form", () => {
+  const home = makeHome();
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, "s.ndjson"),
+    `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}\n`,
+  );
+  expect(summarize(home)).toContain("(Novice)");
 });

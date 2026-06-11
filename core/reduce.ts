@@ -6,6 +6,15 @@ import { loadConfig, type IConfig } from "./config";
 import { loadEvents } from "./journal";
 import { eventLocalDate, computeStreak, localTodayKey } from "./streak";
 import { evaluateAchievements } from "./achievements";
+import { computeAffinity } from "./affinity";
+import { loadProfile, type IProfile } from "./profile";
+import {
+  tierForLevel,
+  formFor,
+  iconFor,
+  advancementPending,
+  type IClassState,
+} from "./classes";
 import { type IState, type IGroupStat } from "./state";
 
 export type TReducedState = Omit<IState, "updated_at">;
@@ -16,8 +25,15 @@ interface IGroupAcc {
   sessions: Set<string>;
 }
 
-function tally(groups: Record<string, IGroupAcc>, key: string, xp: number, sessionId: string): void {
-  if (!groups[key]) groups[key] = { xp: 0, sessions: new Set() };
+function tally(
+  groups: Record<string, IGroupAcc>,
+  key: string,
+  xp: number,
+  sessionId: string,
+): void {
+  if (!groups[key]) {
+    groups[key] = { xp: 0, sessions: new Set() };
+  }
   const group = groups[key];
   group.xp += xp;
   group.sessions.add(sessionId);
@@ -31,7 +47,12 @@ function toGroupStats(groups: Record<string, IGroupAcc>): Record<string, IGroupS
   return stats;
 }
 
-export function reduce(events: INormalizedEvent[], config: IConfig, today?: string): TReducedState {
+export function reduce(
+  events: INormalizedEvent[],
+  config: IConfig,
+  today?: string,
+  profile?: IProfile,
+): TReducedState {
   let xp_total = 0;
   let prompts = 0;
   const actions: Record<string, number> = {};
@@ -45,15 +66,34 @@ export function reduce(events: INormalizedEvent[], config: IConfig, today?: stri
     xp_total += xp;
     sessions.add(e.session_id);
     dates.add(eventLocalDate(e.ts));
-    if (e.type === EventType.Prompt) prompts++;
-    if (e.type === EventType.Action && e.action) actions[e.action] = (actions[e.action] ?? 0) + 1;
+    if (e.type === EventType.Prompt) {
+      prompts++;
+    }
+    if (e.type === EventType.Action && e.action) {
+      actions[e.action] = (actions[e.action] ?? 0) + 1;
+    }
 
     tally(bySource, e.source, xp, e.session_id);
-    if (e.repo) tally(byRepo, e.repo, xp, e.session_id);
+    if (e.repo) {
+      tally(byRepo, e.repo, xp, e.session_id);
+    }
   }
 
   const prog = levelProgress(xp_total, config.difficulty);
   const streak = computeStreak([...dates], today);
+
+  const line = profile?.line ?? null;
+  const branch = profile?.branch ?? null;
+  const tier = line ? tierForLevel(prog.level) : 0; // simple inline conditional is fine
+  const classState: IClassState = {
+    line,
+    tier,
+    form: formFor(line, tier, branch),
+    icon: iconFor(line),
+    branch,
+    affinity: computeAffinity(events),
+    advancement_pending: advancementPending(line, prog.level, branch),
+  };
 
   const prelim: TReducedState = {
     version: 1,
@@ -69,7 +109,11 @@ export function reduce(events: INormalizedEvent[], config: IConfig, today?: stri
       by_repo: toGroupStats(byRepo),
     },
     streak,
+    class: classState,
   };
+  if (profile?.name) {
+    prelim.name = profile.name;
+  }
   return { ...prelim, achievements: evaluateAchievements(prelim, config.achievements) };
 }
 
@@ -79,7 +123,7 @@ function nowStamp(): string {
 
 export function reduceToFile(home: string): IState {
   const { events } = loadEvents(home);
-  const reduced = reduce(events, loadConfig(home), localTodayKey());
+  const reduced = reduce(events, loadConfig(home), localTodayKey(), loadProfile(home));
   const state: IState = { ...reduced, updated_at: nowStamp() };
   const dst = join(home, "state.json");
   const tmp = dst + ".tmp";
@@ -90,6 +134,8 @@ export function reduceToFile(home: string): IState {
 
 export function reduceThrottled(home: string, maxAgeMs = 2000): void {
   const p = join(home, "state.json");
-  if (existsSync(p) && Date.now() - statSync(p).mtimeMs < maxAgeMs) return;
+  if (existsSync(p) && Date.now() - statSync(p).mtimeMs < maxAgeMs) {
+    return;
+  }
   reduceToFile(home);
 }

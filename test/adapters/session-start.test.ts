@@ -9,9 +9,17 @@ test("session_start: git repo resolved, cached, fields present", async () => {
   const gitdir = mkdtempSync(join(tmpdir(), "cq-gitrepo-"));
   Bun.spawnSync(["git", "init", gitdir]);
 
-  const { code, stdout } = await runHook("on-session-start.sh",
-    { session_id: "s1", cwd: gitdir, hook_event_name: "SessionStart", source: "startup", model: "claude-sonnet-4-6" },
-    home);
+  const { code, stdout } = await runHook(
+    "on-session-start.sh",
+    {
+      session_id: "s1",
+      cwd: gitdir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+      model: "claude-sonnet-4-6",
+    },
+    home,
+  );
 
   expect(code).toBe(0);
   expect(stdout).toBe("");
@@ -28,8 +36,16 @@ test("session_start: git repo resolved, cached, fields present", async () => {
 
 test("session_start: non-git cwd falls back to basename", async () => {
   const home = makeHome();
-  const { code } = await runHook("on-session-start.sh",
-    { session_id: "s2", cwd: "/tmp/cq-not-a-repo", hook_event_name: "SessionStart", source: "resume" }, home);
+  const { code } = await runHook(
+    "on-session-start.sh",
+    {
+      session_id: "s2",
+      cwd: "/tmp/cq-not-a-repo",
+      hook_event_name: "SessionStart",
+      source: "resume",
+    },
+    home,
+  );
   expect(code).toBe(0);
   const e = journalLines(home, "s2").at(-1);
   expect(e.repo).toBe("cq-not-a-repo");

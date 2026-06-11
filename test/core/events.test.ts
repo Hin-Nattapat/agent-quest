@@ -2,15 +2,26 @@ import { test, expect } from "bun:test";
 import { isNormalizedEvent, EventType, AgentAction } from "../../core/events";
 
 test("valid event passes the guard", () => {
-  expect(isNormalizedEvent({ ts: "2026-06-11T00:00:00Z", source: "claude-code", session_id: "a", type: EventType.Prompt })).toBe(true);
+  expect(
+    isNormalizedEvent({
+      ts: "2026-06-11T00:00:00Z",
+      source: "claude-code",
+      session_id: "a",
+      type: EventType.Prompt,
+    }),
+  ).toBe(true);
 });
 
 test("missing required field fails", () => {
-  expect(isNormalizedEvent({ source: "claude-code", session_id: "a", type: EventType.Prompt })).toBe(false);
+  expect(
+    isNormalizedEvent({ source: "claude-code", session_id: "a", type: EventType.Prompt }),
+  ).toBe(false);
 });
 
 test("unknown type fails", () => {
-  expect(isNormalizedEvent({ ts: "x", source: "x", session_id: "a", type: "bogus" })).toBe(false);
+  expect(
+    isNormalizedEvent({ ts: "x", source: "x", session_id: "a", type: "bogus" }),
+  ).toBe(false);
 });
 
 test("non-object fails", () => {

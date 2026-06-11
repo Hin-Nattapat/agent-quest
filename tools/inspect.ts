@@ -1,9 +1,11 @@
 // Read the journal and print a verification summary. Read-only.
-import { join } from "path";
 import { type INormalizedEvent } from "../core/events";
 import { loadEvents } from "../core/journal";
+import { reduce } from "../core/reduce";
+import { loadConfig, defaultHome } from "../core/config";
+import { localTodayKey } from "../core/streak";
 
-const HOME = process.env.AGENTRPG_HOME || join(process.env.HOME ?? "", ".agentrpg");
+const HOME = defaultHome();
 
 function countBy(events: INormalizedEvent[], key: keyof INormalizedEvent): Record<string, number> {
   const m: Record<string, number> = {};
@@ -21,11 +23,17 @@ function fmt(m: Record<string, number>): string {
 
 export function summarize(home: string): string {
   const { events, sessions } = loadEvents(home);
+  const s = reduce(events, loadConfig(home), localTodayKey());
+  const streak = s.streak ? `${s.streak.current_days}d (best ${s.streak.best_days})` : "0d";
+  const headline =
+    `level: ${s.level}  xp: ${s.xp_total}  streak: ${streak}  ` +
+    `achievements: ${s.achievements?.earned.length ?? 0} (${s.achievements?.points ?? 0} pts)`;
   const last10 = events
     .slice(-10)
     .map((e) => `  ${e.ts} ${e.source} ${e.type}${e.action ? ":" + e.action : ""} ${e.repo ?? "-"} ${e.file ?? ""}`.trimEnd())
     .join("\n");
   return [
+    headline,
     `events: ${events.length}  sessions: ${sessions}`,
     `by type:`, fmt(countBy(events, "type")),
     `by action:`, fmt(countBy(events, "action")),

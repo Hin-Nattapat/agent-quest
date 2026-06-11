@@ -33,3 +33,14 @@ test("empty home summarizes to zeros", () => {
   expect(out).toContain("events: 0");
   expect(out).toContain("sessions: 0");
 });
+
+test("summary headline shows level, xp, streak, achievements", () => {
+  const home = makeHome();
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "s.ndjson"),
+    `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}\n`);
+  const out = summarize(home);
+  expect(out).toContain("level:");
+  expect(out).toContain("achievements:");
+});

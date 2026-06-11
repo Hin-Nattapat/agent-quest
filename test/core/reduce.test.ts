@@ -33,3 +33,32 @@ test("reduce of no events is a clean level-1 zero state", () => {
   expect(s.level).toBe(1);
   expect(s.stats.sessions).toBe(0);
 });
+
+import { DEFAULT_ACHIEVEMENTS } from "../../core/achievements";
+
+const cfgA = { weights: DEFAULT_WEIGHTS, difficulty: DEFAULT_DIFFICULTY, achievements: DEFAULT_ACHIEVEMENTS };
+const evd = (day: string, o: object) =>
+  ({ ts: `${day}T12:00:00Z`, source: "claude-code", session_id: "s", ...o }) as any;
+
+test("reduce folds a streak across consecutive local days", () => {
+  const events = [
+    evd("2026-06-10", { type: "action", action: "edit", repo: "cq" }),
+    evd("2026-06-11", { type: "action", action: "edit", repo: "cq" }),
+  ];
+  const s = reduce(events, cfgA, "2026-06-11");
+  expect(s.streak?.best_days).toBe(2);
+  expect(s.streak?.current_days).toBe(2);
+});
+
+test("an explicit today with a gap breaks current_days", () => {
+  const events = [evd("2026-06-01", { type: "prompt", repo: "cq" })];
+  const s = reduce(events, cfgA, "2026-06-15");
+  expect(s.streak?.current_days).toBe(0);
+});
+
+test("reduce earns first_blood once an action exists", () => {
+  const events = [evd("2026-06-11", { type: "action", action: "edit", repo: "cq" })];
+  const s = reduce(events, cfgA, "2026-06-11");
+  expect(s.achievements?.earned).toContain("first_blood");
+  expect(s.achievements?.points).toBeGreaterThanOrEqual(5);
+});

@@ -30,3 +30,21 @@ test("invalid config.json falls back to defaults", () => {
   writeFileSync(join(home, "config.json"), "not json");
   expect(loadConfig(home).weights.prompt).toBe(5);
 });
+
+import { DEFAULT_ACHIEVEMENTS } from "../../core/achievements";
+
+test("achievements default to the built-in registry", () => {
+  const c = loadConfig(makeHome());
+  expect(c.achievements?.first_blood?.points).toBe(5);
+  expect(Object.keys(c.achievements ?? {}).length).toBe(Object.keys(DEFAULT_ACHIEVEMENTS).length);
+});
+
+test("config.json can override/add achievements per id", () => {
+  const home = makeHome();
+  writeFileSync(join(home, "config.json"), JSON.stringify({
+    achievements: { first_blood: { name: "X", desc: "", cond: { stat: "level", gte: 99 }, points: 1 } },
+  }));
+  const c = loadConfig(home);
+  expect(c.achievements?.first_blood?.points).toBe(1);          // overridden
+  expect(c.achievements?.tooling_up?.points).toBe(10);          // other defaults kept
+});

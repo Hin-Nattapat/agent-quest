@@ -29,3 +29,12 @@ test("max level shows full bar + MAX at 100%", () => {
   expect(renderHud(s, { model: "M", cost: 0, ctx: 0 })).toBe(
     "Lv.50 ██████████ MAX 100%  |  M  $0.00  ·  ctx 0%");
 });
+
+test("shows the fire streak when current_days >= 1, hidden at 0", () => {
+  const base = state({ level: 5, xp_in_level: 200, xp_to_next: 300 });
+  const tail = { model: "M", cost: 0, ctx: 0 };
+  const hot = { ...base, streak: { current_days: 5, best_days: 9, last_active: "2026-06-11" } };
+  expect(renderHud(hot, tail)).toContain(" 🔥5d ");
+  const cold = { ...base, streak: { current_days: 0, best_days: 9, last_active: "2026-06-01" } };
+  expect(renderHud(cold, tail)).not.toContain("🔥");
+});

@@ -25,6 +25,7 @@ agents ──(adapters)──► append-only journal (NDJSON) ──(reducer)─
 - **String enums, not string-literal unions.** Any finite set of states is a string-valued `enum` (e.g. `EventType`, `AgentAction`) referenced by member at every call site — never a bare `"prompt"` literal or `"a" | "b"` union. String values only (no numeric enums). Enum string values that cross the bash↔TS boundary ARE the wire strings — keep them in sync.
 - **Type prefixes:** `interface I*` for object/shape types (`INormalizedEvent`); `type T*` for unions/aliases/entities.
 - **No `any`.** Use `unknown` + a type guard, or define the proper type.
+- **Clarity over cleverness.** Readability is the priority. Name intermediate values and extract a small, well-named helper instead of dense assign-in-expression bookkeeping (e.g. `(m[k] ??= {...}).x += v` inside a larger statement). Prefer focused functions over clever one-liners.
 - **kebab-case** for all file names (`events.ts`, `on-tool.sh`).
 
 ## 4. Hook scripts (bash + jq) — safety (non-negotiable)

@@ -1,6 +1,14 @@
+import type { IStreak } from "./streak";
+
 export interface IGroupStat {
   xp: number;
   sessions: number;
+}
+
+export interface IAchievementsState {
+  earned: string[];
+  points: number;
+  progress: Record<string, number>;
 }
 
 export interface IState {
@@ -17,4 +25,6 @@ export interface IState {
     by_source: Record<string, IGroupStat>;
     by_repo: Record<string, IGroupStat>;
   };
+  streak?: IStreak;
+  achievements?: IAchievementsState;
 }

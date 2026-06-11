@@ -1,29 +1,9 @@
 // Read the journal and print a verification summary. Read-only.
-import { readdirSync, readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { isNormalizedEvent, type INormalizedEvent } from "../core/events";
+import { type INormalizedEvent } from "../core/events";
+import { loadEvents } from "../core/journal";
 
 const HOME = process.env.AGENTRPG_HOME || join(process.env.HOME ?? "", ".agentrpg");
-
-export function loadEvents(home: string): { events: INormalizedEvent[]; sessions: number } {
-  const dir = join(home, "journal");
-  if (!existsSync(dir)) return { events: [], sessions: 0 };
-  const files = readdirSync(dir).filter((f) => f.endsWith(".ndjson"));
-  const events: INormalizedEvent[] = [];
-  for (const f of files) {
-    for (const line of readFileSync(join(dir, f), "utf8").split("\n")) {
-      const t = line.trim();
-      if (!t) continue;
-      try {
-        const o = JSON.parse(t);
-        if (isNormalizedEvent(o)) events.push(o);
-      } catch {
-        // skip malformed lines — the journal must survive partial writes
-      }
-    }
-  }
-  return { events, sessions: files.length };
-}
 
 function countBy(events: INormalizedEvent[], key: keyof INormalizedEvent): Record<string, number> {
   const m: Record<string, number> = {};

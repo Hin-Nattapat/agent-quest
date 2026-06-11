@@ -41,3 +41,9 @@ test("does not overwrite an existing config.json", async () => {
   await runInstall(home, ["--link"]);
   expect(JSON.parse(readFileSync(cfg, "utf8")).custom).toBe(true);
 });
+
+test("--link deploys hud/", async () => {
+  const home = makeHome();
+  await runInstall(home, ["--link"]);
+  expect(existsSync(join(home, "hud/statusline.ts"))).toBe(true);
+});

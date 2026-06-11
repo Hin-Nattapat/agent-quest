@@ -58,3 +58,19 @@ test("config.json can override/add achievements per id", () => {
   expect(c.achievements?.first_blood?.points).toBe(1); // overridden
   expect(c.achievements?.tooling_up?.points).toBe(10); // other defaults kept
 });
+
+import { DEFAULT_PASSIVE } from "../../core/xp";
+
+test("passive rates default to the built-in set", () => {
+  const c = loadConfig(makeHome());
+  expect(c.passive?.[1]).toBe(0.2);
+  expect(c.passive?.[4]).toBe(0.5);
+});
+
+test("config.json overrides passive rates per tier", () => {
+  const home = makeHome();
+  writeFileSync(join(home, "config.json"), JSON.stringify({ passive: { 1: 0.9 } }));
+  const c = loadConfig(home);
+  expect(c.passive?.[1]).toBe(0.9); // overridden
+  expect(c.passive?.[2]).toBe(DEFAULT_PASSIVE[2]); // default kept
+});

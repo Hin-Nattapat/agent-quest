@@ -76,8 +76,11 @@ function status(profile: IProfile): string {
   const affinity = state.class?.affinity ?? {};
   const suggested = Object.entries(affinity).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
   const bars = LINES.map(l => `${l} ${Math.round((affinity[l] ?? 0) * 100)}%`).join("  ");
+  const form = state.class?.form ?? "Novice";
+  const pct = Math.round((state.class?.base_passive_pct ?? 0) * 100);
   return (
-    `${profile.name ?? "Adventurer"} · ${state.class?.form ?? "Novice"}  (Lv.${state.level})\n` +
+    `${profile.name ?? "Adventurer"} · ${form}  (Lv.${state.level})\n` +
+    `passive: +${pct}% (${form})\n` +
     `affinity: ${bars}\nsuggested line: ${suggested}`
   );
 }

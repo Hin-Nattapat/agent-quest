@@ -36,3 +36,14 @@ test("file extensions route edits to the right line", () => {
   expect(a.mage).toBeCloseTo(0.5);
   expect(a.sage).toBeCloseTo(0.5);
 });
+
+import { lineForEvent } from "../../core/affinity";
+import { ClassLine } from "../../core/classes";
+
+test("lineForEvent maps an event to its line (or null)", () => {
+  expect(lineForEvent(ev({ type: "action", action: "run" }))).toBe(ClassLine.Mage);
+  expect(lineForEvent(ev({ type: "action", action: "edit", file: "a.tsx" }))).toBe(
+    ClassLine.Ranger,
+  );
+  expect(lineForEvent(ev({ type: "prompt" }))).toBe(null);
+});

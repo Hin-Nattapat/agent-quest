@@ -74,3 +74,12 @@ test("config.json overrides passive rates per tier", () => {
   expect(c.passive?.[1]).toBe(0.9); // overridden
   expect(c.passive?.[2]).toBe(DEFAULT_PASSIVE[2]); // default kept
 });
+
+import { LOOT_TABLE, DROP_TABLES } from "../../core/loot";
+
+test("loot table and drop tables default to the built-in sets", () => {
+  const c = loadConfig(makeHome());
+  expect(c.loot?.rookie_title?.name).toBe("Rookie");
+  expect(Object.keys(c.loot ?? {}).length).toBe(Object.keys(LOOT_TABLE).length);
+  expect(c.drops?.streak100?.[0]?.rarity).toBe(DROP_TABLES.streak100[0].rarity);
+});

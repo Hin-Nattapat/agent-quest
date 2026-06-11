@@ -15,6 +15,13 @@ import {
   advancementPending,
   type IClassState,
 } from "./classes";
+import {
+  rollInventory,
+  resolveCosmetics,
+  LOOT_TABLE,
+  DROP_TABLES,
+  type ITrigger,
+} from "./loot";
 import { type IState, type IGroupStat } from "./state";
 
 export type TReducedState = Omit<IState, "updated_at">;
@@ -63,6 +70,7 @@ export function reduce(
   const bySource: Record<string, IGroupAcc> = {};
   const byRepo: Record<string, IGroupAcc> = {};
   const dates = new Set<string>();
+  const sessionInfo: Record<string, { hasFail: boolean; hasEnd: boolean }> = {};
 
   const line = profile?.line ?? null;
   const sorted = [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts));
@@ -78,6 +86,15 @@ export function reduce(
 
     sessions.add(e.session_id);
     dates.add(eventLocalDate(e.ts));
+    if (!sessionInfo[e.session_id]) {
+      sessionInfo[e.session_id] = { hasFail: false, hasEnd: false };
+    }
+    if (e.type === EventType.ActionFail) {
+      sessionInfo[e.session_id].hasFail = true;
+    }
+    if (e.type === EventType.SessionEnd) {
+      sessionInfo[e.session_id].hasEnd = true;
+    }
     if (e.type === EventType.Prompt) {
       prompts++;
     }
@@ -107,6 +124,28 @@ export function reduce(
     base_passive_pct: basePct(classTier, config.passive),
   };
 
+  const lootTable = config.loot ?? LOOT_TABLE;
+  const triggers: ITrigger[] = [];
+  for (const [sid, info] of Object.entries(sessionInfo)) {
+    if (info.hasEnd && !info.hasFail) {
+      triggers.push({ table: "clean", seed: `clean:${sid}` });
+    }
+  }
+  for (let lvl = 2; lvl <= prog.level; lvl++) {
+    triggers.push({ table: "levelup", seed: `level:${lvl}` });
+  }
+  if (streak.best_days >= 7) {
+    triggers.push({ table: "streak7", seed: "streak:7" });
+  }
+  if (streak.best_days >= 30) {
+    triggers.push({ table: "streak30", seed: "streak:30" });
+  }
+  if (streak.best_days >= 100) {
+    triggers.push({ table: "streak100", seed: "streak:100" });
+  }
+  const inventory = rollInventory(triggers, lootTable, config.drops ?? DROP_TABLES);
+  const cosmetics = resolveCosmetics(profile ?? {}, inventory, lootTable);
+
   const prelim: TReducedState = {
     version: 1,
     xp_total,
@@ -122,6 +161,8 @@ export function reduce(
     },
     streak,
     class: classState,
+    inventory,
+    cosmetics,
   };
   if (profile?.name) {
     prelim.name = profile.name;

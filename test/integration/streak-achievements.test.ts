@@ -11,8 +11,10 @@ test("journal -> reduceToFile -> state has streak+achievements; HUD shows fire",
   mkdirSync(dir, { recursive: true });
   // one action today -> first_blood; today's activity -> current streak >= 1
   const today = new Date().toISOString().slice(0, 10);
-  writeFileSync(join(dir, "s.ndjson"),
-    `{"ts":"${today}T12:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}\n`);
+  writeFileSync(
+    join(dir, "s.ndjson"),
+    `{"ts":"${today}T12:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"edit","repo":"cq"}\n`,
+  );
 
   const state = reduceToFile(home);
   expect(state.achievements?.earned).toContain("first_blood");

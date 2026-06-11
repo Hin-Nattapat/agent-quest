@@ -13,16 +13,19 @@ test("missing config.json yields defaults", () => {
 
 test("config.json overrides merge over defaults", () => {
   const home = makeHome();
-  writeFileSync(join(home, "config.json"), JSON.stringify({
-    xp: { weights: { prompt: 9, actions: { edit: 99 } } },
-    difficulty: { level_cap: 60 },
-  }));
+  writeFileSync(
+    join(home, "config.json"),
+    JSON.stringify({
+      xp: { weights: { prompt: 9, actions: { edit: 99 } } },
+      difficulty: { level_cap: 60 },
+    }),
+  );
   const c = loadConfig(home);
-  expect(c.weights.prompt).toBe(9);                 // overridden
-  expect(c.weights.actions.edit).toBe(99);          // nested override
+  expect(c.weights.prompt).toBe(9); // overridden
+  expect(c.weights.actions.edit).toBe(99); // nested override
   expect(c.weights.actions.run).toBe(DEFAULT_WEIGHTS.actions.run); // untouched default kept
   expect(c.difficulty.level_cap).toBe(60);
-  expect(c.difficulty.curve_k).toBe(7);             // untouched default kept
+  expect(c.difficulty.curve_k).toBe(7); // untouched default kept
 });
 
 test("invalid config.json falls back to defaults", () => {
@@ -36,15 +39,22 @@ import { DEFAULT_ACHIEVEMENTS } from "../../core/achievements";
 test("achievements default to the built-in registry", () => {
   const c = loadConfig(makeHome());
   expect(c.achievements?.first_blood?.points).toBe(5);
-  expect(Object.keys(c.achievements ?? {}).length).toBe(Object.keys(DEFAULT_ACHIEVEMENTS).length);
+  expect(Object.keys(c.achievements ?? {}).length).toBe(
+    Object.keys(DEFAULT_ACHIEVEMENTS).length,
+  );
 });
 
 test("config.json can override/add achievements per id", () => {
   const home = makeHome();
-  writeFileSync(join(home, "config.json"), JSON.stringify({
-    achievements: { first_blood: { name: "X", desc: "", cond: { stat: "level", gte: 99 }, points: 1 } },
-  }));
+  writeFileSync(
+    join(home, "config.json"),
+    JSON.stringify({
+      achievements: {
+        first_blood: { name: "X", desc: "", cond: { stat: "level", gte: 99 }, points: 1 },
+      },
+    }),
+  );
   const c = loadConfig(home);
-  expect(c.achievements?.first_blood?.points).toBe(1);          // overridden
-  expect(c.achievements?.tooling_up?.points).toBe(10);          // other defaults kept
+  expect(c.achievements?.first_blood?.points).toBe(1); // overridden
+  expect(c.achievements?.tooling_up?.points).toBe(10); // other defaults kept
 });

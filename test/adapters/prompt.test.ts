@@ -4,8 +4,11 @@ import { runHook, journalLines, makeHome, basename } from "../helpers";
 test("on-prompt emits a prompt event, exit 0, no stdout", async () => {
   const home = makeHome();
   const cwd = "/tmp/cq-test-proj"; // non-git -> repo falls back to basename
-  const { code, stdout } = await runHook("on-prompt.sh",
-    { session_id: "p1", cwd, hook_event_name: "UserPromptSubmit", prompt: "hi" }, home);
+  const { code, stdout } = await runHook(
+    "on-prompt.sh",
+    { session_id: "p1", cwd, hook_event_name: "UserPromptSubmit", prompt: "hi" },
+    home,
+  );
 
   expect(code).toBe(0);
   expect(stdout).toBe(""); // safety: never write to stdout

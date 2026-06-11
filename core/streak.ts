@@ -30,7 +30,9 @@ function isNextDay(earlier: string, later: string): boolean {
 // `today` defaults to the last active day (so a clock-free call treats the streak as alive).
 export function computeStreak(dateKeys: string[], today?: string): IStreak {
   const days = [...new Set(dateKeys)].sort();
-  if (days.length === 0) return { current_days: 0, best_days: 0, last_active: "" };
+  if (days.length === 0) {
+    return { current_days: 0, best_days: 0, last_active: "" };
+  }
 
   let bestRun = 1;
   let run = 1;

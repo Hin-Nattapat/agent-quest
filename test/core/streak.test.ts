@@ -12,15 +12,22 @@ test("active yesterday (gap 1) keeps the streak alive", () => {
 });
 
 test("a gap > 1 day breaks current but best survives", () => {
-  const s = computeStreak(["2026-06-01", "2026-06-02", "2026-06-03", "2026-06-10", "2026-06-11"], "2026-06-15");
-  expect(s.best_days).toBe(3);     // 01-03
-  expect(s.current_days).toBe(0);  // last active 06-11, today 06-15 -> broken
+  const s = computeStreak(
+    ["2026-06-01", "2026-06-02", "2026-06-03", "2026-06-10", "2026-06-11"],
+    "2026-06-15",
+  );
+  expect(s.best_days).toBe(3); // 01-03
+  expect(s.current_days).toBe(0); // last active 06-11, today 06-15 -> broken
   expect(s.last_active).toBe("2026-06-11");
 });
 
 test("duplicates are collapsed; empty input is zero", () => {
   expect(computeStreak(["2026-06-11", "2026-06-11"], "2026-06-11").current_days).toBe(1);
-  expect(computeStreak([], "2026-06-11")).toEqual({ current_days: 0, best_days: 0, last_active: "" });
+  expect(computeStreak([], "2026-06-11")).toEqual({
+    current_days: 0,
+    best_days: 0,
+    last_active: "",
+  });
 });
 
 test("eventLocalDate returns a YYYY-MM-DD key", () => {

@@ -24,17 +24,17 @@ export enum AgentAction {
 }
 
 export interface INormalizedEvent {
-  ts: string;              // UTC ISO8601, second precision
-  source: string;          // adapter id, e.g. "claude-code"
+  ts: string; // UTC ISO8601, second precision
+  source: string; // adapter id, e.g. "claude-code"
   session_id: string;
   type: EventType;
-  repo?: string;           // present on every line when determinable
-  action?: AgentAction;    // type=action/action_fail only
-  native?: string;         // raw tool name, type=action/action_fail only
-  file?: string;           // optional
-  cwd?: string;            // session_start only
-  start?: string;          // session_start only: startup|resume|clear|compact
-  model?: string;          // session_start only
+  repo?: string; // present on every line when determinable
+  action?: AgentAction; // type=action/action_fail only
+  native?: string; // raw tool name, type=action/action_fail only
+  file?: string; // optional
+  cwd?: string; // session_start only
+  start?: string; // session_start only: startup|resume|clear|compact
+  model?: string; // session_start only
 }
 
 export function isNormalizedEvent(o: unknown): o is INormalizedEvent {

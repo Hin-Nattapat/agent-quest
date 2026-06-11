@@ -17,7 +17,7 @@ agents ──(adapters)──► append-only journal (NDJSON) ──(reducer)─
 ## 2. Dependencies
 
 - **Runtime deps = `jq` + `bun` only.** No runtime npm packages.
-- **Type-only devDependencies are allowed** for editor DX (`@types/bun`, `@types/node`). They never affect runtime or the `install.sh` deploy.
+- **Dev-only tooling is allowed** as `devDependencies` — types for editor DX (`@types/bun`, `@types/node`) and formatting (`prettier`). None of it affects runtime or the `install.sh` deploy.
 
 ## 3. TypeScript
 
@@ -26,6 +26,9 @@ agents ──(adapters)──► append-only journal (NDJSON) ──(reducer)─
 - **Type prefixes:** `interface I*` for object/shape types (`INormalizedEvent`); `type T*` for unions/aliases/entities.
 - **No `any`.** Use `unknown` + a type guard, or define the proper type.
 - **Clarity over cleverness.** Readability is the priority. Name intermediate values and extract a small, well-named helper instead of dense assign-in-expression bookkeeping (e.g. `(m[k] ??= {...}).x += v` inside a larger statement). Prefer focused functions over clever one-liners.
+- **Braces on every `if`/`else`** — including single-statement and guard clauses. No brace-less `if (x) return y;`.
+- **No clever/nested/multi-line ternaries.** A ternary is only for a *simple* one-line value (`cost == null ? "0.00" : cost`). Anything that spans lines or branches non-trivially is an `if`/`else`.
+- **Formatting = Prettier.** Config in `.prettierrc` (from `klang-web`). Run `bun run format` (or `format:check` in CI). Prettier owns whitespace; the braces/ternary rules above are yours to keep.
 - **kebab-case** for all file names (`events.ts`, `on-tool.sh`).
 
 ## 4. Hook scripts (bash + jq) — safety (non-negotiable)

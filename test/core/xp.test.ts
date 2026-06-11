@@ -1,8 +1,16 @@
 import { test, expect } from "bun:test";
-import { xpFor, xpForLevel, levelFor, levelProgress, DEFAULT_WEIGHTS, DEFAULT_DIFFICULTY } from "../../core/xp";
+import {
+  xpFor,
+  xpForLevel,
+  levelFor,
+  levelProgress,
+  DEFAULT_WEIGHTS,
+  DEFAULT_DIFFICULTY,
+} from "../../core/xp";
 import { EventType, AgentAction } from "../../core/events";
 
-const ev = (o: object) => ({ ts: "t", source: "claude-code", session_id: "s", ...o }) as any;
+const ev = (o: object) =>
+  ({ ts: "t", source: "claude-code", session_id: "s", ...o }) as any;
 
 test("xpFor maps events to weights; session_start/action_fail = 0", () => {
   expect(xpFor(ev({ type: EventType.Prompt }))).toBe(5);

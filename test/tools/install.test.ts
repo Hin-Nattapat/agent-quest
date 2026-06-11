@@ -8,7 +8,8 @@ const INSTALL = new URL("../../tools/install.sh", import.meta.url).pathname;
 async function runInstall(home: string, args: string[]) {
   const proc = Bun.spawn(["bash", INSTALL, ...args], {
     env: { ...process.env, AGENTRPG_HOME: home },
-    stdout: "pipe", stderr: "pipe",
+    stdout: "pipe",
+    stderr: "pipe",
   });
   const stdout = await new Response(proc.stdout).text();
   const code = await proc.exited;

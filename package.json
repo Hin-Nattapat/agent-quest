@@ -3,10 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "bun test"
+    "test": "bun test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@types/bun": "^1.3.14",
-    "@types/node": "^25.9.2"
+    "@types/node": "^25.9.2",
+    "prettier": "^3.8.4"
   }
 }

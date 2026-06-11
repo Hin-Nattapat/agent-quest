@@ -22,3 +22,8 @@ test("commands point at the hooks/ scripts under ~/.agentrpg", () => {
   const cmd = snippet.hooks.PostToolUse[0].hooks[0].command;
   expect(cmd).toBe("~/.agentrpg/adapters/claude-code/hooks/on-tool.sh");
 });
+
+test("declares a statusLine pointing at the deployed statusline.ts", () => {
+  expect(snippet.statusLine.type).toBe("command");
+  expect(snippet.statusLine.command).toBe("bun ~/.agentrpg/hud/statusline.ts");
+});

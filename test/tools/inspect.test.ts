@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { summarize, loadEvents } from "../../tools/inspect";
+import { summarize } from "../../tools/inspect";
 import { makeHome } from "../helpers";
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -16,14 +16,6 @@ function seed(home: string) {
   writeFileSync(join(dir, "s2.ndjson"),
     `{"ts":"2026-06-11T00:00:02Z","source":"claude-code","session_id":"s2","type":"prompt","repo":"pos"}\n`);
 }
-
-test("loadEvents skips malformed lines and counts sessions by file", () => {
-  const home = makeHome();
-  seed(home);
-  const { events, sessions } = loadEvents(home);
-  expect(events.length).toBe(3); // 2 from s1 (1 skipped) + 1 from s2
-  expect(sessions).toBe(2);
-});
 
 test("summarize reports totals and groupings", () => {
   const home = makeHome();

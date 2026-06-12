@@ -1,5 +1,5 @@
 import type { IStreak } from "./streak";
-import type { IClassState } from "./classes";
+import type { IClassState, SecretLine } from "./classes";
 import type { IInventoryItem, ICosmetics } from "./loot";
 
 export interface IGroupStat {
@@ -26,6 +26,9 @@ export interface IState {
     sessions: number;
     by_source: Record<string, IGroupStat>;
     by_repo: Record<string, IGroupStat>;
+    night_actions?: number;
+    failures_recovered?: number;
+    ascetic_seal?: number;
   };
   streak?: IStreak;
   achievements?: IAchievementsState;
@@ -33,4 +36,5 @@ export interface IState {
   class?: IClassState;
   inventory?: IInventoryItem[];
   cosmetics?: ICosmetics;
+  unlocked_secret_classes?: SecretLine[];
 }

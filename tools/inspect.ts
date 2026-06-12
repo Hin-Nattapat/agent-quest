@@ -3,6 +3,7 @@ import { type INormalizedEvent } from "../core/events";
 import { loadEvents } from "../core/journal";
 import { reduce } from "../core/reduce";
 import { loadConfig, defaultHome } from "../core/config";
+import { loadProfile } from "../core/profile";
 import { localTodayKey } from "../core/streak";
 
 const HOME = defaultHome();
@@ -30,7 +31,7 @@ function fmt(m: Record<string, number>): string {
 
 export function summarize(home: string): string {
   const { events, sessions } = loadEvents(home);
-  const s = reduce(events, loadConfig(home), localTodayKey());
+  const s = reduce(events, loadConfig(home), localTodayKey(), loadProfile(home));
   const streak = s.streak
     ? `${s.streak.current_days}d (best ${s.streak.best_days})`
     : "0d";

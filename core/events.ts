@@ -23,6 +23,19 @@ export enum AgentAction {
   Other = "other",
 }
 
+export enum CmdTag {
+  GitRebaseOnto = "git_rebase_onto",
+  GitRebaseI = "git_rebase_i",
+  CherryPick = "cherry_pick",
+  ForcePush = "force_push",
+  Bisect = "bisect",
+  Reflog = "reflog",
+  Stash = "stash",
+  PrMerge = "pr_merge",
+  Cowboy = "cowboy",
+  TestRun = "test_run",
+}
+
 export interface INormalizedEvent {
   ts: string; // UTC ISO8601, second precision
   source: string; // adapter id, e.g. "claude-code"
@@ -31,6 +44,7 @@ export interface INormalizedEvent {
   repo?: string; // present on every line when determinable
   action?: AgentAction; // type=action/action_fail only
   native?: string; // raw tool name, type=action/action_fail only
+  cmd?: CmdTag; // type=action/action_fail Bash only — a safe classification, never the raw command
   file?: string; // optional
   cwd?: string; // session_start only
   start?: string; // session_start only: startup|resume|clear|compact

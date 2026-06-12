@@ -155,3 +155,17 @@ test("night_owl / the_gremlin / the_ascetic read the new signals", () => {
   });
   expect(evaluateAchievements(asc, reg).earned).toContain("the_ascetic");
 });
+
+test("a deed earns at its cmd_* threshold", () => {
+  const reg = DEFAULT_ACHIEVEMENTS;
+  const withCmds = (cmds: Record<string, number>) =>
+    baseState({
+      stats: { prompts: 0, actions: {}, sessions: 0, by_source: {}, by_repo: {}, cmds },
+    });
+  expect(evaluateAchievements(withCmds({ reflog: 1 }), reg).earned).toContain("undying");
+  expect(evaluateAchievements(withCmds({ stash: 19 }), reg).earned).not.toContain(
+    "hoarder",
+  );
+  expect(evaluateAchievements(withCmds({ stash: 20 }), reg).earned).toContain("hoarder");
+  expect(reg.timebender.reward?.title).toBe("the Timebender");
+});

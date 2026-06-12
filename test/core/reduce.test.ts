@@ -274,3 +274,39 @@ test("failures_recovered counts a fail then a same-kind success in one session",
   const s = reduce(evs, microCfg, "2026-06-11");
   expect(s.stats.failures_recovered).toBe(1);
 });
+
+test("the fold tallies cmd tags and a single rebase --onto earns Threads of Fate", () => {
+  const cfg = loadConfig(makeHome());
+  const evs = [
+    {
+      ts: "2026-06-11T12:00:00Z",
+      source: "claude-code",
+      session_id: "s",
+      type: "action",
+      action: "run",
+      repo: "cq",
+      cmd: "git_rebase_onto",
+    },
+    {
+      ts: "2026-06-11T12:00:01Z",
+      source: "claude-code",
+      session_id: "s",
+      type: "action",
+      action: "run",
+      repo: "cq",
+      cmd: "test_run",
+    },
+    {
+      ts: "2026-06-11T12:00:02Z",
+      source: "claude-code",
+      session_id: "s",
+      type: "action",
+      action: "run",
+      repo: "cq",
+      cmd: "test_run",
+    },
+  ] as any;
+  const s = reduce(evs, cfg, "2026-06-11");
+  expect(s.stats.cmds).toEqual({ git_rebase_onto: 1, test_run: 2 });
+  expect(s.achievements?.earned).toContain("timebender");
+});

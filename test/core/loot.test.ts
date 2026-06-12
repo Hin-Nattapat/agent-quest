@@ -40,3 +40,11 @@ test("resolveCosmetics maps owned equips, ignores unowned/wrong-kind", () => {
   expect(resolveCosmetics({ title: "archmage_title" }, inv).title).toBe(null); // not owned
   expect(resolveCosmetics({ title: "neon_theme" }, inv).title).toBe(null); // wrong kind
 });
+
+test("resolveCosmetics resolves an earned-achievement title; loot title still wins", () => {
+  const inv = [{ id: "rookie_title", rarity: Rarity.Common, count: 1 }];
+  const earned = { undying: "the Undying" };
+  expect(resolveCosmetics({ title: "undying" }, [], earned).title).toBe("the Undying");
+  expect(resolveCosmetics({ title: "undying" }, [], {}).title).toBe(null);
+  expect(resolveCosmetics({ title: "rookie_title" }, inv, earned).title).toBe("Rookie");
+});

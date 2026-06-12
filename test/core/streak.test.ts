@@ -33,3 +33,14 @@ test("duplicates are collapsed; empty input is zero", () => {
 test("eventLocalDate returns a YYYY-MM-DD key", () => {
   expect(eventLocalDate("2026-06-11T12:00:00Z")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 });
+
+import { eventLocalHour, isNight } from "../../core/streak";
+
+test("isNight covers local 00:00–03:59 only", () => {
+  const at = (h: number) => `2026-06-11T${String(h).padStart(2, "0")}:30:00`;
+  expect(isNight(at(0))).toBe(true);
+  expect(isNight(at(3))).toBe(true);
+  expect(isNight(at(4))).toBe(false);
+  expect(isNight(at(13))).toBe(false);
+  expect(eventLocalHour(at(2))).toBe(2);
+});

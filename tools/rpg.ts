@@ -2,11 +2,18 @@
 import { defaultHome, loadConfig } from "../core/config";
 import { loadProfile, saveProfile, type IProfile } from "../core/profile";
 import { reduceToFile } from "../core/reduce";
-import { ClassLine, CLASS_TREE } from "../core/classes";
+import {
+  ClassLine,
+  SecretLine,
+  CLASS_TREE,
+  SECRET_TREE,
+  isSecret,
+} from "../core/classes";
 import { LOOT_TABLE, LootKind } from "../core/loot";
 
 const HOME = defaultHome();
 const LINES = Object.values(ClassLine) as string[];
+const SECRETS = Object.values(SecretLine) as string[];
 
 function fail(message: string): never {
   process.stderr.write(message + "\n");
@@ -29,16 +36,26 @@ function setName(profile: IProfile, name: string): string {
 }
 
 function setClass(profile: IProfile, line: string): string {
-  if (!LINES.includes(line)) {
-    fail(`Unknown class "${line}". Choose: ${LINES.join(", ")}.`);
+  if (LINES.includes(line)) {
+    if (currentLevel() < 5) {
+      fail("Reach level 5 before choosing a class.");
+    }
+    profile.line = line as ClassLine;
+    profile.branch = undefined;
+    persist(profile);
+    return `Class set to ${line}.`;
   }
-  if (currentLevel() < 5) {
-    fail("Reach level 5 before choosing a class.");
+  if (SECRETS.includes(line)) {
+    const unlocked = reduceToFile(HOME).unlocked_secret_classes ?? [];
+    if (!unlocked.includes(line as SecretLine)) {
+      fail(`Secret class "${line}" is locked.`);
+    }
+    profile.line = line as SecretLine;
+    profile.branch = undefined;
+    persist(profile);
+    return `Class set to ${line}.`;
   }
-  profile.line = line as ClassLine;
-  profile.branch = undefined;
-  persist(profile);
-  return `Class set to ${line}.`;
+  fail(`Unknown class "${line}". Choose: ${LINES.join(", ")}.`);
 }
 
 function setBranch(profile: IProfile, branch: string): string {
@@ -47,6 +64,9 @@ function setBranch(profile: IProfile, branch: string): string {
   }
   if (!profile.line) {
     fail("Choose a class first.");
+  }
+  if (isSecret(profile.line)) {
+    fail("Secret classes have no branch.");
   }
   if (currentLevel() < 50) {
     fail("Reach level 50 before branching.");
@@ -119,6 +139,33 @@ function equip(profile: IProfile, kind: LootKind, id: string): string {
   return `Equipped ${kind}: ${item.name}.`;
 }
 
+function secrets(): string {
+  const unlocked = new Set(
+    (reduceToFile(HOME).unlocked_secret_classes ?? []) as string[],
+  );
+  const registry = loadConfig(HOME).achievements ?? {};
+  const hint: Record<string, string> = {
+    [SecretLine.Trickster]: "whispered, not earned",
+  };
+  for (const def of Object.values(registry)) {
+    if (def.reward?.unlocks_class) {
+      hint[def.reward.unlocks_class] = def.desc;
+    }
+  }
+  return SECRETS.map(s => {
+    if (unlocked.has(s)) {
+      return `${SECRET_TREE[s as SecretLine].icon} ${s} — UNLOCKED`;
+    }
+    return `??? — ${hint[s] ?? "hidden"}`;
+  }).join("\n");
+}
+
+function xyzzy(profile: IProfile): string {
+  profile.xyzzy = true;
+  persist(profile);
+  return "A hollow voice says 'Fool.'  ✦ The Trickster is yours — `rpg class trickster`.";
+}
+
 function main(): void {
   const [cmd, ...args] = process.argv.slice(2);
   const profile = loadProfile(HOME);
@@ -148,8 +195,16 @@ function main(): void {
     case "theme":
       out = equip(profile, LootKind.Theme, args[0] ?? "");
       break;
+    case "secrets":
+      out = secrets();
+      break;
+    case "xyzzy":
+      out = xyzzy(profile);
+      break;
     default:
-      fail("Usage: rpg <name|class|branch|respec|status|inventory|title|theme> …");
+      fail(
+        "Usage: rpg <name|class|branch|respec|status|inventory|title|theme|secrets|xyzzy> …",
+      );
   }
   console.log(out);
 }

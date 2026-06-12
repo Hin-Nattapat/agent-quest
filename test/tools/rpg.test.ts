@@ -134,3 +134,21 @@ test("equipping an owned item succeeds; an unowned one errors", async () => {
   const bad = await rpg(home, "title", unowned);
   expect(bad.code).toBe(1);
 });
+
+test("a locked secret class is rejected; xyzzy unlocks the Trickster and lets you equip it", async () => {
+  const home = makeHome();
+  seedLevel(home, 60); // Lv.5+
+  const locked = await rpg(home, "class", "maestro");
+  expect(locked.code).toBe(1); // not unlocked
+
+  const egg = await rpg(home, "xyzzy");
+  expect(egg.code).toBe(0);
+  expect(profile(home).xyzzy).toBe(true);
+
+  const sec = await rpg(home, "secrets");
+  expect(sec.stdout).toContain("trickster");
+
+  const equip = await rpg(home, "class", "trickster");
+  expect(equip.code).toBe(0);
+  expect(profile(home).line).toBe("trickster");
+});

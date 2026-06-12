@@ -1,5 +1,9 @@
 import { test, expect } from "bun:test";
-import { evaluateAchievements, type IAchievementDef } from "../../core/achievements";
+import {
+  evaluateAchievements,
+  DEFAULT_ACHIEVEMENTS,
+  type IAchievementDef,
+} from "../../core/achievements";
 import type { IState } from "../../core/state";
 
 const st = (o: Partial<IState>): IState => ({
@@ -45,7 +49,7 @@ const registry: Record<string, IAchievementDef> = {
     desc: "",
     cond: { stat: "level", gte: 5 },
     points: 25,
-    reward: { unlocks_class: "maestro" },
+    reward: { unlocks_class: SecretLine.Maestro },
   },
 };
 
@@ -74,4 +78,80 @@ test("empty/undefined registry is safe", () => {
     points: 0,
     progress: {},
   });
+});
+
+import { SecretLine } from "../../core/classes";
+
+function baseState(over: Partial<any> = {}): any {
+  return {
+    version: 1,
+    xp_total: 0,
+    level: 0,
+    xp_in_level: 0,
+    xp_to_next: 0,
+    stats: { prompts: 0, actions: {}, sessions: 0, by_source: {}, by_repo: {} },
+    ...over,
+  };
+}
+
+test("maestro needs both 3 sources AND level >= 25; one alone is not enough", () => {
+  const reg = DEFAULT_ACHIEVEMENTS;
+  const sources = {
+    by_source: {
+      a: { xp: 1, sessions: 1 },
+      b: { xp: 1, sessions: 1 },
+      c: { xp: 1, sessions: 1 },
+    },
+  };
+  const low = baseState({
+    level: 10,
+    stats: { prompts: 0, actions: {}, sessions: 0, by_repo: {}, ...sources },
+  });
+  const high = baseState({
+    level: 25,
+    stats: { prompts: 0, actions: {}, sessions: 0, by_repo: {}, ...sources },
+  });
+  expect(evaluateAchievements(low, reg).earned).not.toContain("maestro");
+  expect(evaluateAchievements(high, reg).earned).toContain("maestro");
+  expect(reg.maestro.reward?.unlocks_class).toBe(SecretLine.Maestro);
+});
+
+test("night_owl / the_gremlin / the_ascetic read the new signals", () => {
+  const reg = DEFAULT_ACHIEVEMENTS;
+  const owl = baseState({
+    level: 20,
+    stats: {
+      prompts: 0,
+      actions: {},
+      sessions: 0,
+      by_source: {},
+      by_repo: {},
+      night_actions: 60,
+    },
+  });
+  expect(evaluateAchievements(owl, reg).earned).toContain("night_owl");
+  const grem = baseState({
+    level: 20,
+    stats: {
+      prompts: 0,
+      actions: {},
+      sessions: 0,
+      by_source: {},
+      by_repo: {},
+      failures_recovered: 40,
+    },
+  });
+  expect(evaluateAchievements(grem, reg).earned).toContain("the_gremlin");
+  const asc = baseState({
+    level: 25,
+    stats: {
+      prompts: 0,
+      actions: {},
+      sessions: 0,
+      by_source: {},
+      by_repo: {},
+      ascetic_seal: 1,
+    },
+  });
+  expect(evaluateAchievements(asc, reg).earned).toContain("the_ascetic");
 });

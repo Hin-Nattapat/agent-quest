@@ -121,7 +121,43 @@ function inventory(): string {
     .join("\n");
 }
 
+function availableTitles(): { id: string; name: string }[] {
+  const state = reduceToFile(HOME);
+  const table = lootTable();
+  const out: { id: string; name: string }[] = [];
+  for (const item of state.inventory ?? []) {
+    if (table[item.id]?.kind === LootKind.Title) {
+      out.push({ id: item.id, name: table[item.id].name });
+    }
+  }
+  const registry = loadConfig(HOME).achievements ?? {};
+  for (const id of state.achievements?.earned ?? []) {
+    const title = registry[id]?.reward?.title;
+    if (title) {
+      out.push({ id, name: title });
+    }
+  }
+  return out;
+}
+
+function titles(): string {
+  const list = availableTitles();
+  if (list.length === 0) {
+    return "No titles yet.";
+  }
+  return list.map(t => `${t.id}  —  ${t.name}`).join("\n");
+}
+
 function equip(profile: IProfile, kind: LootKind, id: string): string {
+  if (kind === LootKind.Title) {
+    const match = availableTitles().find(t => t.id === id);
+    if (!match) {
+      fail(`Title "${id}" is locked.`);
+    }
+    profile.title = id;
+    persist(profile);
+    return `Equipped title: ${match.name}.`;
+  }
   const item = lootTable()[id];
   if (!item || item.kind !== kind) {
     fail(`Unknown ${kind} "${id}".`);
@@ -130,11 +166,7 @@ function equip(profile: IProfile, kind: LootKind, id: string): string {
   if (!owned.has(id)) {
     fail(`You don't own "${id}".`);
   }
-  if (kind === LootKind.Title) {
-    profile.title = id;
-  } else {
-    profile.theme = id;
-  }
+  profile.theme = id;
   persist(profile);
   return `Equipped ${kind}: ${item.name}.`;
 }
@@ -195,6 +227,9 @@ function main(): void {
     case "theme":
       out = equip(profile, LootKind.Theme, args[0] ?? "");
       break;
+    case "titles":
+      out = titles();
+      break;
     case "secrets":
       out = secrets();
       break;
@@ -203,7 +238,7 @@ function main(): void {
       break;
     default:
       fail(
-        "Usage: rpg <name|class|branch|respec|status|inventory|title|theme|secrets|xyzzy> …",
+        "Usage: rpg <name|class|branch|respec|status|inventory|title|theme|titles|secrets|xyzzy> …",
       );
   }
   console.log(out);

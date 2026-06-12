@@ -29,6 +29,7 @@ export interface IState {
     night_actions?: number;
     failures_recovered?: number;
     ascetic_seal?: number;
+    cmds?: Record<string, number>;
   };
   streak?: IStreak;
   achievements?: IAchievementsState;

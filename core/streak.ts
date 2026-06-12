@@ -18,6 +18,17 @@ export function localTodayKey(): string {
   return dateKeyOf(new Date());
 }
 
+const NIGHT_END_HOUR = 4; // local 00:00–03:59 is "night"
+
+export function eventLocalHour(ts: string): number {
+  return new Date(ts).getHours();
+}
+
+export function isNight(ts: string): boolean {
+  const hour = eventLocalHour(ts);
+  return hour >= 0 && hour < NIGHT_END_HOUR;
+}
+
 // Date key -> whole-day epoch. Parsed as UTC midnight so the run math is TZ-neutral.
 function dayNumber(key: string): number {
   return Date.parse(`${key}T00:00:00Z`) / 86_400_000;

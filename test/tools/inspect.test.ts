@@ -61,3 +61,13 @@ test("headline includes the class form", () => {
   );
   expect(summarize(home)).toContain("(Novice)");
 });
+
+test("headline reflects the equipped class from the profile", () => {
+  const home = makeHome();
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  const prompt = `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"prompt","repo":"cq"}`;
+  writeFileSync(join(dir, "s.ndjson"), Array(60).fill(prompt).join("\n") + "\n"); // -> Lv.5
+  writeFileSync(join(home, "profile.json"), JSON.stringify({ line: "mage" }));
+  expect(summarize(home)).toContain("(Backend Mage)");
+});

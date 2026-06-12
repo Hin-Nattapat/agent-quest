@@ -1,5 +1,6 @@
 import { EventType, AgentAction, type INormalizedEvent } from "./events";
-import { ClassLine } from "./classes";
+import { ClassLine, SecretLine, isSecret, type TLine } from "./classes";
+import { isNight } from "./streak";
 
 const MAGE_EXT = [".go", ".sql", ".rs", ".yaml", ".yml"];
 const RANGER_EXT = [".tsx", ".jsx", ".css", ".scss", ".html", ".vue"];
@@ -63,4 +64,24 @@ export function computeAffinity(events: INormalizedEvent[]): Record<ClassLine, n
     affinity[line] = counts[line] / total;
   }
   return affinity;
+}
+
+// Which events feed a line's base passive. Main lines reuse affinity's signal; secret lines
+// each have a narrow thematic predicate (so a secret is never strictly stronger than a main line).
+export function isPassiveSignal(line: TLine, e: INormalizedEvent): boolean {
+  if (!isSecret(line)) {
+    return lineForEvent(e) === line;
+  }
+  switch (line) {
+    case SecretLine.Maestro:
+      return e.action === AgentAction.Delegate;
+    case SecretLine.NightOwl:
+      return e.type === EventType.Action && isNight(e.ts);
+    case SecretLine.Ascetic:
+      return e.action === AgentAction.Read || e.action === AgentAction.Edit;
+    case SecretLine.Gremlin:
+      return e.type === EventType.ActionFail;
+    case SecretLine.Trickster:
+      return false;
+  }
 }

@@ -208,3 +208,69 @@ test("cosmetics resolve only when the equipped item is owned", () => {
   expect(s.inventory).toEqual([]);
   expect(s.cosmetics?.title).toBe(null);
 });
+
+import { SecretLine } from "../../core/classes";
+import { loadConfig } from "../../core/config";
+import { makeHome } from "../helpers";
+
+const easy = (home: string) => ({
+  ...loadConfig(home),
+  difficulty: { curve_k: 1, curve_exp: 1, level_cap: 50 },
+});
+const act = (i: number, o: object) =>
+  ({
+    ts: `2026-06-11T12:00:00Z`,
+    source: "s",
+    session_id: "sess",
+    type: "action",
+    ...o,
+  }) as any;
+
+test("secret base passive multiplies its thematic signal (Maestro/delegate micro-case)", () => {
+  const maestroEvents = [
+    at("01", { type: "prompt", repo: "cq" }),
+    at("02", { type: "prompt", repo: "cq" }),
+    at("03", { type: "prompt", repo: "cq" }),
+    at("04", { type: "prompt", repo: "cq" }),
+    at("05", { type: "action", action: "delegate", repo: "cq" }),
+    at("06", { type: "action", action: "delegate", repo: "cq" }),
+    at("07", { type: "action", action: "delegate", repo: "cq" }),
+  ];
+  const maestro = reduce(maestroEvents, microCfg, "2026-06-11", {
+    line: SecretLine.Maestro,
+  });
+  expect(maestro.xp_total).toBe(10); // 4 + 2 + 2 + 2 (delegates x2 past Lv.5)
+});
+
+test("earning an unlock achievement fills unlocked_secret_classes; balance gates on level", () => {
+  const cfg = easy(makeHome());
+  const many = Array.from({ length: 30 }, (_, i) =>
+    act(i, { source: `s${i % 3}`, action: "read" }),
+  );
+  const hi = reduce(many, cfg, "2026-06-11");
+  expect(hi.unlocked_secret_classes).toContain(SecretLine.Maestro);
+  const few = Array.from({ length: 3 }, (_, i) =>
+    act(i, { source: `s${i}`, action: "read" }),
+  );
+  expect(reduce(few, cfg, "2026-06-11").unlocked_secret_classes ?? []).not.toContain(
+    SecretLine.Maestro,
+  );
+});
+
+test("xyzzy unlocks the Trickster; unlocks are stable on recompute", () => {
+  const cfg = loadConfig(makeHome());
+  const a = reduce(microEvents, cfg, "2026-06-11", { xyzzy: true });
+  const b = reduce(microEvents, cfg, "2026-06-11", { xyzzy: true });
+  expect(a.unlocked_secret_classes).toContain(SecretLine.Trickster);
+  expect(b.unlocked_secret_classes).toEqual(a.unlocked_secret_classes);
+});
+
+test("failures_recovered counts a fail then a same-kind success in one session", () => {
+  const evs = [
+    act(0, { type: "action_fail", action: "run", session_id: "x" }),
+    act(1, { type: "action", action: "run", session_id: "x" }),
+    act(2, { type: "action_fail", action: "edit", session_id: "x" }),
+  ];
+  const s = reduce(evs, microCfg, "2026-06-11");
+  expect(s.stats.failures_recovered).toBe(1);
+});

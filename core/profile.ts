@@ -1,13 +1,14 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
-import type { ClassLine } from "./classes";
+import type { TLine } from "./classes";
 
 export interface IProfile {
   name?: string;
-  line?: ClassLine;
+  line?: TLine;
   branch?: "a" | "b";
   title?: string;
   theme?: string;
+  xyzzy?: boolean;
 }
 
 export function loadProfile(home: string): IProfile {

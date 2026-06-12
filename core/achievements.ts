@@ -1,4 +1,5 @@
 import type { IState, IAchievementsState } from "./state";
+import { SecretLine } from "./classes";
 
 export type TCond =
   | { stat: string; gte?: number; lt?: number }
@@ -11,7 +12,7 @@ export interface IAchievementDef {
   desc: string;
   cond: TCond;
   points: number;
-  reward?: { title?: string; loot_roll?: string; unlocks_class?: string };
+  reward?: { title?: string; loot_roll?: string; unlocks_class?: SecretLine };
   hidden?: boolean;
 }
 
@@ -36,6 +37,9 @@ function facts(state: TStateLike): TFacts {
     streak_best: state.streak?.best_days ?? 0,
     distinct_source: Object.keys(state.stats.by_source).length,
     distinct_repo: Object.keys(state.stats.by_repo).length,
+    night_actions: state.stats.night_actions ?? 0,
+    failures_recovered: state.stats.failures_recovered ?? 0,
+    ascetic_seal: state.stats.ascetic_seal ?? 0,
   };
 }
 
@@ -267,5 +271,52 @@ export const DEFAULT_ACHIEVEMENTS: Record<string, IAchievementDef> = {
     },
     points: 20,
     reward: { title: "Manager" },
+  },
+  maestro: {
+    name: "Maestro",
+    desc: "Conduct 3+ agent sources at high level",
+    cond: {
+      all: [
+        { distinct: "source", gte: 3 },
+        { stat: "level", gte: 25 },
+      ],
+    },
+    points: 30,
+    hidden: true,
+    reward: { unlocks_class: SecretLine.Maestro },
+  },
+  night_owl: {
+    name: "Night Owl",
+    desc: "60 actions in the dead of night (local 00–04)",
+    cond: {
+      all: [
+        { stat: "night_actions", gte: 60 },
+        { stat: "level", gte: 20 },
+      ],
+    },
+    points: 25,
+    hidden: true,
+    reward: { unlocks_class: SecretLine.NightOwl },
+  },
+  the_ascetic: {
+    name: "The Ascetic",
+    desc: "Reach Lv.25 as a minimalist — under 20% shell runs",
+    cond: { stat: "ascetic_seal", gte: 1 },
+    points: 30,
+    hidden: true,
+    reward: { unlocks_class: SecretLine.Ascetic },
+  },
+  the_gremlin: {
+    name: "The Gremlin",
+    desc: "Recover from 40 failed actions",
+    cond: {
+      all: [
+        { stat: "failures_recovered", gte: 40 },
+        { stat: "level", gte: 20 },
+      ],
+    },
+    points: 25,
+    hidden: true,
+    reward: { unlocks_class: SecretLine.Gremlin },
   },
 };

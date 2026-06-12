@@ -1,18 +1,19 @@
 import { writeFileSync, renameSync, existsSync, statSync } from "fs";
 import { join } from "path";
-import { EventType, type INormalizedEvent } from "./events";
+import { EventType, AgentAction, type INormalizedEvent } from "./events";
 import { xpFor, levelProgress, levelFor, basePct } from "./xp";
 import { loadConfig, type IConfig } from "./config";
 import { loadEvents } from "./journal";
-import { eventLocalDate, computeStreak, localTodayKey } from "./streak";
-import { evaluateAchievements } from "./achievements";
-import { computeAffinity, lineForEvent } from "./affinity";
+import { eventLocalDate, computeStreak, localTodayKey, isNight } from "./streak";
+import { evaluateAchievements, type IAchievementDef } from "./achievements";
+import { computeAffinity, isPassiveSignal } from "./affinity";
 import { loadProfile, type IProfile } from "./profile";
 import {
   tierForLevel,
   formFor,
   iconFor,
   advancementPending,
+  SecretLine,
   type IClassState,
 } from "./classes";
 import {
@@ -58,6 +59,27 @@ function tsOrder(ts: string): number {
   return Date.parse(ts) || 0;
 }
 
+const ASCETIC_LEVEL = 25;
+const ASCETIC_MAX_RUN_RATIO = 0.2;
+
+function collectUnlocks(
+  earned: string[],
+  registry: Record<string, IAchievementDef>,
+  profile?: IProfile,
+): SecretLine[] {
+  const set = new Set<SecretLine>();
+  for (const id of earned) {
+    const unlock = registry[id]?.reward?.unlocks_class;
+    if (unlock) {
+      set.add(unlock);
+    }
+  }
+  if (profile?.xyzzy) {
+    set.add(SecretLine.Trickster);
+  }
+  return [...set].sort();
+}
+
 export function reduce(
   events: INormalizedEvent[],
   config: IConfig,
@@ -71,6 +93,12 @@ export function reduce(
   const byRepo: Record<string, IGroupAcc> = {};
   const dates = new Set<string>();
   const sessionInfo: Record<string, { hasFail: boolean; hasEnd: boolean }> = {};
+  let nightActions = 0;
+  let failuresRecovered = 0;
+  let asceticSeal = 0;
+  let runningRuns = 0;
+  let runningActions = 0;
+  const pendingFail = new Set<string>();
 
   const line = profile?.line ?? null;
   const sorted = [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts));
@@ -79,7 +107,7 @@ export function reduce(
     const base = xpFor(e, config.weights);
     const level = levelFor(running, config.difficulty); // from XP accrued so far (causal)
     const tier = line != null && level >= 5 ? tierForLevel(level) : 0;
-    const isSignal = line != null && lineForEvent(e) === line;
+    const isSignal = line != null && isPassiveSignal(line, e);
     const mult = isSignal && tier >= 1 ? 1 + basePct(tier, config.passive) : 1;
     const gained = base * mult;
     running += gained;
@@ -100,6 +128,34 @@ export function reduce(
     }
     if (e.type === EventType.Action && e.action) {
       actions[e.action] = (actions[e.action] ?? 0) + 1;
+    }
+    if (e.type === EventType.Action || e.type === EventType.ActionFail) {
+      if (isNight(e.ts)) {
+        nightActions++;
+      }
+    }
+    if (e.type === EventType.Action && e.action) {
+      runningActions++;
+      if (e.action === AgentAction.Run) {
+        runningRuns++;
+      }
+      const key = `${e.session_id}:${e.action}`;
+      if (pendingFail.has(key)) {
+        failuresRecovered++;
+        pendingFail.delete(key);
+      }
+    }
+    if (e.type === EventType.ActionFail && e.action) {
+      pendingFail.add(`${e.session_id}:${e.action}`);
+    }
+    if (asceticSeal === 0 && runningActions > 0) {
+      const lvlNow = levelFor(running, config.difficulty);
+      if (
+        lvlNow >= ASCETIC_LEVEL &&
+        runningRuns / runningActions < ASCETIC_MAX_RUN_RATIO
+      ) {
+        asceticSeal = 1;
+      }
     }
     tally(bySource, e.source, gained, e.session_id);
     if (e.repo) {
@@ -158,6 +214,9 @@ export function reduce(
       sessions: sessions.size,
       by_source: toGroupStats(bySource),
       by_repo: toGroupStats(byRepo),
+      night_actions: nightActions,
+      failures_recovered: failuresRecovered,
+      ascetic_seal: asceticSeal,
     },
     streak,
     class: classState,
@@ -167,7 +226,13 @@ export function reduce(
   if (profile?.name) {
     prelim.name = profile.name;
   }
-  return { ...prelim, achievements: evaluateAchievements(prelim, config.achievements) };
+  const achievements = evaluateAchievements(prelim, config.achievements);
+  const unlocked = collectUnlocks(
+    achievements.earned,
+    config.achievements ?? {},
+    profile,
+  );
+  return { ...prelim, achievements, unlocked_secret_classes: unlocked };
 }
 
 function nowStamp(): string {

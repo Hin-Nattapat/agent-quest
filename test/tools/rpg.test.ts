@@ -152,3 +152,26 @@ test("a locked secret class is rejected; xyzzy unlocks the Trickster and lets yo
   expect(equip.code).toBe(0);
   expect(profile(home).line).toBe("trickster");
 });
+
+function seedCmd(home: string, cmd: string) {
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, "s.ndjson"),
+    `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"run","repo":"cq","cmd":"${cmd}"}\n`,
+  );
+}
+
+test("an earned deed title is listed and equippable; a locked one is rejected", async () => {
+  const home = makeHome();
+  const locked = await rpg(home, "title", "undying");
+  expect(locked.code).toBe(1); // not earned yet
+
+  seedCmd(home, "reflog"); // earns `undying` -> "the Undying"
+  const list = await rpg(home, "titles");
+  expect(list.stdout).toContain("undying");
+
+  const equip = await rpg(home, "title", "undying");
+  expect(equip.code).toBe(0);
+  expect(profile(home).title).toBe("undying");
+});

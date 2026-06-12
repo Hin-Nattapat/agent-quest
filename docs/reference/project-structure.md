@@ -53,11 +53,19 @@ commit-quest/
 ├── hud/                               # ── statusline HUD ── (Phase 1) — Bun, reads state.json
 │   └── statusline.ts
 │
-├── bridge/                            # ── daemon ── (Phase 3) — watch journal -> reduce -> SSE/WS
-│   └── .gitkeep                       #   ref: pixel-agents server/fileWatcher.ts
-│
-├── app/                               # ── companion UI ── (Phase 3) — fork pixel-agents-hq shell
-│   └── .gitkeep
+├── app/                               # ── companion UI ── (Phase 3.1) — separate React+Vite workspace
+│   │                                  #   own renderer (single character); NOT a pixel-agents fork.
+│   │                                  #   npm lives ONLY here; core/adapter/hud stay jq+bun.
+│   ├── CLAUDE.md                      #   FE conventions (klang subset: hooks, body order, enums)
+│   ├── server.ts                      #   Bun bridge: fs.watch(state.json) -> SSE /events + serve dist
+│   ├── src/
+│   │   ├── transport.ts               #   ITransport seam (SSE now -> postMessage in 3.3)
+│   │   ├── use-game-state.ts          #   feature hook: subscribe transport -> IState
+│   │   ├── view.ts                    #   pure HUD helpers (xpPercent, classLabel, …)
+│   │   ├── app.tsx / main.tsx         #   composition + mount
+│   │   └── components/                #   hud, xp-bar, class/title/streak/achievement badges
+│   ├── index.html · vite.config.ts · package.json   #   IState imported type-only from core/state
+│   └── (3.2: Canvas sprite/costume · 3.3: wrap in a VS Code extension webview)
 │
 ├── tools/
 │   ├── inspect.ts                     # journal summary (Phase 0 verification)

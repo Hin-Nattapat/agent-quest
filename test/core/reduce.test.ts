@@ -1,5 +1,6 @@
 import { test, expect } from "bun:test";
 import { reduce } from "../../core/reduce";
+import { EventType } from "../../core/events";
 import { DEFAULT_WEIGHTS, DEFAULT_DIFFICULTY } from "../../core/xp";
 
 const cfg = { weights: DEFAULT_WEIGHTS, difficulty: DEFAULT_DIFFICULTY };
@@ -309,4 +310,37 @@ test("the fold tallies cmd tags and a single rebase --onto earns Threads of Fate
   const s = reduce(evs, cfg, "2026-06-11");
   expect(s.stats.cmds).toEqual({ git_rebase_onto: 1, test_run: 2 });
   expect(s.achievements?.earned).toContain("timebender");
+});
+
+test("last_event is the latest event by ts (or undefined when empty)", () => {
+  const cfg = loadConfig(makeHome());
+  const evs = [
+    {
+      ts: "2026-06-11T12:00:00Z",
+      source: "claude-code",
+      session_id: "s",
+      type: "prompt",
+      repo: "cq",
+    },
+    {
+      ts: "2026-06-11T12:05:00Z",
+      source: "claude-code",
+      session_id: "s",
+      type: "session_end",
+      repo: "cq",
+    },
+    {
+      ts: "2026-06-11T12:02:00Z",
+      source: "claude-code",
+      session_id: "s",
+      type: "action",
+      action: "run",
+      repo: "cq",
+    },
+  ] as any;
+  expect(reduce(evs, cfg, "2026-06-11").last_event).toEqual({
+    ts: "2026-06-11T12:05:00Z",
+    type: EventType.SessionEnd,
+  });
+  expect(reduce([], cfg, "2026-06-11").last_event).toBeUndefined();
 });

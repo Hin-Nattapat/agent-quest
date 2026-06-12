@@ -571,11 +571,33 @@ statusline เป็น text/ANSI เท่านั้น ทำได้แค
 2. **Next.js API route + polling** — client poll ทุก ~2s, API route อ่านไฟล์ ง่ายสุดแต่ไม่เนียนเท่า
 3. **Tauri/Electron overlay** — อ่านไฟล์ตรง ทำเป็น desktop pet/overlay ลอยมุมจอ
 
-### 10.3 อนิเมชั่นตัวละคร
+### 10.3 อนิเมชั่นตัวละคร — โมเดล AFK farming (ปรับ 2026-06-12)
 
-- sprite sheet (CSS steps) หรือ Rive/Lottie สำหรับ idle / walk / cast / level-up burst
-- event-driven: เมื่อ state เปลี่ยน → trigger transition (เช่น xp_total เพิ่ม → เล่น "gain XP", level เพิ่ม → "level up", inventory เพิ่ม → toast "loot dropped")
-- ใช้ stack ที่ถนัดอยู่แล้ว: Next.js + TS + Tailwind
+ใช้ **โมเดล idle/AFK แบบเกมมือถือ** ไม่ map ทุก tool เป็นท่าเฉพาะ — แค่ **3 สเตตหลัก**:
+
+| สเตต | trigger | ภาพ |
+|---|---|---|
+| **farming** | มี activity (agent กำลังทำงาน) | ตัวละครฟาร์มมอนสเตอร์ลูป |
+| **idle** | ไม่มี activity | ยืนเฉย |
+| **rest** | จบ session | กลับโรงเตี๊ยม/นั่งพัก |
+
+- **ทำไม:** renderer เบา (3 สเตต ไม่ต้องคิวท่า edit→ร่ายเวท/run→ระเบิดแยก), **pacing หายเป็นปัญหา** (ไม่ต้องคิวท่าตาม tool รัว ๆ), เข้ากับ MVP throttle — รู้แค่ "active ไหม" ก็พอ ไม่ต้องรอ daemon push ทีละ event
+- **ความลึกไม่หาย — แยกภาพออกจากตัวเลข:** animation เหมารวม แต่ **XP / class affinity (§6.4) / loot ยังคิดจาก event/action จริงใน reducer เหมือนเดิม** ความลึกอยู่ที่ "ตัวเลขที่ไหลเข้า" ไม่ใช่ "ท่าที่ต่างกัน"
+- **active signal:** reducer เก็บ `last_event { ts, type }` (event ล่าสุด — deterministic/idempotent) แล้ว **app ตัดสินสเตตเอง** ด้วย pure fn `activityState(lastEvent, now, window≈60s)` + client timer (reducer ไม่ยุ่งกับ wall-clock)
+
+**ฉาก + มอนสเตอร์ = reward ภาพ ผูกกับ tier** (เติม "ของให้รอ" ให้โมเดล AFK) — ผูก **tier ไม่ใช่ทุก level** (level มี 50, tier มี 5):
+
+| tier | ฉาก (ธีม/ความอลัง) | มอนสเตอร์พื้น |
+|---|---|---|
+| Novice/T1 | ทุ่งหญ้าหน้าเมือง | bug slime ตัวเล็ก |
+| T2 | ป่า / ถ้ำ | error wraith |
+| T3 | ดันเจียน | มอนสเตอร์ใหญ่ |
+| T4a/T4b | แดนลับเฉพาะ branch (Cloud=ลอยฟ้า, Kernel=ถ้ำมืด circuit) | มอนสเตอร์ราชา/บอสประจำแดน |
+
+- **ฉากคุมด้วย tier อย่างเดียว ไม่ผูก repo** — repo คาดเดาไม่ได้ว่าทำอะไร + มักหลาย repo พร้อมกัน เอามากำหนดฉากจะมั่ว. `repo` เก็บเป็น **สถิติ** (`by_repo` §4.2) ได้ แต่ไม่กำหนดภาพ
+- **มอนสเตอร์:** tier = ระดับพื้น (สูง = แข็งขึ้น) · **`action_fail` = บอส/มอนพิเศษโผล่แทรก** (bug ที่ต้องแก้) → recover/test ผ่าน = ล้มบอส ได้ XP ก้อน + โอกาส loot (ผูกงานจริงแบบเบา ไม่ต้องมี combat layer เต็ม)
+- **up-class = moment ใหญ่ "ย้ายโลก"** — ไม่ใช่แค่เปลี่ยนชุด แต่เปลี่ยนฉาก+มอนทั้งชุด (branch T4 a/b คนละแดน = เหตุผลให้อยากเห็นทั้งคู่, เชื่อม §6.2 branch lock ถาวร)
+- stack: **React + Vite + TS** (workspace `app/` แยก, §10.2/Phase 3.1) · sprite จาก PixelLab (`art-prompts.md`) swap หลัง placeholder · roll-out: 3.2a (ฉาก+3 สเตต+tier-swap) → 3.2b (boss/loot-drop/up-class transition) → 3.2c (แดนลับ branch)
 
 ### 10.4 ฝังใน VS Code (อยู่ใกล้ที่ทำงาน)
 

@@ -1,6 +1,7 @@
 import type { ITransport } from "./transport";
 import { useGameState } from "./use-game-state";
-import Hud from "./components/hud";
+import { useActivity } from "./use-activity";
+import SceneView from "./components/scene-view";
 
 interface IProps {
   transport: ITransport;
@@ -9,12 +10,13 @@ interface IProps {
 const App = (props: IProps) => {
   const { transport } = props;
   const state = useGameState(transport);
+  const activity = useActivity(state);
 
   if (!state) {
     return <div className="loading">Connecting…</div>;
   }
 
-  return <Hud state={state} />;
+  return <SceneView state={state} activity={activity} />;
 };
 
 export default App;

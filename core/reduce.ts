@@ -229,6 +229,10 @@ export function reduce(
   if (profile?.name) {
     prelim.name = profile.name;
   }
+  const lastEv = sorted[sorted.length - 1];
+  if (lastEv) {
+    prelim.last_event = { ts: lastEv.ts, type: lastEv.type };
+  }
   const achievements = evaluateAchievements(prelim, config.achievements);
   const unlocked = collectUnlocks(
     achievements.earned,

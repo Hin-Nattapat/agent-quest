@@ -46,3 +46,6 @@ another component.
   unions.**
 - kebab-case file names. Import the shared `IState` **type-only** from `../../core/state` — never
   duplicate it, never import runtime `core` code. (`verbatimModuleSyntax` enforces `import type`.)
+- The **events contract** (`EventType` enum + types) from `../../core/events` MAY be imported at
+  runtime (it is the shared wire contract, like `IState`). Game logic — `reduce`, `classes`, etc. —
+  may not.

@@ -225,8 +225,8 @@ a heroic rubber duck (not human) wearing tiny knight armor and a small cape, hol
 
 ## 5. Asset อื่น (ทำทีหลัง)
 
-- **ฉาก / ออฟฟิศ**: ใช้ tileset ของ **Pixel Agents** (ตัวที่จะ fork) เป็นหลัก — มีออฟฟิศอยู่แล้ว; ทำ custom เพิ่มผ่าน Map Workshop (ล็อก/เสียเงิน) ภายหลัง
-- **loot / เฟอร์นิเจอร์**: gen เดี่ยว พื้นโปร่ง — `single isolated pixel art {ITEM}, top-down, transparent background, limited palette, clean outline` · {ITEM} = desk, server rack, bookshelf, potted plant, coffee machine, golden trophy, neon sign, rug · rarity = สีขอบ (common เทา / rare ฟ้า / epic ม่วง / legendary ทอง)
+- **ฉาก / แดนลับ + มอนสเตอร์**: ดู **§7** (theme = MMORPG fantasy — เลิก office ของ Pixel Agents แล้ว). พื้นหลังฉากเป็น track แยก (tileset/gen ทีหลัง); 3.2a ใช้ CSS placeholder ไปก่อน. มอนสเตอร์/บอส gen ผ่าน PixelLab ตาม §7
+- **loot / ของแต่งแดน**: gen เดี่ยว พื้นโปร่ง — `single isolated pixel art {ITEM}, top-down, transparent background, limited palette, clean outline` · {ITEM} = ถ้วยรางวัล, โล่, ดาบปัก, คบเพลิง, ธงกิลด์, หีบสมบัติ, แท่นรูน, ต้นไม้แฟนตาซี · rarity = สีขอบ (common เทา / rare ฟ้า / epic ม่วง / legendary ทอง)
 - **UI / FX**: XP bar, level-up burst (สีตามคลาส), "???" tile สายลับ, "!" bubble ตอนรอ input
 
 ---
@@ -237,3 +237,94 @@ a heroic rubber duck (not human) wearing tiny knight armor and a small cape, hol
 2. gen **Mage T1** → ทำครบ loop (Create State T2–T4 → Add Animation idle/walk/work → 8 ทิศ) → วัด credit
 3. ทำ **Ranger / Rogue / Sage** T1 + loop เดียวกัน
 4. **สายลับ + item/FX** ทยอยเติมทีหลัง
+
+---
+
+## 7. ฉาก + มอนสเตอร์ (AFK scene · §10.3)
+
+ฉากผูก **tier ไม่ใช่ level/repo**. T1–T3 ใช้ร่วมทุกสาย; **T4 = แดนลับเฉพาะ branch** (สาย×a/b = 8 แดน) — moment "ย้ายโลก" ตอน up-class. มอนสเตอร์ gen ผ่าน **PixelLab Character Creator** (โหมด creature) ตั้งค่าเหมือน §1 (Low Top-Down, Black outline, Highly detailed).
+
+**constants ของมอนสเตอร์** (ครึ่งหน้าของทุก prompt):
+`(not human), full body head-to-toe, centered, slightly stylized, clean 1px black outline` · negative: `blurry, 3d, realistic, text, watermark, human`
+**ขนาด:** mob 48×48 · บอสแดน 64×64
+
+### 7.1 ฉากพื้น T1–T3 (ใช้ร่วม) + มอนสเตอร์พื้น
+
+| tier | ฉาก (ธีม/palette) | มอนสเตอร์ |
+|---|---|---|
+| 1 | **ทุ่งหญ้าหน้าเมือง** — เขียวสด ฟ้าใส กำแพงเมืองไกลๆ | Bug Slime |
+| 2 | **ป่ากระซิบ / ถ้ำ** — เขียวเข้ม หมอก แสงลอด | Error Wraith |
+| 3 | **ดันเจียนลึก** — หินเทา คบเพลิง เงาทึบ | Dungeon Brute |
+
+```
+Bug Slime (T1):     a small round slime creature, translucent sickly-green jelly speckled with tiny glitch pixels, two big round cartoon eyes, tiny and slightly menacing
+Error Wraith (T2):  a floating ghostly wraith, tattered cloak woven from fragmented red error-glyphs, hollow glowing red eyes, wispy crimson smoke trail, eerie
+Dungeon Brute (T3): a hulking armored troll brute, cracked iron-grey stone skin, heavy spiked club, glowing orange eyes, imposing dungeon mini-boss
+```
+
+### 7.2 แดนลับ T4 — 4 สายหลัก × branch a/b (8 แดน + บอสประจำแดน)
+
+palette ยึดตามสาย (§1): Mage ม่วง+ทอง · Ranger teal · Rogue coral · Sage amber.
+
+**Mage ⚔ (ม่วง+ทอง)**
+| branch | แดน (ธีม) | บอส |
+|---|---|---|
+| a · Cloud Summoner | **Skyforge Aether** — เกาะลอยฟ้า เมฆพายุ แสงทอง ท้องฟ้าม่วง | Storm Archon |
+| b · Kernel Lich | **Circuit Catacombs** — สุสานใต้ดิน เส้นวงจรเรืองเขียวพิษในหิน เงาม่วง | The Kernel Lich |
+```
+Storm Archon:    a towering storm elemental archon, body of swirling cloud and crackling golden lightning, ornate floating gold armor plates, glowing violet core, majestic — purple-and-gold electric palette
+The Kernel Lich: an undead lich sorcerer fused with glowing circuit-board veins, tattered royal robes, exposed ribcage with a pulsing toxic-green core, floating, necromantic-tech — deep-purple + toxic-green palette
+```
+
+**Ranger 🏹 (teal)**
+| branch | แดน | บอส |
+|---|---|---|
+| a · Motion Trickster | **Aurora Flux** — แสงออโรราไหลพลิ้ว motion trail ไร้น้ำหนัก | Prism Wisp |
+| b · Design Warden | **Geometric Sanctum** — สวนเรขาคณิต เส้นพิมพ์เขียว สถาปัตย์ขาวสะอาด | The Grid Warden |
+```
+Prism Wisp:      a shimmering wisp tyrant made of refracted rainbow light and motion-blur trails, semi-transparent shifting form, teal core, graceful and elusive — teal with rainbow shimmer
+The Grid Warden: a stoic golem guardian built from perfect geometric panels and glowing blueprint grid-lines, crisp angular form, orderly and imposing — teal + blueprint-blue + white
+```
+
+**Rogue 🗡 (coral)**
+| branch | แดน | บอส |
+|---|---|---|
+| a · Heisenbug Hunter | **Quantum Rift** — ห้วงกระตุก phase double-exposed ไม่แน่นอน | The Heisenbug |
+| b · Forensics Shadow | **Noir Crime Scene** — ตรอกฝนตก เส้นชอล์ก สปอตไลต์เดียว noir | The Phantom Culprit |
+```
+The Heisenbug:        an elusive glitch-creature that phases in and out, double-exposed flickering body, fragmented half-transparent form, unsettling — coral + glitch-magenta
+The Phantom Culprit:  a shadowy noir culprit in a long trench coat and hat, body of living shadow, only two glowing coral eyes visible, mysterious — black-grey noir with coral accent
+```
+
+**Sage 📖 (amber)**
+| branch | แดน | บอส |
+|---|---|---|
+| a · Domain Prophet | **Oracle's Athenaeum** — หอสมุดโบราณลอยฟ้า รูนเรืองอำพัน ม้วนคัมภีร์ | The Domain Sphinx |
+| b · Orchestration Master | **Conductor's Nexus** — โถงควบคุม เส้นแสงทองโยงหุ่นมากมาย ไม้บาตอง | The Orchestration Construct |
+```
+The Domain Sphinx:           a winged sphinx oracle carved from amber stone, body etched with glowing runes, wise all-seeing eyes, regal — amber gold + parchment
+The Orchestration Construct: a multi-armed conductor golem of gilded clockwork, each hand a glowing light-baton, golden threads radiating to unseen puppets, commanding — amber + gold + multicolored threads
+```
+
+### 7.3 แดนลับสายลับ (secret class — ไม่มี branch, 1 แดน/บอส ต่อสาย)
+
+| สาย (palette) | แดน | บอส |
+|---|---|---|
+| Maestro 🎼 (ทอง) | **Grand Concert Vault** — โถงอุปรากรทอง เครื่องดนตรีลอย | The Living Symphony |
+| Night Owl 🦉 (คราม) | **Midnight Roost** — ราตรีนิรันดร์ หอคอยมืด แสงจันทร์ ดาว | The Eclipse Owl |
+| The Ascetic 🧘 (ขาวหิน) | **Silent Summit** — อารามภูเขา minimalist หมอกบาง | The Stone Guardian |
+| The Gremlin 👺 (เขียว glitch) | **The Glitch Pit** — แดนพังทลาย เศษ hardware ลอย pixel เพี้ยน | The Chaos Gremlin King |
+| The Trickster ✦ (legendary มุก) | **Fool's Mirage** — คาร์นิวัลลวงตา กระจก คอนเฟตตี | The Jester Mirage |
+```
+The Living Symphony:    a conductor-spirit formed from a swirling orchestra of golden instruments and music notes, baton raised, grand — radiant gold
+The Eclipse Owl:        a giant spectral owl with glowing crescent-moon eyes, indigo feathers trailing stardust, perched and watchful — deep-indigo + moonlight-silver
+The Stone Guardian:     a serene stone meditation guardian, simple monk-like rock form sitting cross-legged, faint white aura, minimalist and calm — pale stone-white
+The Chaos Gremlin King: a cackling gremlin king on a throne of broken hardware, oversized grin, electric sparks and glitch artifacts, chaotic — glitch-green
+The Jester Mirage:      a mischievous illusion jester splitting into mirror-image duplicates, harlequin pattern, playing-card confetti, whimsical (จับคู่กับ Sir Quacks-a-lot §4.5 — จะให้เป็ดยักษ์ลวงตาก็ได้) — rainbow harlequin
+```
+
+### 7.4 หมายเหตุ implementation
+
+- **3.2c** จะ map `sceneFor(tier=4, line, branch)` → theme key ของแดน (เช่น `skyforge_aether`) — โค้ดอ้าง theme key, art เสียบหลัง CSS seam
+- พื้นหลังแดน = tileset/gen แยก (PixelLab map หรือ free fantasy tileset) — มอนสเตอร์/บอสมาก่อน, ฉากตามทีหลัง
+- gen ตามลำดับ: base mob (slime/wraith/brute) → บอสสายที่เล่นอยู่ (Mage ก่อน) → ที่เหลือทยอย

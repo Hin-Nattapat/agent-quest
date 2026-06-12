@@ -38,3 +38,20 @@ test("advancementPending", () => {
   expect(advancementPending(ClassLine.Mage, 50, "a")).toBe(null);
   expect(advancementPending(null, 4, null)).toBe(null);
 });
+
+import { SecretLine, isSecret, SECRET_TREE } from "../../core/classes";
+
+test("secret lines resolve four branchless forms; Novice at tier 0", () => {
+  expect(isSecret(SecretLine.Maestro)).toBe(true);
+  expect(isSecret(ClassLine.Mage)).toBe(false);
+  expect(formFor(SecretLine.Maestro, 0, null)).toBe(ClassForm.Novice);
+  expect(formFor(SecretLine.Maestro, 1, null)).toBe(ClassForm.Conductor);
+  expect(formFor(SecretLine.Maestro, 4, null)).toBe(ClassForm.GrandSymphony);
+  expect(formFor(SecretLine.NightOwl, 4, "a")).toBe(ClassForm.Eclipse); // branch ignored
+  expect(iconFor(SecretLine.Gremlin)).toBe(SECRET_TREE[SecretLine.Gremlin].icon);
+});
+
+test("a secret line never pends a branch, even at level 50", () => {
+  expect(advancementPending(SecretLine.Maestro, 50, null)).toBe(null);
+  expect(advancementPending(ClassLine.Mage, 50, null)).toBe("branch"); // main unchanged
+});

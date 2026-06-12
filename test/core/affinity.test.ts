@@ -47,3 +47,39 @@ test("lineForEvent maps an event to its line (or null)", () => {
   );
   expect(lineForEvent(ev({ type: "prompt" }))).toBe(null);
 });
+
+import { isPassiveSignal } from "../../core/affinity";
+import { SecretLine } from "../../core/classes";
+
+test("isPassiveSignal: main lines delegate to lineForEvent, secrets use their predicate", () => {
+  expect(isPassiveSignal(ClassLine.Mage, ev({ type: "action", action: "run" }))).toBe(
+    true,
+  );
+  expect(
+    isPassiveSignal(SecretLine.Maestro, ev({ type: "action", action: "delegate" })),
+  ).toBe(true);
+  expect(
+    isPassiveSignal(SecretLine.Maestro, ev({ type: "action", action: "read" })),
+  ).toBe(false);
+  expect(
+    isPassiveSignal(
+      SecretLine.NightOwl,
+      ev({ type: "action", action: "read", ts: "2026-06-11T02:00:00" }),
+    ),
+  ).toBe(true);
+  expect(
+    isPassiveSignal(
+      SecretLine.NightOwl,
+      ev({ type: "action", action: "read", ts: "2026-06-11T13:00:00" }),
+    ),
+  ).toBe(false);
+  expect(
+    isPassiveSignal(SecretLine.Ascetic, ev({ type: "action", action: "edit" })),
+  ).toBe(true);
+  expect(
+    isPassiveSignal(SecretLine.Gremlin, ev({ type: "action_fail", action: "run" })),
+  ).toBe(true);
+  expect(
+    isPassiveSignal(SecretLine.Trickster, ev({ type: "action", action: "delegate" })),
+  ).toBe(false);
+});

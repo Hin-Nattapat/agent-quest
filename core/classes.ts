@@ -5,6 +5,23 @@ export enum ClassLine {
   Sage = "sage",
 }
 
+// Secret lines: unlocked via hidden achievements / an easter egg, never in the pick menu.
+export enum SecretLine {
+  Maestro = "maestro",
+  NightOwl = "night_owl",
+  Ascetic = "ascetic",
+  Gremlin = "gremlin",
+  Trickster = "trickster",
+}
+
+export type TLine = ClassLine | SecretLine;
+
+const SECRET_VALUES: Set<string> = new Set(Object.values(SecretLine));
+
+export function isSecret(line: TLine): line is SecretLine {
+  return SECRET_VALUES.has(line);
+}
+
 // Every (line × tier) form name. Members carry the display string (the wire/HUD value).
 export enum ClassForm {
   Novice = "Novice",
@@ -32,6 +49,31 @@ export enum ClassForm {
   PatternMagus = "Pattern Magus",
   DomainProphet = "Domain Prophet",
   OrchestrationMaster = "Orchestration Master",
+
+  Conductor = "Conductor",
+  Maestro = "Maestro",
+  Virtuoso = "Virtuoso",
+  GrandSymphony = "Grand Symphony",
+
+  NightOwl = "Night Owl",
+  Moonlighter = "Moonlighter",
+  Nocturne = "Nocturne",
+  Eclipse = "Eclipse",
+
+  Initiate = "Initiate",
+  Ascetic = "Ascetic",
+  Hermit = "Hermit",
+  Enlightened = "Enlightened",
+
+  Imp = "Imp",
+  Gremlin = "Gremlin",
+  Poltergeist = "Poltergeist",
+  ChaosDaemon = "Chaos Daemon",
+
+  Prankster = "Prankster",
+  Trickster = "Trickster",
+  Illusionist = "Illusionist",
+  Archfool = "Archfool",
 }
 
 export interface IClassDef {
@@ -63,8 +105,61 @@ export const CLASS_TREE: Record<ClassLine, IClassDef> = {
   },
 };
 
+export interface ISecretDef {
+  icon: string;
+  forms: [ClassForm, ClassForm, ClassForm, ClassForm]; // T1..T4, no branch
+}
+
+export const SECRET_TREE: Record<SecretLine, ISecretDef> = {
+  [SecretLine.Maestro]: {
+    icon: "🎼",
+    forms: [
+      ClassForm.Conductor,
+      ClassForm.Maestro,
+      ClassForm.Virtuoso,
+      ClassForm.GrandSymphony,
+    ],
+  },
+  [SecretLine.NightOwl]: {
+    icon: "🦉",
+    forms: [
+      ClassForm.NightOwl,
+      ClassForm.Moonlighter,
+      ClassForm.Nocturne,
+      ClassForm.Eclipse,
+    ],
+  },
+  [SecretLine.Ascetic]: {
+    icon: "🧘",
+    forms: [
+      ClassForm.Initiate,
+      ClassForm.Ascetic,
+      ClassForm.Hermit,
+      ClassForm.Enlightened,
+    ],
+  },
+  [SecretLine.Gremlin]: {
+    icon: "👺",
+    forms: [
+      ClassForm.Imp,
+      ClassForm.Gremlin,
+      ClassForm.Poltergeist,
+      ClassForm.ChaosDaemon,
+    ],
+  },
+  [SecretLine.Trickster]: {
+    icon: "✦",
+    forms: [
+      ClassForm.Prankster,
+      ClassForm.Trickster,
+      ClassForm.Illusionist,
+      ClassForm.Archfool,
+    ],
+  },
+};
+
 export interface IClassState {
-  line: ClassLine | null;
+  line: TLine | null;
   tier: number;
   form: ClassForm;
   icon: string;
@@ -90,20 +185,27 @@ export function tierForLevel(level: number): number {
   return 0;
 }
 
-export function iconFor(line: ClassLine | null): string {
+export function iconFor(line: TLine | null): string {
   if (!line) {
     return "";
+  }
+  if (isSecret(line)) {
+    return SECRET_TREE[line].icon;
   }
   return CLASS_TREE[line].icon;
 }
 
 export function formFor(
-  line: ClassLine | null,
+  line: TLine | null,
   tier: number,
   branch: "a" | "b" | null,
 ): ClassForm {
   if (!line || tier === 0) {
     return ClassForm.Novice;
+  }
+  if (isSecret(line)) {
+    const idx = Math.min(Math.max(tier - 1, 0), 3);
+    return SECRET_TREE[line].forms[idx];
   }
   if (tier >= 4) {
     if (branch) {
@@ -115,12 +217,15 @@ export function formFor(
 }
 
 export function advancementPending(
-  line: ClassLine | null,
+  line: TLine | null,
   level: number,
   branch: "a" | "b" | null,
 ): "class" | "branch" | null {
   if (level >= 5 && line == null) {
     return "class";
+  }
+  if (line != null && isSecret(line)) {
+    return null; // secret lines have no T4 branch and aren't offered at Lv.5
   }
   if (level >= 50 && line != null && branch == null) {
     return "branch";

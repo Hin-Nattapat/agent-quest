@@ -62,10 +62,13 @@ commit-quest/
 │   │   ├── transport.ts               #   ITransport seam (SSE now -> postMessage in 3.3)
 │   │   ├── use-game-state.ts          #   feature hook: subscribe transport -> IState
 │   │   ├── view.ts                    #   pure HUD helpers (xpPercent, classLabel, …)
+│   │   ├── activity.ts                #   AFK state machine: activityState -> farming/idle/rest (3.2a)
+│   │   ├── scene.ts                   #   sceneFor(tier) -> theme + monster (3.2a)
+│   │   ├── use-activity.ts            #   hook: derive activity + client timer (3.2a)
 │   │   ├── app.tsx / main.tsx         #   composition + mount
-│   │   └── components/                #   hud, xp-bar, class/title/streak/achievement badges
-│   ├── index.html · vite.config.ts · package.json   #   IState imported type-only from core/state
-│   └── (3.2: Canvas sprite/costume · 3.3: wrap in a VS Code extension webview)
+│   │   └── components/                #   scene-view, hero, monster (AFK scene); hud + badges
+│   ├── index.html · vite.config.ts · package.json   #   IState/EventType from core (contract only)
+│   └── (3.2b: boss/loot-drop/up-class transition · 3.3: VS Code extension webview)
 │
 ├── tools/
 │   ├── inspect.ts                     # journal summary (Phase 0 verification)

@@ -73,3 +73,103 @@ body {
   color: var(--muted);
   font-family: ui-monospace, monospace;
 }
+
+/* ── Phase 3.2a: AFK scene · CSS owns every visual (swap these for PixelLab sprites later) ── */
+.scene {
+  position: relative;
+  width: min(560px, 94vw);
+  height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid #b08a3e;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+.scene-grassland {
+  background: linear-gradient(180deg, #2e4d23, #1a2c13);
+}
+.scene-forest {
+  background: linear-gradient(180deg, #16331f, #0c1d12);
+}
+.scene-dungeon {
+  background: linear-gradient(180deg, #2a2230, #141019);
+}
+.scene-secret_realm {
+  background: linear-gradient(180deg, #3a2c54, #15102a);
+}
+
+/* sprite = swap surface: placeholder via ::after content -> replace with a background sprite-sheet */
+.sprite {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+}
+.hero {
+  left: 38%;
+  bottom: 18px;
+}
+.hero::after {
+  content: "🧙";
+}
+.hero-farming {
+  animation: hero-bob 0.5s steps(2) infinite;
+}
+.hero-idle {
+  animation: hero-sway 2.4s ease-in-out infinite;
+}
+.hero-rest {
+  opacity: 0.85;
+}
+.hero-rest::after {
+  content: "🧙";
+  filter: grayscale(0.4);
+}
+.monster {
+  right: 16%;
+  bottom: 22px;
+  font-size: 34px;
+}
+.monster-grassland::after {
+  content: "🟢";
+}
+.monster-forest::after {
+  content: "👻";
+}
+.monster-dungeon::after {
+  content: "👹";
+}
+.monster-secret_realm::after {
+  content: "👑";
+}
+@keyframes hero-bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+@keyframes hero-sway {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+/* HUD as a top overlay on the scene */
+.scene-hud {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+}
+.scene-hud .hud {
+  width: auto;
+  background: #1d212bdd;
+  padding: 10px 14px;
+}

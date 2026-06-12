@@ -235,15 +235,22 @@ export function rollInventory(
 export function resolveCosmetics(
   profile: { title?: string; theme?: string },
   inventory: IInventoryItem[],
+  earnedTitles: Record<string, string> = {},
   lootTable: Record<string, ILootItem> = LOOT_TABLE,
 ): ICosmetics {
   const owned = new Set(inventory.map(i => i.id));
-  const titleItem =
-    profile.title && owned.has(profile.title) ? lootTable[profile.title] : null;
+  const lootTitle =
+    profile.title &&
+    owned.has(profile.title) &&
+    lootTable[profile.title]?.kind === LootKind.Title
+      ? lootTable[profile.title].name
+      : null;
+  const earnedTitle =
+    profile.title && earnedTitles[profile.title] ? earnedTitles[profile.title] : null;
   const themeItem =
     profile.theme && owned.has(profile.theme) ? lootTable[profile.theme] : null;
   return {
-    title: titleItem?.kind === LootKind.Title ? titleItem.name : null,
+    title: lootTitle ?? earnedTitle,
     theme_color: themeItem?.kind === LootKind.Theme ? (themeItem.value ?? null) : null,
   };
 }

@@ -99,6 +99,7 @@ export function reduce(
   let runningRuns = 0;
   let runningActions = 0;
   const pendingFail = new Set<string>();
+  const cmds: Record<string, number> = {};
 
   const line = profile?.line ?? null;
   const sorted = [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts));
@@ -147,6 +148,9 @@ export function reduce(
     }
     if (e.type === EventType.ActionFail && e.action) {
       pendingFail.add(`${e.session_id}:${e.action}`);
+    }
+    if (e.cmd) {
+      cmds[e.cmd] = (cmds[e.cmd] ?? 0) + 1;
     }
     if (asceticSeal === 0 && runningActions > 0) {
       const lvlNow = levelFor(running, config.difficulty);
@@ -200,7 +204,6 @@ export function reduce(
     triggers.push({ table: "streak100", seed: "streak:100" });
   }
   const inventory = rollInventory(triggers, lootTable, config.drops ?? DROP_TABLES);
-  const cosmetics = resolveCosmetics(profile ?? {}, inventory, lootTable);
 
   const prelim: TReducedState = {
     version: 1,
@@ -217,11 +220,11 @@ export function reduce(
       night_actions: nightActions,
       failures_recovered: failuresRecovered,
       ascetic_seal: asceticSeal,
+      cmds,
     },
     streak,
     class: classState,
     inventory,
-    cosmetics,
   };
   if (profile?.name) {
     prelim.name = profile.name;
@@ -232,7 +235,21 @@ export function reduce(
     config.achievements ?? {},
     profile,
   );
-  return { ...prelim, achievements, unlocked_secret_classes: unlocked };
+  const registry = config.achievements ?? {};
+  const earnedTitles: Record<string, string> = {};
+  for (const id of achievements.earned) {
+    const title = registry[id]?.reward?.title;
+    if (title) {
+      earnedTitles[id] = title;
+    }
+  }
+  const cosmetics = resolveCosmetics(profile ?? {}, inventory, earnedTitles, lootTable);
+  return {
+    ...prelim,
+    achievements,
+    cosmetics,
+    unlocked_secret_classes: unlocked,
+  };
 }
 
 function nowStamp(): string {

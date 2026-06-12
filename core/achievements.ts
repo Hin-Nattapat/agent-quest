@@ -22,7 +22,7 @@ type TStateLike = Omit<IState, "updated_at">;
 function facts(state: TStateLike): TFacts {
   const a = state.stats.actions;
   const n = (k: string) => a[k] ?? 0;
-  return {
+  const base: TFacts = {
     xp_total: state.xp_total,
     level: state.level,
     prompts: state.stats.prompts,
@@ -41,6 +41,10 @@ function facts(state: TStateLike): TFacts {
     failures_recovered: state.stats.failures_recovered ?? 0,
     ascetic_seal: state.stats.ascetic_seal ?? 0,
   };
+  for (const [tag, count] of Object.entries(state.stats.cmds ?? {})) {
+    base[`cmd_${tag}`] = count;
+  }
+  return base;
 }
 
 function passes(cond: TCond, f: TFacts): boolean {
@@ -318,5 +322,75 @@ export const DEFAULT_ACHIEVEMENTS: Record<string, IAchievementDef> = {
     points: 25,
     hidden: true,
     reward: { unlocks_class: SecretLine.Gremlin },
+  },
+  timebender: {
+    name: "Threads of Fate",
+    desc: "Rewrite a branch's roots with git rebase --onto",
+    cond: { stat: "cmd_git_rebase_onto", gte: 1 },
+    points: 25,
+    reward: { title: "the Timebender" },
+  },
+  undying: {
+    name: "From Beyond the Grave",
+    desc: "Raise lost work with git reflog",
+    cond: { stat: "cmd_reflog", gte: 1 },
+    points: 25,
+    reward: { title: "the Undying" },
+  },
+  truthseeker: {
+    name: "Trial by Ordeal",
+    desc: "Hunt the guilty commit with git bisect",
+    cond: { stat: "cmd_bisect", gte: 1 },
+    points: 20,
+    reward: { title: "the Truthseeker" },
+  },
+  reckless: {
+    name: "Ride or Die",
+    desc: "Push or merge straight onto a protected branch",
+    cond: { stat: "cmd_cowboy", gte: 1 },
+    points: 15,
+    reward: { title: "the Reckless" },
+  },
+  chronicler: {
+    name: "Rewriting History",
+    desc: "10 interactive rebases",
+    cond: { stat: "cmd_git_rebase_i", gte: 10 },
+    points: 15,
+    reward: { title: "the Chronicler" },
+  },
+  gleaner: {
+    name: "A Fine Harvest",
+    desc: "10 cherry-picks",
+    cond: { stat: "cmd_cherry_pick", gte: 10 },
+    points: 15,
+    reward: { title: "the Gleaner" },
+  },
+  unrelenting: {
+    name: "No Mercy",
+    desc: "10 force pushes",
+    cond: { stat: "cmd_force_push", gte: 10 },
+    points: 15,
+    reward: { title: "the Unrelenting" },
+  },
+  hoarder: {
+    name: "Squirreled Away",
+    desc: "20 stashes",
+    cond: { stat: "cmd_stash", gte: 20 },
+    points: 15,
+    reward: { title: "the Hoarder" },
+  },
+  unifier: {
+    name: "For the Guild",
+    desc: "Merge 20 pull requests",
+    cond: { stat: "cmd_pr_merge", gte: 20 },
+    points: 20,
+    reward: { title: "the Unifier" },
+  },
+  slayer: {
+    name: "Boss Hunter",
+    desc: "Run the test suite 100 times",
+    cond: { stat: "cmd_test_run", gte: 100 },
+    points: 25,
+    reward: { title: "the Slayer" },
   },
 };

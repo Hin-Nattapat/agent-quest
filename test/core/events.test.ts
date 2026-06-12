@@ -33,3 +33,12 @@ test("enums expose the wire values", () => {
   expect(Object.values(EventType) as string[]).toContain("session_start");
   expect(Object.values(AgentAction) as string[]).toContain("delegate");
 });
+
+import { CmdTag } from "../../core/events";
+
+test("CmdTag members carry the wire strings the hook emits", () => {
+  expect(CmdTag.GitRebaseOnto as string).toBe("git_rebase_onto");
+  expect(CmdTag.Reflog as string).toBe("reflog");
+  expect(CmdTag.TestRun as string).toBe("test_run");
+  expect(CmdTag.Cowboy as string).toBe("cowboy");
+});

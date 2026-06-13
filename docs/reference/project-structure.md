@@ -70,7 +70,9 @@ commit-quest/
 │   │   ├── app.tsx / main.tsx         #   composition + mount
 │   │   └── components/                #   scene-view, hero, monster, boss-encounter, loot-toast; hud + badges
 │   ├── index.html · vite.config.ts · package.json   #   IState/EventType from core (contract only)
-│   └── (3.2b: boss/loot-drop/up-class transition · 3.3: VS Code extension webview)
+│   ├── extension/                     #   VS Code UI host (3.3) — own npm pkg (esbuild); NOT in adapters/ (not agent-aware)
+│   │   └── src/                       #     extension.ts (command+panel), webview-html.ts (CSP+nonce), state-feed.ts (fs.watch -> postMessage)
+│   └── (3.2b: boss/loot-drop/up-class transition · 3.3 reskin: pixel-MMO UI)
 │
 ├── tools/
 │   ├── inspect.ts                     # journal summary (Phase 0 verification)

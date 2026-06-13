@@ -499,3 +499,36 @@ test("reduce counts action_fail events into stats.action_fails, idempotently", (
   const clean = reduce({ events: [ev({ type: "action", action: "edit" })], config: cfg });
   expect(clean.stats.action_fails).toBe(0);
 });
+
+import type { IProfile } from "../../core/profile";
+
+test("reduce denormalizes class.tree + achievements.earned_detail + total (idempotent)", () => {
+  const events = [evd("2026-06-11", { type: "action", action: "edit" })]; // earns first_blood
+  const profile = { line: "mage" } as unknown as IProfile;
+  const s = reduce({ events, config: cfgA, today: "2026-06-11", profile });
+
+  expect(s.class?.tree?.forms.length).toBe(3);
+  expect(s.class?.tree?.branches).toBeDefined();
+
+  const fb = s.achievements?.earned_detail?.find(d => d.id === "first_blood");
+  expect(fb?.name).toBe("First Blood");
+  expect(typeof fb?.desc).toBe("string");
+  expect(s.achievements?.total).toBeGreaterThan(0);
+
+  expect(
+    reduce({ events, config: cfgA, today: "2026-06-11", profile }).achievements
+      ?.earned_detail,
+  ).toEqual(s.achievements?.earned_detail);
+});
+
+test("reduce enriches inventory items with name/kind", () => {
+  const events = [
+    evd("2026-06-11", { session_id: "s1", type: "action", action: "edit" }),
+    evd("2026-06-11", { session_id: "s1", type: "session_end" }),
+  ];
+  const s = reduce({ events, config: cfgA, today: "2026-06-11" });
+  for (const item of s.inventory ?? []) {
+    expect(typeof item.name).toBe("string");
+    expect(typeof item.kind).toBe("string");
+  }
+});

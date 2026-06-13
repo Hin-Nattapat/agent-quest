@@ -158,6 +158,24 @@ export const SECRET_TREE: Record<SecretLine, ISecretDef> = {
   },
 };
 
+export interface IClassTree {
+  forms: string[]; // tier forms (3 main, 4 secret)
+  branches?: { a: string; b: string }; // T4 forms (main lines only)
+}
+
+export const classTree = (line: TLine | null): IClassTree | undefined => {
+  if (line === null) {
+    return undefined;
+  }
+  if (isSecret(line)) {
+    return { forms: [...SECRET_TREE[line].forms] };
+  }
+  return {
+    forms: [...CLASS_TREE[line].forms],
+    branches: { ...CLASS_TREE[line].branches },
+  };
+};
+
 export interface IClassState {
   line: TLine | null;
   tier: number;
@@ -167,6 +185,7 @@ export interface IClassState {
   affinity: Record<string, number>;
   advancement_pending: "class" | "branch" | null;
   base_passive_pct: number;
+  tree?: IClassTree;
 }
 
 export const tierForLevel = (level: number): number => {

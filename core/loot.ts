@@ -25,6 +25,9 @@ export interface IInventoryItem {
   id: string;
   rarity: Rarity;
   count: number;
+  name?: string;
+  kind?: LootKind;
+  equipped?: boolean;
 }
 
 export interface ICosmetics {

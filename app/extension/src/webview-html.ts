@@ -7,11 +7,14 @@ export interface IBuildWebviewHtmlArgs {
 
 export const buildWebviewHtml = (args: IBuildWebviewHtmlArgs): string => {
   const { scriptUri, styleUri, cspSource, nonce } = args;
+  // Google Fonts: the @import pulls a stylesheet from fonts.googleapis.com and the
+  // font files from fonts.gstatic.com — both must be allowlisted or the webview CSP
+  // silently blocks them and the pixel/fantasy fonts fall back to system fonts.
   const csp = [
     "default-src 'none'",
     `img-src ${cspSource} data:`,
-    `font-src ${cspSource}`,
-    `style-src ${cspSource}`,
+    `font-src ${cspSource} https://fonts.gstatic.com`,
+    `style-src ${cspSource} https://fonts.googleapis.com`,
     `script-src 'nonce-${nonce}'`,
   ].join("; ");
   return `<!doctype html>

@@ -314,6 +314,9 @@ body {
 .chip-streak {
   color: var(--ember);
 }
+.chip-items {
+  color: var(--teal);
+}
 .chip-mult {
   color: var(--gold-soft);
 }
@@ -568,6 +571,143 @@ body {
   }
 }
 
+/* ── combat choreography (emoji/CSS placeholders; swap for sprite-sheets later) ── */
+.hero-attack {
+  animation: hero-attack 0.4s ease-out;
+}
+.hero-hurt {
+  animation: hero-hurt 0.5s steps(2) 2;
+  filter: hue-rotate(-30deg) brightness(1.2);
+}
+.hero-celebrate {
+  animation: hero-celebrate 1.2s ease-out;
+}
+@keyframes hero-attack {
+  0% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(14px) scale(1.05);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+@keyframes hero-hurt {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-6px);
+  }
+}
+@keyframes hero-celebrate {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-16px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+.monster-hp {
+  width: 46px;
+  height: 5px;
+  border: 1px solid var(--ink);
+  background: #241636;
+}
+.monster-hp > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, #d4886a, #9c4a3a);
+  transition: width 200ms ease;
+}
+.m-hurt {
+  animation: m-hurt 0.3s steps(2) 1;
+}
+.m-attack {
+  animation: m-attack 0.5s ease-out;
+}
+.m-die {
+  animation: m-die 0.6s ease-in forwards;
+}
+@keyframes m-hurt {
+  0%,
+  100% {
+    filter: none;
+    transform: translateX(0);
+  }
+  50% {
+    filter: brightness(2);
+    transform: translateX(5px);
+  }
+}
+@keyframes m-attack {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(-16px) scale(1.05);
+  }
+}
+@keyframes m-die {
+  0% {
+    transform: translateY(0) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(10px) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+.floaters {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.floater {
+  position: absolute;
+  font-family: "Pixelify Sans", monospace;
+  font-weight: 700;
+  font-size: 16px;
+  text-shadow: 2px 2px 0 #000;
+  animation: floater-rise 0.9s ease-out forwards;
+}
+.floater-xp {
+  right: 26%;
+  bottom: 42%;
+  color: var(--gold-soft);
+}
+.floater-hurt {
+  left: 30%;
+  bottom: 40%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #cc4a3a99;
+}
+@keyframes floater-rise {
+  0% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-26px);
+    opacity: 0;
+  }
+}
+
 /* motion conveys state; honor reduced-motion by stilling it */
 @media (prefers-reduced-motion: reduce) {
   .hero-farming,
@@ -576,6 +716,15 @@ body {
   .boss-defeated .boss,
   .boss-fled .boss,
   .loot-toast {
+    animation: none;
+  }
+  .hero-attack,
+  .hero-hurt,
+  .hero-celebrate,
+  .m-hurt,
+  .m-attack,
+  .m-die,
+  .floater {
     animation: none;
   }
   .xpbar > i {

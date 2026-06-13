@@ -1,5 +1,6 @@
 import { test, expect } from "bun:test";
-import { diffStates, GameEventType } from "./game-events";
+import { diffStates, GameEventType, combatBeats } from "./game-events";
+import type { IState } from "../../core/state";
 
 const st = (
   defeated: number,
@@ -36,4 +37,23 @@ test("diffStates emits boss outcomes with the loot delta", () => {
 
   expect(diffStates(prev, prev)).toEqual([]);
   expect(diffStates(null, won)).toEqual([]); // no animation on first load
+});
+
+const mkState = (o: object): IState =>
+  ({ xp_total: 0, level: 1, stats: {}, ...o }) as unknown as IState;
+
+test("combatBeats reports xp gain, failure, and level-up deltas", () => {
+  const prev = mkState({ xp_total: 100, level: 5, stats: { action_fails: 2 } });
+  const next = mkState({ xp_total: 103, level: 6, stats: { action_fails: 3 } });
+  expect(combatBeats(prev, next)).toEqual({ xp: 3, hurt: true, leveledUp: true });
+});
+
+test("combatBeats is empty with no prev and clamps negative xp", () => {
+  expect(combatBeats(null, mkState({ xp_total: 5 }))).toEqual({
+    xp: 0,
+    hurt: false,
+    leveledUp: false,
+  });
+  const beats = combatBeats(mkState({ xp_total: 10 }), mkState({ xp_total: 4 }));
+  expect(beats.xp).toBe(0); // clamped
 });

@@ -34,6 +34,7 @@ export interface IState {
     cmds?: Record<string, number>;
     boss_defeated?: number;
     boss_fled?: number;
+    action_fails?: number;
   };
   streak?: IStreak;
   achievements?: IAchievementsState;

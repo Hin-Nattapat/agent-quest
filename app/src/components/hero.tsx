@@ -1,15 +1,11 @@
-import type { ActivityState } from "../activity";
-
 interface IProps {
   line: string;
-  activity: ActivityState;
+  anim: string;
 }
 
 const Hero = (props: IProps) => {
-  const { line, activity } = props;
-  return (
-    <div className={`sprite hero hero-${line} hero-${activity}`} aria-label="hero" />
-  );
+  const { line, anim } = props;
+  return <div className={`sprite hero hero-${line} hero-${anim}`} aria-label="hero" />;
 };
 
 export default Hero;

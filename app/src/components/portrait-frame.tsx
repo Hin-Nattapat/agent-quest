@@ -11,6 +11,7 @@ const PortraitFrame = (props: IProps) => {
   const form = state.class?.form ?? "Novice";
   const title = state.cosmetics?.title ?? null;
   const days = state.streak?.current_days ?? 0;
+  const items = (state.inventory ?? []).length; // distinct loot owned
   const total = state.xp_in_level + state.xp_to_next;
 
   return (
@@ -38,6 +39,7 @@ const PortraitFrame = (props: IProps) => {
         </div>
         <div className="pf-chips">
           {days > 0 ? <span className="chip chip-streak">🔥 {days}d</span> : null}
+          <span className="chip chip-items">💎 {items}</span>
           <span className="chip chip-mult">{passiveMultiplier(state)}x</span>
         </div>
       </div>

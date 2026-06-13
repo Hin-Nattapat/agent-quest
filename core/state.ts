@@ -9,10 +9,19 @@ export interface IGroupStat {
   sessions: number;
 }
 
+export interface IEarnedAchievement {
+  id: string;
+  name: string;
+  desc: string;
+  points: number;
+}
+
 export interface IAchievementsState {
   earned: string[];
   points: number;
   progress: Record<string, number>;
+  earned_detail?: IEarnedAchievement[];
+  total?: number;
 }
 
 export interface IState {

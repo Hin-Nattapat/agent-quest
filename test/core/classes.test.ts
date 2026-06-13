@@ -49,7 +49,7 @@ test("advancementPending", () => {
   expect(advancementPending({ line: null, level: 4, branch: null })).toBe(null);
 });
 
-import { SecretLine, isSecret, SECRET_TREE } from "../../core/classes";
+import { SecretLine, isSecret, SECRET_TREE, classTree } from "../../core/classes";
 
 test("secret lines resolve four branchless forms; Novice at tier 0", () => {
   expect(isSecret(SecretLine.Maestro)).toBe(true);
@@ -76,4 +76,17 @@ test("a secret line never pends a branch, even at level 50", () => {
   expect(advancementPending({ line: ClassLine.Mage, level: 50, branch: null })).toBe(
     "branch",
   ); // main unchanged
+});
+
+test("classTree gives 3 forms + branches for a main line, 4 + none for secret, undefined for null", () => {
+  const mage = classTree(ClassLine.Mage);
+  expect(mage?.forms.length).toBe(3);
+  expect(mage?.branches?.a).toBe("Cloud Summoner");
+  expect(mage?.branches?.b).toBe("Kernel Lich");
+
+  const trick = classTree(SecretLine.Trickster);
+  expect(trick?.forms.length).toBe(4);
+  expect(trick?.branches).toBeUndefined();
+
+  expect(classTree(null)).toBeUndefined();
 });

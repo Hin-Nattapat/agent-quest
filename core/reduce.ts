@@ -13,6 +13,7 @@ import {
   formFor,
   iconFor,
   advancementPending,
+  classTree,
   SecretLine,
   type IClassState,
 } from "./classes";
@@ -269,6 +270,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     affinity: computeAffinity(events),
     advancement_pending: advancementPending({ line, level: prog.level, branch }),
     base_passive_pct: basePct(classTier, config.passive),
+    tree: classTree(line),
   };
 
   const triggers: ITrigger[] = [];
@@ -290,11 +292,13 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     triggers.push({ table: "streak100", seed: "streak:100" });
   }
   triggers.push(...bossTriggers);
-  const inventory = rollInventory({
-    triggers,
-    lootTable,
-    dropTables,
-  });
+  const inventoryRaw = rollInventory({ triggers, lootTable, dropTables });
+  const inventory = inventoryRaw.map(item => ({
+    ...item,
+    name: lootTable[item.id]?.name,
+    kind: lootTable[item.id]?.kind,
+    equipped: item.id === profile?.title || item.id === profile?.theme,
+  }));
 
   const prelim: TReducedState = {
     version: 1,
@@ -348,9 +352,15 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     earnedTitles,
     lootTable,
   });
+  const earned_detail = achievements.earned.map(id => ({
+    id,
+    name: registry[id]?.name ?? id,
+    desc: registry[id]?.desc ?? "",
+    points: registry[id]?.points ?? 0,
+  }));
   return {
     ...prelim,
-    achievements,
+    achievements: { ...achievements, earned_detail, total: Object.keys(registry).length },
     cosmetics,
     unlocked_secret_classes: unlocked,
   };

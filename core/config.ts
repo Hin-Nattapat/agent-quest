@@ -9,7 +9,14 @@ import {
   type TPassiveRates,
 } from "./xp";
 import { DEFAULT_ACHIEVEMENTS, type IAchievementDef } from "./achievements";
-import { LOOT_TABLE, DROP_TABLES, type ILootItem, type TDropTable } from "./loot";
+import {
+  LOOT_TABLE,
+  DROP_TABLES,
+  DEFAULT_BOSS_RATE,
+  DEFAULT_BOSS_FLEE_RATE,
+  type ILootItem,
+  type TDropTable,
+} from "./loot";
 
 export interface IConfig {
   weights: IWeights;
@@ -18,6 +25,8 @@ export interface IConfig {
   passive?: TPassiveRates;
   loot?: Record<string, ILootItem>;
   drops?: Record<string, TDropTable>;
+  boss_rate?: number;
+  boss_flee_rate?: number;
 }
 
 // The runtime home (`$AGENTRPG_HOME`, else `~/.agentrpg`). Shared by the CLI entry points.
@@ -33,6 +42,8 @@ export function loadConfig(home: string): IConfig {
     passive: DEFAULT_PASSIVE,
     loot: LOOT_TABLE,
     drops: DROP_TABLES,
+    boss_rate: DEFAULT_BOSS_RATE,
+    boss_flee_rate: DEFAULT_BOSS_FLEE_RATE,
   };
   const p = join(home, "config.json");
   if (!existsSync(p)) {
@@ -51,6 +62,8 @@ export function loadConfig(home: string): IConfig {
       passive: { ...DEFAULT_PASSIVE, ...(raw?.passive ?? {}) },
       loot: { ...LOOT_TABLE, ...(raw?.loot ?? {}) },
       drops: { ...DROP_TABLES, ...(raw?.drops ?? {}) },
+      boss_rate: raw?.boss_rate ?? DEFAULT_BOSS_RATE,
+      boss_flee_rate: raw?.boss_flee_rate ?? DEFAULT_BOSS_FLEE_RATE,
     };
   } catch {
     return base;

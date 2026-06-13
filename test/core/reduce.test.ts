@@ -344,3 +344,44 @@ test("last_event is the latest event by ts (or undefined when empty)", () => {
   });
   expect(reduce([], cfg, "2026-06-11").last_event).toBeUndefined();
 });
+
+test("bosses are rate-based, seeded, and idempotent", () => {
+  const home = makeHome();
+  const acts = Array.from(
+    { length: 20 },
+    () =>
+      ({
+        ts: "2026-06-11T12:00:00Z",
+        source: "claude-code",
+        session_id: "s",
+        type: "action",
+        action: "read",
+        repo: "cq",
+      }) as any,
+  );
+
+  const none = reduce(acts, { ...loadConfig(home), boss_rate: 0 }, "2026-06-11");
+  expect(none.stats.boss_defeated).toBe(0);
+  expect(none.stats.boss_fled).toBe(0);
+
+  const won = reduce(
+    acts,
+    { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 0 },
+    "2026-06-11",
+  );
+  expect(won.stats.boss_defeated).toBe(20);
+  expect(won.stats.boss_fled).toBe(0);
+  expect((won.inventory ?? []).length).toBeGreaterThan(0);
+
+  const fled = reduce(
+    acts,
+    { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 1 },
+    "2026-06-11",
+  );
+  expect(fled.stats.boss_fled).toBe(20);
+  expect(fled.stats.boss_defeated).toBe(0);
+
+  expect(
+    reduce(acts, { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 0 }, "2026-06-11"),
+  ).toEqual(won);
+});

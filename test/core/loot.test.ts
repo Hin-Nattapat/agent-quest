@@ -48,3 +48,19 @@ test("resolveCosmetics resolves an earned-achievement title; loot title still wi
   expect(resolveCosmetics({ title: "undying" }, [], {}).title).toBe(null);
   expect(resolveCosmetics({ title: "rookie_title" }, inv, earned).title).toBe("Rookie");
 });
+
+import { DROP_TABLES, DEFAULT_BOSS_RATE, DEFAULT_BOSS_FLEE_RATE } from "../../core/loot";
+
+test("the boss drop table exists and rolls a valid item", () => {
+  expect(DROP_TABLES.boss).toBeDefined();
+  const id = rollDrop({ table: "boss", seed: "b1" });
+  expect(id).not.toBe(null);
+  expect(LOOT_TABLE[id!]).toBeDefined();
+});
+
+test("boss rate defaults are sane fractions", () => {
+  expect(DEFAULT_BOSS_RATE).toBeGreaterThan(0);
+  expect(DEFAULT_BOSS_RATE).toBeLessThan(1);
+  expect(DEFAULT_BOSS_FLEE_RATE).toBeGreaterThan(0);
+  expect(DEFAULT_BOSS_FLEE_RATE).toBeLessThan(1);
+});

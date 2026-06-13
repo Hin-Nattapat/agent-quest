@@ -21,8 +21,11 @@ import {
   resolveCosmetics,
   LOOT_TABLE,
   DROP_TABLES,
+  DEFAULT_BOSS_RATE,
+  DEFAULT_BOSS_FLEE_RATE,
   type ITrigger,
 } from "./loot";
+import { seededRng } from "./rng";
 import { type IState, type IGroupStat } from "./state";
 
 export type TReducedState = Omit<IState, "updated_at">;
@@ -100,6 +103,12 @@ export function reduce(
   let runningActions = 0;
   const pendingFail = new Set<string>();
   const cmds: Record<string, number> = {};
+  let bossOrdinal = 0;
+  let bossDefeated = 0;
+  let bossFled = 0;
+  const bossTriggers: ITrigger[] = [];
+  const bossRate = config.boss_rate ?? DEFAULT_BOSS_RATE;
+  const bossFleeRate = config.boss_flee_rate ?? DEFAULT_BOSS_FLEE_RATE;
 
   const line = profile?.line ?? null;
   const sorted = [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts));
@@ -152,6 +161,17 @@ export function reduce(
     if (e.cmd) {
       cmds[e.cmd] = (cmds[e.cmd] ?? 0) + 1;
     }
+    if (e.type === EventType.Action) {
+      bossOrdinal++;
+      if (seededRng(`boss:${bossOrdinal}`)() < bossRate) {
+        if (seededRng(`bossflee:${bossOrdinal}`)() < bossFleeRate) {
+          bossFled++;
+        } else {
+          bossDefeated++;
+          bossTriggers.push({ table: "boss", seed: `bossloot:${bossOrdinal}` });
+        }
+      }
+    }
     if (asceticSeal === 0 && runningActions > 0) {
       const lvlNow = levelFor(running, config.difficulty);
       if (
@@ -203,6 +223,7 @@ export function reduce(
   if (streak.best_days >= 100) {
     triggers.push({ table: "streak100", seed: "streak:100" });
   }
+  triggers.push(...bossTriggers);
   const inventory = rollInventory(triggers, lootTable, config.drops ?? DROP_TABLES);
 
   const prelim: TReducedState = {
@@ -221,6 +242,8 @@ export function reduce(
       failures_recovered: failuresRecovered,
       ascetic_seal: asceticSeal,
       cmds,
+      boss_defeated: bossDefeated,
+      boss_fled: bossFled,
     },
     streak,
     class: classState,

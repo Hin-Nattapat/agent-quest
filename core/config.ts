@@ -30,11 +30,11 @@ export interface IConfig {
 }
 
 // The runtime home (`$AGENTRPG_HOME`, else `~/.agentrpg`). Shared by the CLI entry points.
-export function defaultHome(): string {
+export const defaultHome = (): string => {
   return process.env.AGENTRPG_HOME || join(process.env.HOME ?? "", ".agentrpg");
-}
+};
 
-export function loadConfig(home: string): IConfig {
+export const loadConfig = (home: string): IConfig => {
   const base: IConfig = {
     weights: DEFAULT_WEIGHTS,
     difficulty: DEFAULT_DIFFICULTY,
@@ -68,4 +68,4 @@ export function loadConfig(home: string): IConfig {
   } catch {
     return base;
   }
-}
+};

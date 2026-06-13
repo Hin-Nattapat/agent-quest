@@ -19,7 +19,7 @@ export interface IAchievementDef {
 type TFacts = Record<string, number>;
 type TStateLike = Omit<IState, "updated_at">;
 
-function facts(state: TStateLike): TFacts {
+const facts = (state: TStateLike): TFacts => {
   const a = state.stats.actions;
   const n = (k: string) => a[k] ?? 0;
   const base: TFacts = {
@@ -45,9 +45,9 @@ function facts(state: TStateLike): TFacts {
     base[`cmd_${tag}`] = count;
   }
   return base;
-}
+};
 
-function passes(cond: TCond, f: TFacts): boolean {
+const passes = (cond: TCond, f: TFacts): boolean => {
   if ("all" in cond) {
     return cond.all.every(c => passes(c, f));
   }
@@ -60,10 +60,10 @@ function passes(cond: TCond, f: TFacts): boolean {
   }
   const v = f[cond.stat] ?? 0;
   return (cond.gte == null || v >= cond.gte) && (cond.lt == null || v < cond.lt);
-}
+};
 
 // Current value for a simple gte condition, for an unearned progress bar. null = no simple bar.
-function progressValue(cond: TCond, f: TFacts): number | null {
+const progressValue = (cond: TCond, f: TFacts): number | null => {
   if ("distinct" in cond) {
     return cond.distinct === "source" ? f.distinct_source : f.distinct_repo;
   }
@@ -71,12 +71,12 @@ function progressValue(cond: TCond, f: TFacts): number | null {
     return f[cond.stat] ?? 0;
   }
   return null;
-}
+};
 
-export function evaluateAchievements(
+export const evaluateAchievements = (
   state: TStateLike,
   registry: Record<string, IAchievementDef> = {},
-): IAchievementsState {
+): IAchievementsState => {
   const f = facts(state);
   const earned: string[] = [];
   let points = 0;
@@ -93,7 +93,7 @@ export function evaluateAchievements(
     }
   }
   return { earned, points, progress };
-}
+};
 
 export const DEFAULT_ACHIEVEMENTS: Record<string, IAchievementDef> = {
   first_blood: {

@@ -25,7 +25,10 @@ test("journal -> reduceToFile -> renderHud produces a coherent line", () => {
   expect(state.level).toBe(3);
 
   const onDisk = JSON.parse(readFileSync(join(home, "state.json"), "utf8"));
-  const line = renderHud(onDisk, { model: "Opus 4.8", cost: 0.1, ctx: 12 });
+  const line = renderHud({
+    state: onDisk,
+    tail: { model: "Opus 4.8", cost: 0.1, ctx: 12 },
+  });
   expect(line).toContain("Lv.3");
   expect(line).toContain("ctx 12%");
 });

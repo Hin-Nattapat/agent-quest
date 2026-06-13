@@ -6,12 +6,12 @@ const MAGE_EXT = [".go", ".sql", ".rs", ".yaml", ".yml"];
 const RANGER_EXT = [".tsx", ".jsx", ".css", ".scss", ".html", ".vue"];
 const SAGE_EXT = [".md", ".mdx"];
 
-function hasExt(file: string | undefined, exts: string[]): boolean {
+const hasExt = (file: string | undefined, exts: string[]): boolean => {
   return file != null && exts.some(ext => file.endsWith(ext));
-}
+};
 
 // Each event contributes to at most one line (delegate wins over a failed delegate, etc.).
-export function lineForEvent(e: INormalizedEvent): ClassLine | null {
+export const lineForEvent = (e: INormalizedEvent): ClassLine | null => {
   if (e.action === AgentAction.Delegate) {
     return ClassLine.Sage;
   }
@@ -39,9 +39,11 @@ export function lineForEvent(e: INormalizedEvent): ClassLine | null {
     }
   }
   return null;
-}
+};
 
-export function computeAffinity(events: INormalizedEvent[]): Record<ClassLine, number> {
+export const computeAffinity = (
+  events: INormalizedEvent[],
+): Record<ClassLine, number> => {
   const counts: Record<ClassLine, number> = {
     [ClassLine.Mage]: 0,
     [ClassLine.Ranger]: 0,
@@ -64,11 +66,11 @@ export function computeAffinity(events: INormalizedEvent[]): Record<ClassLine, n
     affinity[line] = counts[line] / total;
   }
   return affinity;
-}
+};
 
 // Which events feed a line's base passive. Main lines reuse affinity's signal; secret lines
 // each have a narrow thematic predicate (so a secret is never strictly stronger than a main line).
-export function isPassiveSignal(line: TLine, e: INormalizedEvent): boolean {
+export const isPassiveSignal = (line: TLine, e: INormalizedEvent): boolean => {
   if (!isSecret(line)) {
     return lineForEvent(e) === line;
   }
@@ -84,4 +86,4 @@ export function isPassiveSignal(line: TLine, e: INormalizedEvent): boolean {
     case SecretLine.Trickster:
       return false;
   }
-}
+};

@@ -11,7 +11,7 @@ export interface IProfile {
   xyzzy?: boolean;
 }
 
-export function loadProfile(home: string): IProfile {
+export const loadProfile = (home: string): IProfile => {
   const p = join(home, "profile.json");
   if (!existsSync(p)) {
     return {};
@@ -21,8 +21,8 @@ export function loadProfile(home: string): IProfile {
   } catch {
     return {};
   }
-}
+};
 
-export function saveProfile(home: string, profile: IProfile): void {
+export const saveProfile = (home: string, profile: IProfile): void => {
   writeFileSync(join(home, "profile.json"), JSON.stringify(profile, null, 2));
-}
+};

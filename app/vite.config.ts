@@ -8,5 +8,15 @@ export default defineConfig({
   server: {
     proxy: { "/events": "http://localhost:7070" },
   },
-  build: { outDir: "dist" },
+  build: {
+    outDir: "dist",
+    // Stable, unhashed names so the VS Code webview can reference assets/app.js + app.css directly.
+    rollupOptions: {
+      output: {
+        entryFileNames: "assets/app.js",
+        chunkFileNames: "assets/app-[name].js",
+        assetFileNames: "assets/app.[ext]",
+      },
+    },
+  },
 });

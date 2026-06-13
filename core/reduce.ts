@@ -108,6 +108,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   const dates = new Set<string>();
   const sessionInfo: Record<string, { hasFail: boolean; hasEnd: boolean }> = {};
   let nightActions = 0;
+  let actionFails = 0;
   let failuresRecovered = 0;
   let asceticSeal = 0;
   let runningRuns = 0;
@@ -169,6 +170,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     }
     if (e.type === EventType.ActionFail) {
       sessionInfo[e.session_id].hasFail = true;
+      actionFails++;
     }
     if (e.type === EventType.SessionEnd) {
       sessionInfo[e.session_id].hasEnd = true;
@@ -312,6 +314,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
       cmds,
       boss_defeated: bossDefeated,
       boss_fled: bossFled,
+      action_fails: actionFails,
     },
     streak,
     class: classState,

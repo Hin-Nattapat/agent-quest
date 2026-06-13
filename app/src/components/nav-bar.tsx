@@ -1,11 +1,23 @@
-const BUTTONS = ["Hero", "Talents", "Items", "Codex"];
+import { PanelId } from "../panels";
 
-const NavBar = () => {
+interface IProps {
+  onOpen: (panel: PanelId) => void;
+}
+
+const BUTTONS: { id: PanelId; label: string }[] = [
+  { id: PanelId.Hero, label: "Hero" },
+  { id: PanelId.Talents, label: "Talents" },
+  { id: PanelId.Items, label: "Items" },
+  { id: PanelId.Codex, label: "Codex" },
+];
+
+const NavBar = (props: IProps) => {
+  const { onOpen } = props;
   return (
     <div className="nav-bar">
-      {BUTTONS.map(label => (
-        <button key={label} className="nav-btn" type="button" disabled>
-          {label}
+      {BUTTONS.map(b => (
+        <button key={b.id} className="nav-btn" type="button" onClick={() => onOpen(b.id)}>
+          {b.label}
         </button>
       ))}
     </div>

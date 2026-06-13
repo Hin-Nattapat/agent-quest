@@ -16,26 +16,28 @@ const state = (o: Partial<IState>): IState => ({
 test("renders level, bar, percent, model, cost, ctx", () => {
   const s = state({ level: 5, xp_in_level: 200, xp_to_next: 300 }); // pct 0.4
   const tail: ITail = { model: "Opus 4.8", cost: 0.42, ctx: 8 };
-  expect(renderHud(s, tail)).toBe(
+  expect(renderHud({ state: s, tail })).toBe(
     "Adventurer · Novice  Lv.5 ████░░░░░░ 40%  |  Opus 4.8  $0.42  ·  ctx 8%",
   );
 });
 
 test("null cost -> $0.00, null ctx -> ctx 0%, null model -> ?", () => {
   const s = state({ level: 1, xp_in_level: 0, xp_to_next: 7 });
-  expect(renderHud(s, { model: null, cost: null, ctx: null })).toBe(
+  expect(renderHud({ state: s, tail: { model: null, cost: null, ctx: null } })).toBe(
     "Adventurer · Novice  Lv.1 ░░░░░░░░░░ 0%  |  ?  $0.00  ·  ctx 0%",
   );
 });
 
 test("non-integer ctx is rounded", () => {
   const s = state({ level: 1, xp_in_level: 0, xp_to_next: 7 });
-  expect(renderHud(s, { model: "M", cost: 1, ctx: 23.5 })).toContain("ctx 24%");
+  expect(renderHud({ state: s, tail: { model: "M", cost: 1, ctx: 23.5 } })).toContain(
+    "ctx 24%",
+  );
 });
 
 test("max level shows full bar + MAX at 100%", () => {
   const s = state({ level: 50, xp_in_level: 1000, xp_to_next: 0 });
-  expect(renderHud(s, { model: "M", cost: 0, ctx: 0 })).toBe(
+  expect(renderHud({ state: s, tail: { model: "M", cost: 0, ctx: 0 } })).toBe(
     "Adventurer · Novice  Lv.50 ██████████ MAX 100%  |  M  $0.00  ·  ctx 0%",
   );
 });
@@ -56,7 +58,9 @@ test("named character shows icon + form; pending adds the sparkle", () => {
       advancement_pending: null,
     },
   } as any;
-  expect(renderHud(named, tail)).toContain("Gandalf · ⚔ Infra Archmage  Lv.30");
+  expect(renderHud({ state: named, tail })).toContain(
+    "Gandalf · ⚔ Infra Archmage  Lv.30",
+  );
 
   const pending = {
     ...base,
@@ -70,7 +74,7 @@ test("named character shows icon + form; pending adds the sparkle", () => {
       advancement_pending: "class",
     },
   } as any;
-  expect(renderHud(pending, tail)).toContain("Adventurer · Novice ✨  Lv.30");
+  expect(renderHud({ state: pending, tail })).toContain("Adventurer · Novice ✨  Lv.30");
 });
 
 test("shows the fire streak when current_days >= 1, hidden at 0", () => {
@@ -80,12 +84,12 @@ test("shows the fire streak when current_days >= 1, hidden at 0", () => {
     ...base,
     streak: { current_days: 5, best_days: 9, last_active: "2026-06-11" },
   };
-  expect(renderHud(hot, tail)).toContain(" 🔥5d ");
+  expect(renderHud({ state: hot, tail })).toContain(" 🔥5d ");
   const cold = {
     ...base,
     streak: { current_days: 0, best_days: 9, last_active: "2026-06-01" },
   };
-  expect(renderHud(cold, tail)).not.toContain("🔥");
+  expect(renderHud({ state: cold, tail })).not.toContain("🔥");
 });
 
 test("loot cosmetics + rate limits render; null rates are omitted", () => {
@@ -94,12 +98,15 @@ test("loot cosmetics + rate limits render; null rates are omitted", () => {
     cosmetics: { title: "Codeweaver", theme_color: "36" },
     inventory: [{ id: "x", rarity: "rare", count: 3 }],
   } as any;
-  const out = renderHud(s, {
-    model: "Opus",
-    cost: 0.5,
-    ctx: 8,
-    five_hour: 23,
-    seven_day: 41,
+  const out = renderHud({
+    state: s,
+    tail: {
+      model: "Opus",
+      cost: 0.5,
+      ctx: 8,
+      five_hour: 23,
+      seven_day: 41,
+    },
   });
   expect(out).toContain("Adventurer the Codeweaver");
   expect(out).toContain("\x1b[36m");
@@ -107,12 +114,15 @@ test("loot cosmetics + rate limits render; null rates are omitted", () => {
   expect(out).toContain("5h 23%");
   expect(out).toContain("7d 41%");
 
-  const bare = renderHud(state({ level: 5, xp_in_level: 0, xp_to_next: 100 }), {
-    model: "M",
-    cost: 0,
-    ctx: 0,
-    five_hour: null,
-    seven_day: null,
+  const bare = renderHud({
+    state: state({ level: 5, xp_in_level: 0, xp_to_next: 100 }),
+    tail: {
+      model: "M",
+      cost: 0,
+      ctx: 0,
+      five_hour: null,
+      seven_day: null,
+    },
   });
   expect(bare).not.toContain("5h");
   expect(bare).not.toContain("7d");
@@ -120,7 +130,7 @@ test("loot cosmetics + rate limits render; null rates are omitted", () => {
 
 test("space-between right-aligns the CC group when cols is wide", () => {
   const s = state({ level: 5, xp_in_level: 0, xp_to_next: 100 });
-  const out = renderHud(s, { model: "M", cost: 0, ctx: 0 }, 200);
+  const out = renderHud({ state: s, tail: { model: "M", cost: 0, ctx: 0 }, cols: 200 });
   expect(out.endsWith("ctx 0%")).toBe(true);
   expect(out).not.toContain("|");
   expect(out.length).toBe(196); // padded to cols, reserving a 4-col right safety gap
@@ -132,10 +142,10 @@ test("emoji are counted as two columns so the right group never clips", () => {
     streak: { current_days: 1, best_days: 1, last_active: "2026-06-11" },
     inventory: [{ id: "x", rarity: "rare", count: 22 }],
   } as any;
-  const out = renderHud(
-    s,
-    { model: "M", cost: 0, ctx: 0, five_hour: 37, seven_day: 41 },
-    120,
-  );
+  const out = renderHud({
+    state: s,
+    tail: { model: "M", cost: 0, ctx: 0, five_hour: 37, seven_day: 41 },
+    cols: 120,
+  });
   expect(out.endsWith("7d 41%")).toBe(true); // full right group, not truncated
 });

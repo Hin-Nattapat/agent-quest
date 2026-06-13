@@ -3,6 +3,7 @@ import {
   parseStateEvent,
   sseTransport,
   postMessageTransport,
+  selectTransport,
   type IMessageTarget,
 } from "./transport";
 
@@ -78,4 +79,18 @@ test("postMessageTransport delivers state, posts ready, ignores non-state, unsub
 
   unsubscribe();
   expect(fake.handler).toBe(null);
+});
+
+test("selectTransport picks postMessage when acquireVsCodeApi exists", () => {
+  const posted: unknown[] = [];
+  const fakeWin = {
+    acquireVsCodeApi: () => ({ postMessage: (m: unknown) => posted.push(m) }),
+    addEventListener() {},
+    removeEventListener() {},
+  };
+  const transport = selectTransport(
+    fakeWin as unknown as Parameters<typeof selectTransport>[0],
+  );
+  transport.subscribe(() => {});
+  expect(posted).toEqual([{ type: "ready" }]); // proves the postMessage branch was chosen
 });

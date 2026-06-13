@@ -47,6 +47,21 @@ export function postMessageTransport(
   };
 }
 
+export interface IVsCodeWindow {
+  acquireVsCodeApi?: () => IVsCodeApi;
+  addEventListener(type: "message", handler: (event: MessageEvent) => void): void;
+  removeEventListener(type: "message", handler: (event: MessageEvent) => void): void;
+}
+
+// In a VS Code webview, acquireVsCodeApi is injected and may be called only once.
+// Everywhere else (browser dev, prod SSE bridge) fall back to the SSE endpoint.
+export function selectTransport(win: IVsCodeWindow): ITransport {
+  if (typeof win.acquireVsCodeApi === "function") {
+    return postMessageTransport(win.acquireVsCodeApi(), win);
+  }
+  return sseTransport("/events");
+}
+
 type TMakeSource = (url: string) => EventSource;
 
 export function sseTransport(

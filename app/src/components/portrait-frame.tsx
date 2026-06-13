@@ -39,7 +39,7 @@ const PortraitFrame = (props: IProps) => {
         </div>
         <div className="pf-chips">
           {days > 0 ? <span className="chip chip-streak">🔥 {days}d</span> : null}
-          <span className="chip chip-items">🎒 {items}</span>
+          <span className="chip chip-items">💎 {items}</span>
           <span className="chip chip-mult">{passiveMultiplier(state)}x</span>
         </div>
       </div>

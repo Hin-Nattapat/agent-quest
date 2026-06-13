@@ -6,35 +6,21 @@ import { buildWebviewHtml } from "./webview-html";
 import { watchState, readStateText } from "./state-feed";
 
 const HOME = process.env.AGENTRPG_HOME || join(homedir(), ".agentrpg");
-
-let panel: vscode.WebviewPanel | undefined;
-let disposeFeed: (() => void) | undefined;
+const VIEW_ID = "commitQuest.companion";
 
 // base64url avoids +, /, = so the value is unambiguous inside the CSP nonce-source and attribute.
 const nonce = (): string => randomBytes(16).toString("base64url");
 
-const openPanel = (context: vscode.ExtensionContext): void => {
-  if (panel) {
-    panel.reveal(vscode.ViewColumn.Beside);
-    return;
-  }
-
+// Wire one resolved webview view to the live state feed (re-run on each resolve).
+const resolveView = (
+  context: vscode.ExtensionContext,
+  view: vscode.WebviewView,
+): void => {
   // app/extension/ -> app/dist (the Vite build output)
   const distRoot = vscode.Uri.joinPath(context.extensionUri, "..", "dist");
-  panel = vscode.window.createWebviewPanel(
-    "commitQuestCompanion",
-    "Commit Quest",
-    vscode.ViewColumn.Beside,
-    {
-      enableScripts: true,
-      localResourceRoots: [distRoot],
-      // Keep the renderer alive when the tab is hidden so switching back doesn't reload + re-handshake.
-      retainContextWhenHidden: true,
-    },
-  );
-  context.subscriptions.push(panel);
+  const { webview } = view;
+  webview.options = { enableScripts: true, localResourceRoots: [distRoot] };
 
-  const { webview } = panel;
   const scriptUri = webview
     .asWebviewUri(vscode.Uri.joinPath(distRoot, "assets", "app.js"))
     .toString();
@@ -57,29 +43,34 @@ const openPanel = (context: vscode.ExtensionContext): void => {
       }
     }
   });
-  context.subscriptions.push(messageSub);
 
   // watchState clears its pending debounce timer on dispose, so onJson never fires post-dispose.
-  disposeFeed = watchState(HOME, json => {
+  const disposeFeed = watchState(HOME, json => {
     webview.postMessage({ type: "state", json });
   });
 
-  panel.onDidDispose(() => {
-    disposeFeed?.();
-    disposeFeed = undefined;
+  view.onDidDispose(() => {
+    disposeFeed();
     messageSub.dispose();
-    panel = undefined;
   });
 };
 
 export const activate = (context: vscode.ExtensionContext): void => {
+  const provider: vscode.WebviewViewProvider = {
+    resolveWebviewView(view) {
+      resolveView(context, view);
+    },
+  };
+
   context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(VIEW_ID, provider, {
+      // Keep the renderer alive when the panel is collapsed so reopening doesn't reload + re-handshake.
+      webviewOptions: { retainContextWhenHidden: true },
+    }),
     vscode.commands.registerCommand("commitQuest.openCompanion", () =>
-      openPanel(context),
+      vscode.commands.executeCommand(`${VIEW_ID}.focus`),
     ),
   );
 };
 
-export const deactivate = (): void => {
-  disposeFeed?.();
-};
+export const deactivate = (): void => {};

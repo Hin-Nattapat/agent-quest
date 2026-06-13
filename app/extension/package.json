@@ -8,10 +8,26 @@
     "vscode": "^1.90.0"
   },
   "main": "./dist/extension.js",
-  "activationEvents": [
-    "onCommand:commitQuest.openCompanion"
-  ],
+  "activationEvents": [],
   "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "commitQuestPanel",
+          "title": "Commit Quest",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "commitQuestPanel": [
+        {
+          "id": "commitQuest.companion",
+          "type": "webview",
+          "name": "Companion"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "commitQuest.openCompanion",

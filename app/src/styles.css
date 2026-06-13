@@ -507,12 +507,13 @@ body {
 .boss-encounter {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
   pointer-events: none;
 }
+/* boss takes the foe slot on the right (same combat axis as the ambient monster) */
 .boss-encounter .boss {
-  position: static;
+  position: absolute;
+  right: 14%;
+  bottom: 18%;
   width: 96px;
   height: 96px;
   font-size: 64px;
@@ -706,6 +707,362 @@ body {
     transform: translateY(-26px);
     opacity: 0;
   }
+}
+
+/* ── nav panels (overlay over the scene) ── */
+.nav-btn {
+  cursor: pointer;
+  opacity: 1;
+}
+.nav-btn:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.panel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #0a0712cc;
+  display: grid;
+  place-items: center;
+  z-index: 20;
+}
+.panel-window {
+  width: min(82%, 600px);
+  height: min(86%, 460px); /* fixed so all four panels are the same size */
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow:
+    inset 0 0 0 2px var(--panel-dark),
+    0 0 0 2px var(--ink);
+  border-radius: 3px;
+}
+.panel-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--gold-soft);
+  border-bottom: 2px solid var(--ink);
+}
+.panel-close {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: var(--text);
+  background: #c0392b;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.panel-body {
+  flex: 1;
+  min-height: 0; /* lets overflow-y actually scroll inside the fixed window */
+  padding: 10px 12px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+.panel-head {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  margin: 10px 0 6px;
+}
+.panel-empty {
+  color: var(--dim);
+  padding: 8px 0;
+}
+
+/* hero panel */
+.hero-id {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.panel-portrait {
+  position: static;
+  width: 52px;
+  height: 52px;
+  font-size: 32px;
+  background: var(--panel-2);
+  border: 2px solid var(--ink);
+}
+.panel-portrait::after {
+  content: "🧙";
+}
+.hp-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+.hp-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--gold-soft);
+}
+.hp-class {
+  font-size: 12px;
+  color: var(--teal);
+}
+.hp-lvl {
+  font-size: 12px;
+  color: var(--dim);
+}
+.aff-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.aff-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 38px;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+.aff-bar {
+  height: 10px;
+  border: 2px solid var(--ink);
+  background: #1d1830;
+}
+.aff-bar > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, #69b09c, #3c7e6c);
+}
+.aff-pct {
+  text-align: right;
+  color: var(--dim);
+}
+.hero-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.hero-col {
+  min-width: 0;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  margin: 0;
+  font-size: 12px;
+}
+.stat-grid dt {
+  color: var(--dim);
+  white-space: nowrap;
+}
+.stat-grid dd {
+  margin: 0;
+  text-align: right;
+  color: var(--text);
+}
+
+/* items grid */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+}
+.item-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px 5px;
+  background: var(--panel-2);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+}
+.item-slot.equipped {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-soft);
+}
+.item-icon {
+  font-size: 24px;
+}
+.item-count {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 10px;
+  color: var(--dim);
+}
+.item-name {
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.rarity-common {
+  border-bottom: 3px solid #b3ad9c;
+}
+.rarity-rare {
+  border-bottom: 3px solid #6f9fcf;
+}
+.rarity-epic {
+  border-bottom: 3px solid #b491cf;
+}
+.rarity-legendary {
+  border-bottom: 3px solid #cf9f4e;
+}
+
+/* codex deeds */
+.deed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-content: start;
+}
+.deed-row {
+  padding: 4px 7px;
+  background: var(--panel-2);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+}
+.deed-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+.deed-name {
+  color: var(--gold-soft);
+  font-size: 11px;
+}
+.deed-pts {
+  color: var(--dim);
+  font-size: 9px;
+  white-space: nowrap;
+}
+.deed-desc {
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 1px;
+  line-height: 1.15;
+}
+.deed-locked {
+  grid-column: 1 / -1;
+  color: var(--dim);
+  text-align: center;
+}
+
+/* talents — vertical MMORPG-style tree with connector lines */
+.talent-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 0 4px;
+}
+.talent-node {
+  position: relative;
+  width: 190px;
+  margin-top: 16px;
+  padding: 7px 10px;
+  text-align: center;
+  background: var(--panel-2);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+}
+.talent-node:first-child {
+  margin-top: 0;
+}
+/* connector stem from the node above */
+.talent-node:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  width: 3px;
+  height: 16px;
+  background: var(--gold);
+  transform: translateX(-50%);
+}
+.tn-tier {
+  display: block;
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  margin-bottom: 3px;
+}
+.tn-form {
+  display: block;
+  font-size: 13px;
+}
+.talent-node.past {
+  border-color: var(--gold);
+}
+.talent-node.past .tn-form {
+  color: var(--text);
+}
+.talent-node.current {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 2px var(--gold-soft),
+    inset 0 0 8px #f0c04033;
+}
+.talent-node.current .tn-form {
+  color: var(--gold-soft);
+  font-weight: 700;
+}
+.talent-node.locked {
+  opacity: 0.55;
+}
+/* T4 fork: stem down from T3, a crossbar, then a stem up into each branch */
+.talent-fork {
+  position: relative;
+  display: flex;
+  gap: 28px;
+  margin-top: 30px;
+}
+/* crossbar joining the two branch stems (their centers sit at ~23% / ~77%) */
+.talent-fork::before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: 23%;
+  right: 23%;
+  height: 3px;
+  background: var(--gold);
+}
+/* stem from T3 above down to the crossbar */
+.talent-fork::after {
+  content: "";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  width: 3px;
+  height: 15px;
+  background: var(--gold);
+  transform: translateX(-50%);
+}
+.talent-fork .talent-node {
+  margin-top: 0;
+  width: 150px;
+}
+.talent-fork .talent-node::before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  width: 3px;
+  height: 15px;
+  background: var(--gold);
+  transform: translateX(-50%);
 }
 
 /* motion conveys state; honor reduced-motion by stilling it */

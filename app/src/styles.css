@@ -173,3 +173,62 @@ body {
   background: #1d212bdd;
   padding: 10px 14px;
 }
+
+/* ── Phase 3.2b: boss encounter (CSS art surface — swap for realm boss sprites §7) ── */
+.boss-encounter {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.boss-encounter .boss {
+  position: static;
+  width: 96px;
+  height: 96px;
+  font-size: 64px;
+}
+.boss-encounter .boss::after {
+  content: "🐉";
+}
+.boss-defeated .boss {
+  animation: boss-hit 0.5s steps(2) 8;
+}
+.boss-fled .boss {
+  animation: boss-flee 1s ease-in forwards;
+}
+@keyframes boss-hit {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(5px);
+  }
+}
+@keyframes boss-flee {
+  to {
+    transform: translateX(120px);
+    opacity: 0;
+  }
+}
+.loot-toast {
+  position: absolute;
+  bottom: 56px;
+  display: flex;
+  gap: 8px;
+  animation: toast-rise 0.6s ease-out;
+}
+.loot-item {
+  background: #1d212bdd;
+  border: 1px solid #b08a3e;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 0.85rem;
+  color: #e8c873;
+}
+@keyframes toast-rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}

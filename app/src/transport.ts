@@ -18,7 +18,7 @@ export interface IVsCodeApi {
   postMessage(message: unknown): void;
 }
 
-interface IMessageTarget {
+export interface IMessageTarget {
   addEventListener(type: "message", handler: (event: MessageEvent) => void): void;
   removeEventListener(type: "message", handler: (event: MessageEvent) => void): void;
 }
@@ -31,7 +31,7 @@ export function postMessageTransport(
   return {
     subscribe(onState) {
       const handler = (event: MessageEvent) => {
-        const message = event.data as { type?: string; json?: string };
+        const message = event.data as { type?: unknown; json?: unknown };
         if (message?.type !== "state" || typeof message.json !== "string") {
           return;
         }

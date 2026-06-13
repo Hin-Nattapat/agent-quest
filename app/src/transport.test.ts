@@ -1,5 +1,10 @@
 import { test, expect } from "bun:test";
-import { parseStateEvent, sseTransport, postMessageTransport } from "./transport";
+import {
+  parseStateEvent,
+  sseTransport,
+  postMessageTransport,
+  type IMessageTarget,
+} from "./transport";
 
 const sample = {
   version: 1,
@@ -48,7 +53,7 @@ class FakeTarget {
   addEventListener(_type: "message", cb: (e: { data: unknown }) => void) {
     this.handler = cb;
   }
-  removeEventListener() {
+  removeEventListener(_type: "message", _cb: (e: { data: unknown }) => void) {
     this.handler = null;
   }
   emit(data: unknown) {
@@ -60,7 +65,7 @@ test("postMessageTransport delivers state, posts ready, ignores non-state, unsub
   const fake = new FakeTarget();
   const posted: unknown[] = [];
   const api = { postMessage: (m: unknown) => posted.push(m) };
-  const transport = postMessageTransport(api, fake as unknown as Window);
+  const transport = postMessageTransport(api, fake as unknown as IMessageTarget);
 
   const seen: number[] = [];
   const unsubscribe = transport.subscribe(s => seen.push(s.level));

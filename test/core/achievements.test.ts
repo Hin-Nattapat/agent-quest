@@ -167,5 +167,5 @@ test("a deed earns at its cmd_* threshold", () => {
     "hoarder",
   );
   expect(evaluateAchievements(withCmds({ stash: 20 }), reg).earned).toContain("hoarder");
-  expect(reg.timebender.reward?.title).toBe("the Timebender");
+  expect(reg.timebender.reward?.title).toBe("Timebender");
 });

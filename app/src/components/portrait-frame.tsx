@@ -9,6 +9,7 @@ const PortraitFrame = (props: IProps) => {
   const { state } = props;
   const tier = state.class?.tier ?? 0;
   const form = state.class?.form ?? "Novice";
+  const title = state.cosmetics?.title ?? null;
   const days = state.streak?.current_days ?? 0;
   const total = state.xp_in_level + state.xp_to_next;
 
@@ -16,7 +17,6 @@ const PortraitFrame = (props: IProps) => {
     <div className="portrait-frame">
       <div className="portrait">
         <span className="sprite portrait-face" aria-hidden="true" />
-        <span className="lvl-badge">{state.level}</span>
       </div>
       <div className="portrait-body">
         <div className="pf-top">
@@ -26,11 +26,15 @@ const PortraitFrame = (props: IProps) => {
             {tier > 0 ? ` · T${tier}` : ""}
           </span>
         </div>
-        <div className="xpbar">
-          <i style={{ width: `${xpPercent(state)}%` }} />
-          <span>
-            XP {state.xp_in_level} / {total}
-          </span>
+        {title ? <div className="pf-title">the {title}</div> : null}
+        <div className="xp-row">
+          <span className="lvl-tag">Lv.{state.level}</span>
+          <div className="xpbar">
+            <i style={{ width: `${xpPercent(state)}%` }} />
+            <span>
+              {state.xp_in_level} / {total}
+            </span>
+          </div>
         </div>
         <div className="pf-chips">
           {days > 0 ? <span className="chip chip-streak">🔥 {days}d</span> : null}

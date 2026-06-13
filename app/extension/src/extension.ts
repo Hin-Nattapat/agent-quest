@@ -10,7 +10,8 @@ const HOME = process.env.AGENTRPG_HOME || join(homedir(), ".agentrpg");
 let panel: vscode.WebviewPanel | undefined;
 let disposeFeed: (() => void) | undefined;
 
-const nonce = (): string => randomBytes(16).toString("base64");
+// base64url avoids +, /, = so the value is unambiguous inside the CSP nonce-source and attribute.
+const nonce = (): string => randomBytes(16).toString("base64url");
 
 const openPanel = (context: vscode.ExtensionContext): void => {
   if (panel) {
@@ -27,9 +28,11 @@ const openPanel = (context: vscode.ExtensionContext): void => {
     {
       enableScripts: true,
       localResourceRoots: [distRoot],
+      // Keep the renderer alive when the tab is hidden so switching back doesn't reload + re-handshake.
       retainContextWhenHidden: true,
     },
   );
+  context.subscriptions.push(panel);
 
   const { webview } = panel;
   const scriptUri = webview
@@ -46,15 +49,17 @@ const openPanel = (context: vscode.ExtensionContext): void => {
   });
 
   // The webview asks for the current state once it has subscribed (mount-race fix).
-  webview.onDidReceiveMessage((message: { type?: string }) => {
-    if (message?.type === "ready") {
+  const messageSub = webview.onDidReceiveMessage((message: { type?: string }) => {
+    if (message.type === "ready") {
       const text = readStateText(HOME);
       if (text) {
         webview.postMessage({ type: "state", json: text });
       }
     }
   });
+  context.subscriptions.push(messageSub);
 
+  // watchState clears its pending debounce timer on dispose, so onJson never fires post-dispose.
   disposeFeed = watchState(HOME, json => {
     webview.postMessage({ type: "state", json });
   });
@@ -62,6 +67,7 @@ const openPanel = (context: vscode.ExtensionContext): void => {
   panel.onDidDispose(() => {
     disposeFeed?.();
     disposeFeed = undefined;
+    messageSub.dispose();
     panel = undefined;
   });
 };

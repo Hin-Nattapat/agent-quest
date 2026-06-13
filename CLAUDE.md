@@ -24,6 +24,16 @@ agents ──(adapters)──► append-only journal (NDJSON) ──(reducer)─
 - **Run on Bun.** Bun executes `.ts` directly; tests run with `bun test`. No transpile step.
 - **String enums, not string-literal unions.** Any finite set of states is a string-valued `enum` (e.g. `EventType`, `AgentAction`) referenced by member at every call site — never a bare `"prompt"` literal or `"a" | "b"` union. String values only (no numeric enums). Enum string values that cross the bash↔TS boundary ARE the wire strings — keep them in sync.
 - **Type prefixes:** `interface I*` for object/shape types (`INormalizedEvent`); `type T*` for unions/aliases/entities.
+- **Arrow functions assigned to `const`** — not `function` declarations — across all source (`core/`, `hud/`, `tools/`, `app/`), to match the FE. `const reduce = (…) => { … }`, never `function reduce(…) {}`. (Define before use; arrow consts don't hoist.)
+  - **0–2 params:** pass directly — `const xpFor = (event: INormalizedEvent, weights: IWeights): number => { … }`.
+  - **3+ params:** take a **single props object**, destructured on the first line, typed by a named `interface I<Fn>Args`:
+    ```ts
+    interface IReduceArgs { events: INormalizedEvent[]; config: IConfig; today?: string; profile?: IProfile; }
+    export const reduce = (props: IReduceArgs): TReducedState => {
+      const { events, config, today, profile } = props;
+      …
+    };
+    ```
 - **No `any`.** Use `unknown` + a type guard, or define the proper type.
 - **Clarity over cleverness.** Readability is the priority. Name intermediate values and extract a small, well-named helper instead of dense assign-in-expression bookkeeping (e.g. `(m[k] ??= {...}).x += v` inside a larger statement). Prefer focused functions over clever one-liners.
 - **Braces on every `if`/`else`** — including single-statement and guard clauses. No brace-less `if (x) return y;`.

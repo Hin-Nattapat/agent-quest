@@ -485,3 +485,17 @@ test("no boss spawns -> no boss/loot milestones", () => {
   expect(kinds).not.toContain(TimelineKind.BossDefeated);
   expect(kinds).not.toContain(TimelineKind.Loot);
 });
+
+test("reduce counts action_fail events into stats.action_fails, idempotently", () => {
+  const events = [
+    ev({ type: "action", action: "edit" }),
+    ev({ type: "action_fail", action: "run" }),
+    ev({ type: "action_fail", action: "read" }),
+  ];
+  const s = reduce({ events, config: cfg });
+  expect(s.stats.action_fails).toBe(2);
+  expect(reduce({ events, config: cfg }).stats.action_fails).toBe(2); // idempotent
+
+  const clean = reduce({ events: [ev({ type: "action", action: "edit" })], config: cfg });
+  expect(clean.stats.action_fails).toBe(0);
+});

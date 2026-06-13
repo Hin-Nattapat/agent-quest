@@ -1,103 +1,79 @@
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Press+Start+2P&display=swap");
+
 :root {
-  color-scheme: dark;
-  --bg: #14161b;
-  --panel: #1d212b;
-  --fill: #4cc2ff;
-  --text: #e6e6e6;
-  --muted: #8b93a3;
+  --gold: #f0c040;
+  --panel: #4a2d7a;
+  --panel-dark: #2a1a40;
+  --ink: #1a0f2e;
+  --text: #ece4f7;
+  --dim: #a99bc8;
 }
+
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  background: var(--bg);
+  font-family: "Pixelify Sans", system-ui, sans-serif;
   color: var(--text);
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-}
-.hud {
-  width: min(520px, 92vw);
-  background: var(--panel);
-  border-radius: 14px;
-  padding: 20px 24px;
-  display: grid;
-  gap: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-}
-.hud-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-}
-.title-tag {
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-.class-badge {
-  color: var(--muted);
-}
-.hud-level {
-  font-size: 0.95rem;
-  color: var(--muted);
-}
-.xp-bar {
-  position: relative;
-  height: 22px;
-  background: #0e1015;
-  border-radius: 11px;
-  overflow: hidden;
-}
-.xp-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #2f86c5, var(--fill));
-  transition: width 600ms ease;
-}
-.xp-bar-label {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: 0.8rem;
-}
-.hud-meta {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-.loading {
-  color: var(--muted);
-  font-family: ui-monospace, monospace;
+  background: #0e0a18;
+  image-rendering: pixelated;
 }
 
-/* ── Phase 3.2a: AFK scene · CSS owns every visual (swap these for PixelLab sprites later) ── */
+.loading {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  font-family: "Pixelify Sans", monospace;
+  color: var(--dim);
+}
+
+/* ── two-column companion ── */
+.companion {
+  display: flex;
+  gap: 8px;
+  height: 100vh;
+  padding: 8px;
+}
+
+/* ── scene (left) ── */
 .scene {
   position: relative;
-  width: min(560px, 94vw);
-  height: 320px;
-  border-radius: 14px;
+  flex: 1;
+  min-width: 0;
+  border: 3px solid var(--gold);
+  border-radius: 4px;
   overflow: hidden;
-  border: 2px solid #b08a3e;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 0 0 2px var(--ink);
+  background-color: #16331f;
 }
-.scene-grassland {
-  background: linear-gradient(180deg, #2e4d23, #1a2c13);
+.sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(2px 2px at 20% 18%, #fff8, transparent),
+    radial-gradient(2px 2px at 70% 28%, #fff6, transparent),
+    radial-gradient(2px 2px at 45% 12%, #fff7, transparent),
+    radial-gradient(circle at 82% 20%, #f3eecf 0 9px, transparent 10px),
+    linear-gradient(180deg, #1a1640 0%, #2a2456 55%, #234a2b 66%, #1a3a22 100%);
 }
-.scene-forest {
-  background: linear-gradient(180deg, #16331f, #0c1d12);
+.scene-grassland .sky {
+  background:
+    radial-gradient(2px 2px at 20% 18%, #fff8, transparent),
+    radial-gradient(circle at 82% 20%, #f3eecf 0 9px, transparent 10px),
+    linear-gradient(180deg, #1a1640, #2a2456 55%, #2e5d2b 66%, #1f3f1a);
 }
-.scene-dungeon {
-  background: linear-gradient(180deg, #2a2230, #141019);
+.scene-forest .sky {
+  background: linear-gradient(180deg, #0c1d12, #16331f 60%, #0c1d12);
 }
-.scene-secret_realm {
-  background: linear-gradient(180deg, #3a2c54, #15102a);
+.scene-dungeon .sky {
+  background: linear-gradient(180deg, #141019, #2a2230 60%, #141019);
+}
+.scene-secret_realm .sky {
+  background: linear-gradient(180deg, #15102a, #3a2c54 60%, #15102a);
 }
 
-/* sprite = swap surface: placeholder via ::after content -> replace with a background sprite-sheet */
 .sprite {
   position: absolute;
   width: 64px;
@@ -107,8 +83,8 @@ body {
   font-size: 40px;
 }
 .hero {
-  left: 38%;
-  bottom: 18px;
+  left: 30%;
+  bottom: 12%;
 }
 .hero::after {
   content: "🧙";
@@ -127,8 +103,8 @@ body {
   filter: grayscale(0.4);
 }
 .monster {
-  right: 16%;
-  bottom: 22px;
+  right: 20%;
+  bottom: 14%;
   font-size: 34px;
 }
 .monster-grassland::after {
@@ -161,20 +137,280 @@ body {
   }
 }
 
-/* HUD as a top overlay on the scene */
-.scene-hud {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 10px;
-}
-.scene-hud .hud {
-  width: auto;
-  background: #1d212bdd;
-  padding: 10px 14px;
+/* ── pixel panel chrome ── */
+.panel {
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow:
+    inset 0 0 0 2px var(--panel-dark),
+    0 0 0 2px var(--ink);
+  border-radius: 3px;
 }
 
-/* ── Phase 3.2b: boss encounter (CSS art surface — swap for realm boss sprites §7) ── */
+/* ── portrait frame (overlay top-left of scene) ── */
+.portrait-frame {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  max-width: 320px;
+  background: var(--panel);
+  border: 3px solid var(--gold);
+  box-shadow:
+    inset 0 0 0 2px var(--panel-dark),
+    0 0 0 2px var(--ink);
+  border-radius: 3px;
+}
+.portrait {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  background: var(--panel-dark);
+  border: 2px solid var(--ink);
+  font-size: 30px;
+}
+.portrait-face::after {
+  content: "🧙";
+}
+.lvl-badge {
+  position: absolute;
+  left: -10px;
+  bottom: -10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #3a2456;
+  border: 3px solid var(--gold);
+  font-weight: 700;
+  font-size: 12px;
+  text-shadow: 1px 1px 0 #000;
+}
+.portrait-body {
+  flex: 1;
+  min-width: 0;
+}
+.pf-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  align-items: baseline;
+}
+.pf-name {
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+.pf-class {
+  font-size: 11px;
+  color: var(--gold);
+  white-space: nowrap;
+}
+.xpbar {
+  position: relative;
+  height: 13px;
+  margin-top: 5px;
+  border: 2px solid var(--ink);
+  background: #241636;
+}
+.xpbar > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, #ffe06a, #e0a020);
+  transition: width 500ms ease;
+}
+.xpbar > span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  text-shadow: 1px 1px 0 #000;
+}
+.pf-chips {
+  margin-top: 5px;
+  display: flex;
+  gap: 4px;
+}
+.chip {
+  padding: 1px 6px;
+  border-radius: 9px;
+  font-size: 10px;
+  border: 1px solid var(--ink);
+  background: var(--panel-dark);
+}
+.chip-streak {
+  color: #ff9a6a;
+}
+.chip-mult {
+  color: var(--gold);
+}
+
+/* ── area/zone tag (overlay top-right of scene) ── */
+.area-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  max-width: 45%;
+  padding: 5px 10px;
+  background: #1d1730dd;
+  border: 2px solid var(--gold);
+  box-shadow: inset 0 0 0 2px var(--panel-dark);
+  border-radius: 3px;
+  text-align: right;
+}
+.area-name {
+  font-size: 13px;
+  color: var(--gold);
+  text-shadow: 1px 1px 0 #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ── activity bar (bottom-center of scene) ── */
+.activity-bar {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  background: #1d1730dd;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6ad06a;
+}
+.activity-idle .activity-dot {
+  background: var(--gold);
+}
+.activity-rest .activity-dot {
+  background: #8a8a8a;
+}
+
+/* ── sidebar (right) ── */
+.sidebar {
+  width: 240px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+.activity-log {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+.log-head {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  padding-bottom: 6px;
+}
+.log-empty {
+  color: var(--dim);
+  font-size: 12px;
+}
+.log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+}
+.log-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 3px 0;
+  font-size: 12px;
+}
+.log-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.log-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.log-tag {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  color: var(--dim);
+}
+.tone-gold {
+  color: var(--gold);
+}
+.tone-teal {
+  color: #5fe0c8;
+}
+.tone-green {
+  color: #6ad06a;
+}
+.tone-red {
+  color: #ff6a6a;
+}
+.tone-common {
+  color: #cfcfcf;
+}
+.tone-rare {
+  color: #5fa8ff;
+}
+.tone-epic {
+  color: #c06aff;
+}
+.tone-legendary {
+  color: #ffb84a;
+}
+
+/* ── nav buttons ── */
+.nav-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  flex: none;
+}
+.nav-btn {
+  font-family: "Pixelify Sans", monospace;
+  font-size: 12px;
+  color: var(--text);
+  padding: 8px 0;
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  box-shadow: inset 0 0 0 2px var(--panel-dark);
+  border-radius: 3px;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ── boss encounter (kept from 3.2b) ── */
 .boss-encounter {
   position: absolute;
   inset: 0;
@@ -206,6 +442,10 @@ body {
   }
 }
 @keyframes boss-flee {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
   to {
     transform: translateX(120px);
     opacity: 0;
@@ -213,22 +453,27 @@ body {
 }
 .loot-toast {
   position: absolute;
-  bottom: 56px;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  gap: 8px;
+  gap: 6px;
   animation: toast-rise 0.6s ease-out;
 }
 .loot-item {
-  background: #1d212bdd;
-  border: 1px solid #b08a3e;
+  background: #1d1730e0;
+  border: 2px solid var(--gold);
   border-radius: 6px;
-  padding: 4px 9px;
-  font-size: 0.85rem;
-  color: #e8c873;
+  padding: 3px 8px;
+  font-size: 12px;
 }
 @keyframes toast-rise {
   from {
-    transform: translateY(12px);
+    transform: translate(-50%, 12px);
     opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
   }
 }

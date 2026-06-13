@@ -1,5 +1,5 @@
 // cyrb53 string hash -> a stable number seed.
-export function hashStr(str: string): number {
+export const hashStr = (str: string): number => {
   let h1 = 0xdeadbeef;
   let h2 = 0x41c6ce57;
   for (let i = 0; i < str.length; i++) {
@@ -10,10 +10,10 @@ export function hashStr(str: string): number {
   h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
   h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-}
+};
 
 // mulberry32 PRNG: a numeric seed -> a function yielding values in [0, 1).
-export function mulberry32(seed: number): () => number {
+export const mulberry32 = (seed: number): (() => number) => {
   let a = seed >>> 0;
   return function () {
     a = (a + 0x6d2b79f5) | 0;
@@ -21,8 +21,8 @@ export function mulberry32(seed: number): () => number {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
+};
 
-export function seededRng(seedStr: string): () => number {
+export const seededRng = (seedStr: string): (() => number) => {
   return mulberry32(hashStr(seedStr));
-}
+};

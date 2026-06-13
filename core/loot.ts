@@ -173,14 +173,23 @@ export const DROP_TABLES: Record<string, TDropTable> = {
     { rarity: Rarity.Legendary, weight: 0.2 },
   ],
   streak100: [{ rarity: Rarity.Legendary, weight: 1.0 }],
+  boss: [
+    { rarity: Rarity.Common, weight: 0.4 },
+    { rarity: Rarity.Rare, weight: 0.35 },
+    { rarity: Rarity.Epic, weight: 0.2 },
+    { rarity: Rarity.Legendary, weight: 0.05 },
+  ],
 };
+
+export const DEFAULT_BOSS_RATE = 0.02;
+export const DEFAULT_BOSS_FLEE_RATE = 0.2;
 
 export interface ITrigger {
   table: string;
   seed: string;
 }
 
-function rollRarity(rng: () => number, table: TDropTable): Rarity {
+const rollRarity = (rng: () => number, table: TDropTable): Rarity => {
   const total = table.reduce((sum, e) => sum + e.weight, 0);
   let r = rng() * total;
   for (const entry of table) {
@@ -190,20 +199,23 @@ function rollRarity(rng: () => number, table: TDropTable): Rarity {
     }
   }
   return table[table.length - 1].rarity;
-}
+};
 
-function pickItem(rng: () => number, items: ILootItem[]): ILootItem | null {
+const pickItem = (rng: () => number, items: ILootItem[]): ILootItem | null => {
   if (items.length === 0) {
     return null;
   }
   return items[Math.floor(rng() * items.length)];
+};
+
+interface IRollDropArgs {
+  trigger: ITrigger;
+  lootTable?: Record<string, ILootItem>;
+  dropTables?: Record<string, TDropTable>;
 }
 
-export function rollDrop(
-  trigger: ITrigger,
-  lootTable: Record<string, ILootItem> = LOOT_TABLE,
-  dropTables: Record<string, TDropTable> = DROP_TABLES,
-): string | null {
+export const rollDrop = (props: IRollDropArgs): string | null => {
+  const { trigger, lootTable = LOOT_TABLE, dropTables = DROP_TABLES } = props;
   const dropTable = dropTables[trigger.table];
   if (!dropTable) {
     return null;
@@ -213,16 +225,19 @@ export function rollDrop(
   const pool = Object.values(lootTable).filter(item => item.rarity === rarity);
   const item = pickItem(rng, pool);
   return item ? item.id : null;
+};
+
+interface IRollInventoryArgs {
+  triggers: ITrigger[];
+  lootTable?: Record<string, ILootItem>;
+  dropTables?: Record<string, TDropTable>;
 }
 
-export function rollInventory(
-  triggers: ITrigger[],
-  lootTable: Record<string, ILootItem> = LOOT_TABLE,
-  dropTables: Record<string, TDropTable> = DROP_TABLES,
-): IInventoryItem[] {
+export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
+  const { triggers, lootTable = LOOT_TABLE, dropTables = DROP_TABLES } = props;
   const counts: Record<string, number> = {};
   for (const trigger of triggers) {
-    const id = rollDrop(trigger, lootTable, dropTables);
+    const id = rollDrop({ trigger, lootTable, dropTables });
     if (id) {
       counts[id] = (counts[id] ?? 0) + 1;
     }
@@ -230,14 +245,17 @@ export function rollInventory(
   return Object.entries(counts)
     .map(([id, count]) => ({ id, rarity: lootTable[id].rarity, count }))
     .sort((a, b) => a.id.localeCompare(b.id));
+};
+
+interface IResolveCosmeticsArgs {
+  profile: { title?: string; theme?: string };
+  inventory: IInventoryItem[];
+  earnedTitles?: Record<string, string>;
+  lootTable?: Record<string, ILootItem>;
 }
 
-export function resolveCosmetics(
-  profile: { title?: string; theme?: string },
-  inventory: IInventoryItem[],
-  earnedTitles: Record<string, string> = {},
-  lootTable: Record<string, ILootItem> = LOOT_TABLE,
-): ICosmetics {
+export const resolveCosmetics = (props: IResolveCosmeticsArgs): ICosmetics => {
+  const { profile, inventory, earnedTitles = {}, lootTable = LOOT_TABLE } = props;
   const owned = new Set(inventory.map(i => i.id));
   const lootTitle =
     profile.title &&
@@ -253,4 +271,4 @@ export function resolveCosmetics(
     title: lootTitle ?? earnedTitle,
     theme_color: themeItem?.kind === LootKind.Theme ? (themeItem.value ?? null) : null,
   };
-}
+};

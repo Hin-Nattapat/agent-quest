@@ -19,7 +19,7 @@ export interface IAchievementDef {
 type TFacts = Record<string, number>;
 type TStateLike = Omit<IState, "updated_at">;
 
-function facts(state: TStateLike): TFacts {
+const facts = (state: TStateLike): TFacts => {
   const a = state.stats.actions;
   const n = (k: string) => a[k] ?? 0;
   const base: TFacts = {
@@ -45,9 +45,9 @@ function facts(state: TStateLike): TFacts {
     base[`cmd_${tag}`] = count;
   }
   return base;
-}
+};
 
-function passes(cond: TCond, f: TFacts): boolean {
+const passes = (cond: TCond, f: TFacts): boolean => {
   if ("all" in cond) {
     return cond.all.every(c => passes(c, f));
   }
@@ -60,10 +60,10 @@ function passes(cond: TCond, f: TFacts): boolean {
   }
   const v = f[cond.stat] ?? 0;
   return (cond.gte == null || v >= cond.gte) && (cond.lt == null || v < cond.lt);
-}
+};
 
 // Current value for a simple gte condition, for an unearned progress bar. null = no simple bar.
-function progressValue(cond: TCond, f: TFacts): number | null {
+const progressValue = (cond: TCond, f: TFacts): number | null => {
   if ("distinct" in cond) {
     return cond.distinct === "source" ? f.distinct_source : f.distinct_repo;
   }
@@ -71,12 +71,12 @@ function progressValue(cond: TCond, f: TFacts): number | null {
     return f[cond.stat] ?? 0;
   }
   return null;
-}
+};
 
-export function evaluateAchievements(
+export const evaluateAchievements = (
   state: TStateLike,
   registry: Record<string, IAchievementDef> = {},
-): IAchievementsState {
+): IAchievementsState => {
   const f = facts(state);
   const earned: string[] = [];
   let points = 0;
@@ -93,7 +93,7 @@ export function evaluateAchievements(
     }
   }
   return { earned, points, progress };
-}
+};
 
 export const DEFAULT_ACHIEVEMENTS: Record<string, IAchievementDef> = {
   first_blood: {
@@ -328,69 +328,69 @@ export const DEFAULT_ACHIEVEMENTS: Record<string, IAchievementDef> = {
     desc: "Rewrite a branch's roots with git rebase --onto",
     cond: { stat: "cmd_git_rebase_onto", gte: 1 },
     points: 25,
-    reward: { title: "the Timebender" },
+    reward: { title: "Timebender" },
   },
   undying: {
     name: "From Beyond the Grave",
     desc: "Raise lost work with git reflog",
     cond: { stat: "cmd_reflog", gte: 1 },
     points: 25,
-    reward: { title: "the Undying" },
+    reward: { title: "Undying" },
   },
   truthseeker: {
     name: "Trial by Ordeal",
     desc: "Hunt the guilty commit with git bisect",
     cond: { stat: "cmd_bisect", gte: 1 },
     points: 20,
-    reward: { title: "the Truthseeker" },
+    reward: { title: "Truthseeker" },
   },
   reckless: {
     name: "Ride or Die",
     desc: "Push or merge straight onto a protected branch",
     cond: { stat: "cmd_cowboy", gte: 1 },
     points: 15,
-    reward: { title: "the Reckless" },
+    reward: { title: "Reckless" },
   },
   chronicler: {
     name: "Rewriting History",
     desc: "10 interactive rebases",
     cond: { stat: "cmd_git_rebase_i", gte: 10 },
     points: 15,
-    reward: { title: "the Chronicler" },
+    reward: { title: "Chronicler" },
   },
   gleaner: {
     name: "A Fine Harvest",
     desc: "10 cherry-picks",
     cond: { stat: "cmd_cherry_pick", gte: 10 },
     points: 15,
-    reward: { title: "the Gleaner" },
+    reward: { title: "Gleaner" },
   },
   unrelenting: {
     name: "No Mercy",
     desc: "10 force pushes",
     cond: { stat: "cmd_force_push", gte: 10 },
     points: 15,
-    reward: { title: "the Unrelenting" },
+    reward: { title: "Unrelenting" },
   },
   hoarder: {
     name: "Squirreled Away",
     desc: "20 stashes",
     cond: { stat: "cmd_stash", gte: 20 },
     points: 15,
-    reward: { title: "the Hoarder" },
+    reward: { title: "Hoarder" },
   },
   unifier: {
     name: "For the Guild",
     desc: "Merge 20 pull requests",
     cond: { stat: "cmd_pr_merge", gte: 20 },
     points: 20,
-    reward: { title: "the Unifier" },
+    reward: { title: "Unifier" },
   },
   slayer: {
     name: "Boss Hunter",
     desc: "Run the test suite 100 times",
     cond: { stat: "cmd_test_run", gte: 100 },
     points: 25,
-    reward: { title: "the Slayer" },
+    reward: { title: "Slayer" },
   },
 };

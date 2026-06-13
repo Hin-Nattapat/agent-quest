@@ -17,18 +17,28 @@ test("unlock via xyzzy, equip the secret, and see it in the HUD", () => {
     },
   ] as any;
 
-  const unlocked = reduce(events, cfg, "2026-06-11", { xyzzy: true });
+  const unlocked = reduce({
+    events,
+    config: cfg,
+    today: "2026-06-11",
+    profile: { xyzzy: true },
+  });
   expect(unlocked.unlocked_secret_classes).toContain(SecretLine.Trickster);
 
-  const equipped = reduce(events, cfg, "2026-06-11", {
-    xyzzy: true,
-    line: SecretLine.Trickster,
+  const equipped = reduce({
+    events,
+    config: cfg,
+    today: "2026-06-11",
+    profile: {
+      xyzzy: true,
+      line: SecretLine.Trickster,
+    },
   });
   expect(equipped.class?.line).toBe(SecretLine.Trickster);
   expect(equipped.class?.branch).toBe(null);
-  const line = renderHud(
-    { ...equipped, updated_at: "" },
-    { model: "M", cost: 0, ctx: 0 },
-  );
+  const line = renderHud({
+    state: { ...equipped, updated_at: "" },
+    tail: { model: "M", cost: 0, ctx: 0 },
+  });
   expect(line).toContain("✦"); // the Trickster icon renders
 });

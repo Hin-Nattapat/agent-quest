@@ -122,7 +122,7 @@ test("inventory lists owned items after a clean session", async () => {
 test("equipping an owned item succeeds; an unowned one errors", async () => {
   const home = makeHome();
   seedOneClean(home);
-  const droppedId = rollDrop({ table: "clean", seed: "clean:s" })!;
+  const droppedId = rollDrop({ trigger: { table: "clean", seed: "clean:s" } })!;
   const kind = LOOT_TABLE[droppedId].kind;
   if (kind !== LootKind.Skin) {
     const ok = await rpg(home, kind, droppedId);

@@ -21,5 +21,7 @@ test("journal -> reduceToFile -> state has streak+achievements; HUD shows fire",
   expect(state.streak?.current_days).toBeGreaterThanOrEqual(1);
 
   const onDisk = JSON.parse(readFileSync(join(home, "state.json"), "utf8"));
-  expect(renderHud(onDisk, { model: "M", cost: 0, ctx: 0 })).toContain("🔥");
+  expect(renderHud({ state: onDisk, tail: { model: "M", cost: 0, ctx: 0 } })).toContain(
+    "🔥",
+  );
 });

@@ -15,27 +15,27 @@ const HOME = defaultHome();
 const LINES = Object.values(ClassLine) as string[];
 const SECRETS = Object.values(SecretLine) as string[];
 
-function fail(message: string): never {
+const fail: (message: string) => never = message => {
   process.stderr.write(message + "\n");
   process.exit(1);
-}
+};
 
-function currentLevel(): number {
+const currentLevel = (): number => {
   return reduceToFile(HOME).level;
-}
+};
 
-function persist(profile: IProfile): void {
+const persist = (profile: IProfile): void => {
   saveProfile(HOME, profile);
   reduceToFile(HOME);
-}
+};
 
-function setName(profile: IProfile, name: string): string {
+const setName = (profile: IProfile, name: string): string => {
   profile.name = name.trim().slice(0, 24);
   persist(profile);
   return `Name set to "${profile.name}".`;
-}
+};
 
-function setClass(profile: IProfile, line: string): string {
+const setClass = (profile: IProfile, line: string): string => {
   if (LINES.includes(line)) {
     if (currentLevel() < 5) {
       fail("Reach level 5 before choosing a class.");
@@ -56,9 +56,9 @@ function setClass(profile: IProfile, line: string): string {
     return `Class set to ${line}.`;
   }
   fail(`Unknown class "${line}". Choose: ${LINES.join(", ")}.`);
-}
+};
 
-function setBranch(profile: IProfile, branch: string): string {
+const setBranch = (profile: IProfile, branch: string): string => {
   if (branch !== "a" && branch !== "b") {
     fail(`Branch must be "a" or "b".`);
   }
@@ -77,9 +77,9 @@ function setBranch(profile: IProfile, branch: string): string {
   profile.branch = branch;
   persist(profile);
   return `Branch locked: ${CLASS_TREE[profile.line].branches[branch]}.`;
-}
+};
 
-function respec(profile: IProfile, line: string): string {
+const respec = (profile: IProfile, line: string): string => {
   if (!LINES.includes(line)) {
     fail(`Unknown class "${line}".`);
   }
@@ -90,9 +90,9 @@ function respec(profile: IProfile, line: string): string {
   profile.branch = undefined;
   persist(profile);
   return `Respec to ${line}.`;
-}
+};
 
-function status(profile: IProfile): string {
+const status = (profile: IProfile): string => {
   const state = reduceToFile(HOME);
   const affinity = state.class?.affinity ?? {};
   const suggested = Object.entries(affinity).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
@@ -104,13 +104,13 @@ function status(profile: IProfile): string {
     `passive: +${pct}% (${form})\n` +
     `affinity: ${bars}\nsuggested line: ${suggested}`
   );
-}
+};
 
-function lootTable() {
+const lootTable = () => {
   return loadConfig(HOME).loot ?? LOOT_TABLE;
-}
+};
 
-function inventory(): string {
+const inventory = (): string => {
   const inv = reduceToFile(HOME).inventory ?? [];
   if (inv.length === 0) {
     return "Inventory empty.";
@@ -119,9 +119,9 @@ function inventory(): string {
   return inv
     .map(i => `${i.rarity.padEnd(9)} ${table[i.id]?.name ?? i.id}  ×${i.count}`)
     .join("\n");
-}
+};
 
-function availableTitles(): { id: string; name: string }[] {
+const availableTitles = (): { id: string; name: string }[] => {
   const state = reduceToFile(HOME);
   const table = lootTable();
   const out: { id: string; name: string }[] = [];
@@ -138,17 +138,24 @@ function availableTitles(): { id: string; name: string }[] {
     }
   }
   return out;
-}
+};
 
-function titles(): string {
+const titles = (): string => {
   const list = availableTitles();
   if (list.length === 0) {
     return "No titles yet.";
   }
   return list.map(t => `${t.id}  —  ${t.name}`).join("\n");
+};
+
+interface IEquipArgs {
+  profile: IProfile;
+  kind: LootKind;
+  id: string;
 }
 
-function equip(profile: IProfile, kind: LootKind, id: string): string {
+const equip = (props: IEquipArgs): string => {
+  const { profile, kind, id } = props;
   if (kind === LootKind.Title) {
     const match = availableTitles().find(t => t.id === id);
     if (!match) {
@@ -169,9 +176,9 @@ function equip(profile: IProfile, kind: LootKind, id: string): string {
   profile.theme = id;
   persist(profile);
   return `Equipped ${kind}: ${item.name}.`;
-}
+};
 
-function secrets(): string {
+const secrets = (): string => {
   const unlocked = new Set(
     (reduceToFile(HOME).unlocked_secret_classes ?? []) as string[],
   );
@@ -190,15 +197,15 @@ function secrets(): string {
     }
     return `??? — ${hint[s] ?? "hidden"}`;
   }).join("\n");
-}
+};
 
-function xyzzy(profile: IProfile): string {
+const xyzzy = (profile: IProfile): string => {
   profile.xyzzy = true;
   persist(profile);
   return "A hollow voice says 'Fool.'  ✦ The Trickster is yours — `rpg class trickster`.";
-}
+};
 
-function main(): void {
+const main = (): void => {
   const [cmd, ...args] = process.argv.slice(2);
   const profile = loadProfile(HOME);
   let out: string;
@@ -222,10 +229,10 @@ function main(): void {
       out = inventory();
       break;
     case "title":
-      out = equip(profile, LootKind.Title, args[0] ?? "");
+      out = equip({ profile, kind: LootKind.Title, id: args[0] ?? "" });
       break;
     case "theme":
-      out = equip(profile, LootKind.Theme, args[0] ?? "");
+      out = equip({ profile, kind: LootKind.Theme, id: args[0] ?? "" });
       break;
     case "titles":
       out = titles();
@@ -242,7 +249,7 @@ function main(): void {
       );
   }
   console.log(out);
-}
+};
 
 if (import.meta.main) {
   main();

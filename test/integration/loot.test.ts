@@ -25,16 +25,21 @@ test("clean sessions produce an inventory; equipping resolves into the HUD", () 
     },
   ] as any;
 
-  const base = reduce(events, cfg, "2026-06-11");
+  const base = reduce({ events, config: cfg, today: "2026-06-11" });
   expect((base.inventory ?? []).length).toBeGreaterThan(0);
 
   const owned = base.inventory!.find(i => LOOT_TABLE[i.id].kind === "title");
   if (owned) {
-    const equipped = reduce(events, cfg, "2026-06-11", { title: owned.id });
-    const line = renderHud(
-      { ...equipped, updated_at: "" },
-      { model: "M", cost: 0, ctx: 0 },
-    );
+    const equipped = reduce({
+      events,
+      config: cfg,
+      today: "2026-06-11",
+      profile: { title: owned.id },
+    });
+    const line = renderHud({
+      state: { ...equipped, updated_at: "" },
+      tail: { model: "M", cost: 0, ctx: 0 },
+    });
     expect(line).toContain(`the ${LOOT_TABLE[owned.id].name}`);
   }
 });

@@ -25,7 +25,7 @@ test("name / class / title / streak text", () => {
   ).toBe("⚔ Server Sorcerer");
   expect(titleSuffix(base)).toBe("");
   expect(
-    titleSuffix({ ...base, cosmetics: { title: "the Undying", theme_color: null } }),
+    titleSuffix({ ...base, cosmetics: { title: "Undying", theme_color: null } }),
   ).toBe(" the Undying");
   expect(streakText(base)).toBe("");
   expect(

@@ -2,6 +2,7 @@ import type { IStreak } from "./streak";
 import type { IClassState, SecretLine } from "./classes";
 import type { IInventoryItem, ICosmetics } from "./loot";
 import type { EventType } from "./events";
+import type { ITimelineEntry } from "./timeline";
 
 export interface IGroupStat {
   xp: number;
@@ -42,4 +43,5 @@ export interface IState {
   cosmetics?: ICosmetics;
   unlocked_secret_classes?: SecretLine[];
   last_event?: { ts: string; type: EventType };
+  recent?: ITimelineEntry[];
 }

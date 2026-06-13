@@ -18,6 +18,7 @@ import {
 } from "./classes";
 import {
   rollInventory,
+  rollDrop,
   resolveCosmetics,
   LOOT_TABLE,
   DROP_TABLES,
@@ -25,6 +26,7 @@ import {
   DEFAULT_BOSS_FLEE_RATE,
   type ITrigger,
 } from "./loot";
+import { TimelineKind, pushTimeline, type ITimelineEntry } from "./timeline";
 import { seededRng } from "./rng";
 import { type IState, type IGroupStat } from "./state";
 
@@ -120,8 +122,14 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   const bossFleeRate = config.boss_flee_rate ?? DEFAULT_BOSS_FLEE_RATE;
 
   const line = profile?.line ?? null;
+  const branch = profile?.branch ?? null;
+  const lootTable = config.loot ?? LOOT_TABLE;
+  const dropTables = config.drops ?? DROP_TABLES;
   const sorted = [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts));
   let running = 0;
+  let recent: ITimelineEntry[] = [];
+  let prevLevel = levelFor(0, config.difficulty);
+  let prevTier = 0;
   for (const e of sorted) {
     const base = xpFor(e, config.weights);
     const level = levelFor(running, config.difficulty); // from XP accrued so far (causal)
@@ -130,6 +138,29 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     const mult = isSignal && tier >= 1 ? 1 + basePct(tier, config.passive) : 1;
     const gained = base * mult;
     running += gained;
+
+    // `level` above is pre-gain (causal for this event's passive mult); newLevel is
+    // post-gain, which is what a level-up milestone reflects.
+    const newLevel = levelFor(running, config.difficulty);
+    if (newLevel > prevLevel) {
+      for (let lv = prevLevel + 1; lv <= newLevel; lv++) {
+        recent = pushTimeline(recent, {
+          kind: TimelineKind.LevelUp,
+          detail: String(lv),
+          ts: e.ts,
+        });
+      }
+      prevLevel = newLevel;
+    }
+    const newTier = line != null && newLevel >= 5 ? tierForLevel(newLevel) : 0;
+    if (newTier > prevTier) {
+      recent = pushTimeline(recent, {
+        kind: TimelineKind.Advance,
+        detail: formFor({ line, tier: newTier, branch }),
+        ts: e.ts,
+      });
+      prevTier = newTier;
+    }
 
     sessions.add(e.session_id);
     dates.add(eventLocalDate(e.ts));
@@ -175,9 +206,35 @@ export const reduce = (props: IReduceArgs): TReducedState => {
       if (seededRng(`boss:${bossOrdinal}`)() < bossRate) {
         if (seededRng(`bossflee:${bossOrdinal}`)() < bossFleeRate) {
           bossFled++;
+          recent = pushTimeline(recent, {
+            kind: TimelineKind.BossFled,
+            detail: "",
+            ts: e.ts,
+          });
         } else {
           bossDefeated++;
-          bossTriggers.push({ table: "boss", seed: `bossloot:${bossOrdinal}` });
+          // One seed shared by the inventory roll and the timeline peek so the logged
+          // loot name always matches the item rollInventory actually grants.
+          const bossSeed = `bossloot:${bossOrdinal}`;
+          bossTriggers.push({ table: "boss", seed: bossSeed });
+          recent = pushTimeline(recent, {
+            kind: TimelineKind.BossDefeated,
+            detail: "",
+            ts: e.ts,
+          });
+          const dropId = rollDrop({
+            trigger: { table: "boss", seed: bossSeed },
+            lootTable,
+            dropTables,
+          });
+          if (dropId && lootTable[dropId]) {
+            recent = pushTimeline(recent, {
+              kind: TimelineKind.Loot,
+              detail: lootTable[dropId].name,
+              rarity: lootTable[dropId].rarity,
+              ts: e.ts,
+            });
+          }
         }
       }
     }
@@ -200,7 +257,6 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   const prog = levelProgress(xp_total, config.difficulty);
   const streak = computeStreak([...dates], today);
 
-  const branch = profile?.branch ?? null;
   const classTier = line ? tierForLevel(prog.level) : 0;
   const classState: IClassState = {
     line,
@@ -213,7 +269,6 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     base_passive_pct: basePct(classTier, config.passive),
   };
 
-  const lootTable = config.loot ?? LOOT_TABLE;
   const triggers: ITrigger[] = [];
   for (const [sid, info] of Object.entries(sessionInfo)) {
     if (info.hasEnd && !info.hasFail) {
@@ -236,7 +291,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   const inventory = rollInventory({
     triggers,
     lootTable,
-    dropTables: config.drops ?? DROP_TABLES,
+    dropTables,
   });
 
   const prelim: TReducedState = {
@@ -261,6 +316,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     streak,
     class: classState,
     inventory,
+    recent,
   };
   if (profile?.name) {
     prelim.name = profile.name;

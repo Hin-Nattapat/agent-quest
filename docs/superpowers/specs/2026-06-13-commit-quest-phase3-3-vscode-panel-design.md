@@ -1,10 +1,17 @@
 # Phase 3.3 (pulled forward) — VS Code Companion Panel (minimal shell)
 
-> **Status:** design approved 2026-06-13. Implementation plan: `docs/superpowers/plans/`.
+> **Status:** design approved 2026-06-13; **shipped & validated** in the Extension Development Host.
+> Implementation plan: `docs/superpowers/plans/`.
 > **Reorder note:** 3.3 (VS Code panel — originally the *final* target) is pulled ahead of the
 > pixel-MMORPG UI reskin / realm / animation work. Rationale: the panel is the **real
 > container**; its actual dimensions in VS Code are what we measure the canvas-sizing decision
 > against, instead of guessing from a browser.
+> **Placement note (as shipped):** during smoke-testing we moved the companion from an editor
+> `WebviewPanel` to a **bottom-panel `WebviewView`** (a "Commit Quest" tab beside Terminal/Output,
+> like Pixel Agents) — a better fit for an always-visible AFK companion. The transport seam, state
+> feed, and CSP/nonce HTML builder are identical; only the host registration changed
+> (`registerWebviewViewProvider` + a `panel` viewsContainer). The wide/short panel shape is the
+> sizing input for the reskin checkpoint.
 
 ## Goal
 

@@ -22,7 +22,7 @@ test("a rebase --onto deed unlocks a title that renders in the HUD", () => {
   expect(earned.achievements?.earned).toContain("timebender");
 
   const worn = reduce(events, cfg, "2026-06-11", { name: "Nat", title: "timebender" });
-  expect(worn.cosmetics?.title).toBe("the Timebender");
+  expect(worn.cosmetics?.title).toBe("Timebender");
   const line = renderHud({ ...worn, updated_at: "" }, { model: "M", cost: 0, ctx: 0 });
   expect(line).toContain("Nat the Timebender");
 });

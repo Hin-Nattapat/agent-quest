@@ -31,6 +31,8 @@ export interface IState {
     failures_recovered?: number;
     ascetic_seal?: number;
     cmds?: Record<string, number>;
+    boss_defeated?: number;
+    boss_fled?: number;
   };
   streak?: IStreak;
   achievements?: IAchievementsState;

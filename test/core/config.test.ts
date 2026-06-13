@@ -83,3 +83,15 @@ test("loot table and drop tables default to the built-in sets", () => {
   expect(Object.keys(c.loot ?? {}).length).toBe(Object.keys(LOOT_TABLE).length);
   expect(c.drops?.streak100?.[0]?.rarity).toBe(DROP_TABLES.streak100[0].rarity);
 });
+
+test("boss rates default and can be overridden", () => {
+  const c = loadConfig(makeHome());
+  expect(c.boss_rate).toBe(0.02);
+  expect(c.boss_flee_rate).toBe(0.2);
+
+  const home = makeHome();
+  writeFileSync(join(home, "config.json"), JSON.stringify({ boss_rate: 0.5 }));
+  const o = loadConfig(home);
+  expect(o.boss_rate).toBe(0.5);
+  expect(o.boss_flee_rate).toBe(0.2);
+});

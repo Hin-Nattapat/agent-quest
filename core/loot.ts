@@ -173,7 +173,16 @@ export const DROP_TABLES: Record<string, TDropTable> = {
     { rarity: Rarity.Legendary, weight: 0.2 },
   ],
   streak100: [{ rarity: Rarity.Legendary, weight: 1.0 }],
+  boss: [
+    { rarity: Rarity.Common, weight: 0.4 },
+    { rarity: Rarity.Rare, weight: 0.35 },
+    { rarity: Rarity.Epic, weight: 0.2 },
+    { rarity: Rarity.Legendary, weight: 0.05 },
+  ],
 };
+
+export const DEFAULT_BOSS_RATE = 0.02;
+export const DEFAULT_BOSS_FLEE_RATE = 0.2;
 
 export interface ITrigger {
   table: string;

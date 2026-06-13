@@ -17,8 +17,13 @@ test("a classed character out-levels a Novice on the same line-heavy journal", (
   } as any;
   const events = Array.from({ length: 80 }, () => ({ ...run }));
 
-  const novice = reduce(events, cfg, "2026-06-11");
-  const mage = reduce(events, cfg, "2026-06-11", { line: ClassLine.Mage });
+  const novice = reduce({ events, config: cfg, today: "2026-06-11" });
+  const mage = reduce({
+    events,
+    config: cfg,
+    today: "2026-06-11",
+    profile: { line: ClassLine.Mage },
+  });
 
   expect(mage.xp_total).toBeGreaterThan(novice.xp_total);
   expect(mage.level).toBeGreaterThanOrEqual(novice.level);

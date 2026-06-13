@@ -2,10 +2,12 @@ import { readdirSync, readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { isNormalizedEvent, type INormalizedEvent } from "./events";
 
-export function loadEvents(home: string): {
+export const loadEvents = (
+  home: string,
+): {
   events: INormalizedEvent[];
   sessions: number;
-} {
+} => {
   const dir = join(home, "journal");
   if (!existsSync(dir)) {
     return { events: [], sessions: 0 };
@@ -29,4 +31,4 @@ export function loadEvents(home: string): {
     }
   }
   return { events, sessions: files.length };
-}
+};

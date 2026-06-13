@@ -1,0 +1,40 @@
+import type { IState } from "../../core/state";
+
+export enum GameEventType {
+  BossDefeated = "boss_defeated",
+  BossFled = "boss_fled",
+}
+
+export interface IGameEvent {
+  type: GameEventType;
+  items: string[];
+}
+
+// ids gained in `next.inventory` vs `prev` (counts the per-item increase).
+function newItems(prev: IState | null, next: IState): string[] {
+  const before = new Map((prev?.inventory ?? []).map(i => [i.id, i.count]));
+  const out: string[] = [];
+  for (const item of next.inventory ?? []) {
+    const had = before.get(item.id) ?? 0;
+    for (let k = 0; k < item.count - had; k++) {
+      out.push(item.id);
+    }
+  }
+  return out;
+}
+
+export function diffStates(prev: IState | null, next: IState): IGameEvent[] {
+  if (!prev) {
+    return [];
+  }
+  const events: IGameEvent[] = [];
+  const defeated = (next.stats.boss_defeated ?? 0) - (prev.stats.boss_defeated ?? 0);
+  const fled = (next.stats.boss_fled ?? 0) - (prev.stats.boss_fled ?? 0);
+  if (defeated > 0) {
+    events.push({ type: GameEventType.BossDefeated, items: newItems(prev, next) });
+  }
+  if (fled > 0) {
+    events.push({ type: GameEventType.BossFled, items: [] });
+  }
+  return events;
+}

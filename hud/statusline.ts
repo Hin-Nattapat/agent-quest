@@ -15,7 +15,7 @@ export interface ITail {
 
 // Display columns, ignoring ANSI SGR codes and counting emoji / CJK as 2 cells.
 // Iterating by code point (for..of) so astral emoji count once, then widened.
-function displayWidth(s: string): number {
+const displayWidth = (s: string): number => {
   const noAnsi = s.replace(/\x1b\[[0-9;]*m/g, "");
   let width = 0;
   for (const ch of noAnsi) {
@@ -30,9 +30,16 @@ function displayWidth(s: string): number {
     width += wide ? 2 : 1;
   }
   return width;
+};
+
+interface IRenderHudArgs {
+  state: IState;
+  tail: ITail;
+  cols?: number;
 }
 
-export function renderHud(state: IState, tail: ITail, cols = 0): string {
+export const renderHud = (props: IRenderHudArgs): string => {
+  const { state, tail, cols = 0 } = props;
   const pct =
     state.xp_to_next === 0
       ? 1
@@ -74,11 +81,11 @@ export function renderHud(state: IState, tail: ITail, cols = 0): string {
     return left + " ".repeat(cols - used - RIGHT_SAFETY) + right;
   }
   return `${left}  |  ${right}`;
-}
+};
 
 const HOME = defaultHome();
 
-function readState(home: string): IState {
+const readState = (home: string): IState => {
   const p = join(home, "state.json");
   if (existsSync(p)) {
     try {
@@ -97,9 +104,9 @@ function readState(home: string): IState {
     xp_to_next: prog.xp_to_next,
     stats: { prompts: 0, actions: {}, sessions: 0, by_source: {}, by_repo: {} },
   };
-}
+};
 
-async function main(): Promise<void> {
+const main = async (): Promise<void> => {
   let raw = "";
   try {
     raw = await new Response(Bun.stdin.stream()).text();
@@ -125,8 +132,8 @@ async function main(): Promise<void> {
     // statusline must never break the prompt
   }
   const cols = Number(process.env.COLUMNS) || 0;
-  process.stdout.write(renderHud(readState(HOME), tail, cols));
-}
+  process.stdout.write(renderHud({ state: readState(HOME), tail, cols }));
+};
 
 if (import.meta.main) {
   main().catch(() => process.stdout.write("Lv.1 ░░░░░░░░░░ 0%  |  ?  $0.00  ·  ctx 0%"));

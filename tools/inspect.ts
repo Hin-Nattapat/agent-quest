@@ -8,10 +8,10 @@ import { localTodayKey } from "../core/streak";
 
 const HOME = defaultHome();
 
-function countBy(
+const countBy = (
   events: INormalizedEvent[],
   key: keyof INormalizedEvent,
-): Record<string, number> {
+): Record<string, number> => {
   const m: Record<string, number> = {};
   for (const e of events) {
     const v = e[key];
@@ -20,18 +20,23 @@ function countBy(
     }
   }
   return m;
-}
+};
 
-function fmt(m: Record<string, number>): string {
+const fmt = (m: Record<string, number>): string => {
   const rows = Object.entries(m)
     .sort((a, b) => b[1] - a[1])
     .map(([k, v]) => `  ${k}: ${v}`);
   return rows.length ? rows.join("\n") : "  (none)";
-}
+};
 
-export function summarize(home: string): string {
+export const summarize = (home: string): string => {
   const { events, sessions } = loadEvents(home);
-  const s = reduce(events, loadConfig(home), localTodayKey(), loadProfile(home));
+  const s = reduce({
+    events,
+    config: loadConfig(home),
+    today: localTodayKey(),
+    profile: loadProfile(home),
+  });
   const streak = s.streak
     ? `${s.streak.current_days}d (best ${s.streak.best_days})`
     : "0d";
@@ -58,7 +63,7 @@ export function summarize(home: string): string {
     `last 10:`,
     last10 || "  (none)",
   ].join("\n");
-}
+};
 
 if (import.meta.main) {
   console.log(summarize(HOME));

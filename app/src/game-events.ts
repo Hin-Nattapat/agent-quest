@@ -38,3 +38,19 @@ export function diffStates(prev: IState | null, next: IState): IGameEvent[] {
   }
   return events;
 }
+
+export interface ICombatBeats {
+  xp: number; // xp_total gained since prev (clamped >= 0)
+  hurt: boolean; // a new action_fail occurred
+  leveledUp: boolean; // level increased
+}
+
+export function combatBeats(prev: IState | null, next: IState): ICombatBeats {
+  if (!prev) {
+    return { xp: 0, hurt: false, leveledUp: false };
+  }
+  const xp = Math.max(0, next.xp_total - prev.xp_total);
+  const hurt = (next.stats.action_fails ?? 0) > (prev.stats.action_fails ?? 0);
+  const leveledUp = next.level > prev.level;
+  return { xp, hurt, leveledUp };
+}

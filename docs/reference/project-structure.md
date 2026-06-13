@@ -65,8 +65,10 @@ commit-quest/
 │   │   ├── activity.ts                #   AFK state machine: activityState -> farming/idle/rest (3.2a)
 │   │   ├── scene.ts                   #   sceneFor(tier) -> theme + monster (3.2a)
 │   │   ├── use-activity.ts            #   hook: derive activity + client timer (3.2a)
+│   │   ├── game-events.ts            #   diffStates -> boss encounter events (3.2b)
+│   │   ├── use-encounter.ts          #   hook: queue boss encounters + min-duration (3.2b)
 │   │   ├── app.tsx / main.tsx         #   composition + mount
-│   │   └── components/                #   scene-view, hero, monster (AFK scene); hud + badges
+│   │   └── components/                #   scene-view, hero, monster, boss-encounter, loot-toast; hud + badges
 │   ├── index.html · vite.config.ts · package.json   #   IState/EventType from core (contract only)
 │   └── (3.2b: boss/loot-drop/up-class transition · 3.3: VS Code extension webview)
 │

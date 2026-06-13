@@ -445,3 +445,43 @@ test("bosses are rate-based, seeded, and idempotent", () => {
     }),
   ).toEqual(won);
 });
+
+import { TimelineKind } from "../../core/timeline";
+
+const cfgBoss = {
+  weights: DEFAULT_WEIGHTS,
+  difficulty: DEFAULT_DIFFICULTY,
+  boss_rate: 1, // every action spawns a boss (deterministic for the test)
+  boss_flee_rate: 0, // never flees -> always defeated + drops
+};
+
+test("reduce records level-up + boss + loot milestones, idempotently", () => {
+  const events = [
+    ev({ type: "action", action: "edit" }),
+    ev({ type: "action", action: "write" }),
+    ev({ type: "action", action: "run" }),
+  ];
+  const s = reduce({ events, config: cfgBoss });
+  const kinds = (s.recent ?? []).map(r => r.kind);
+  expect(kinds).toContain(TimelineKind.BossDefeated);
+  expect(kinds).toContain(TimelineKind.Loot);
+  expect(kinds).toContain(TimelineKind.LevelUp);
+
+  const s2 = reduce({ events, config: cfgBoss });
+  expect(s2.recent).toEqual(s.recent); // idempotent
+});
+
+test("no boss spawns -> no boss/loot milestones", () => {
+  const cfgNoBoss = {
+    weights: DEFAULT_WEIGHTS,
+    difficulty: DEFAULT_DIFFICULTY,
+    boss_rate: 0,
+  };
+  const s = reduce({
+    events: [ev({ type: "action", action: "edit" }), ev({ type: "prompt" })],
+    config: cfgNoBoss,
+  });
+  const kinds = (s.recent ?? []).map(r => r.kind);
+  expect(kinds).not.toContain(TimelineKind.BossDefeated);
+  expect(kinds).not.toContain(TimelineKind.Loot);
+});

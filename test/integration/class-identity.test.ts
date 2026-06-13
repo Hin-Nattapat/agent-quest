@@ -20,7 +20,7 @@ test("profile + journal -> reduceToFile -> HUD shows name + form", () => {
   expect(state.class?.form).toBe(ClassForm.BackendMage);
 
   const onDisk = JSON.parse(readFileSync(join(home, "state.json"), "utf8"));
-  expect(renderHud(onDisk, { model: "M", cost: 0, ctx: 0 })).toContain(
+  expect(renderHud({ state: onDisk, tail: { model: "M", cost: 0, ctx: 0 } })).toContain(
     "Gandalf · ⚔ Backend Mage",
   );
 });

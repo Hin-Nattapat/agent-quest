@@ -18,9 +18,9 @@ export type TLine = ClassLine | SecretLine;
 
 const SECRET_VALUES: Set<string> = new Set(Object.values(SecretLine));
 
-export function isSecret(line: TLine): line is SecretLine {
+export const isSecret = (line: TLine): line is SecretLine => {
   return SECRET_VALUES.has(line);
-}
+};
 
 // Every (line × tier) form name. Members carry the display string (the wire/HUD value).
 export enum ClassForm {
@@ -169,7 +169,7 @@ export interface IClassState {
   base_passive_pct: number;
 }
 
-export function tierForLevel(level: number): number {
+export const tierForLevel = (level: number): number => {
   if (level >= 50) {
     return 4;
   }
@@ -183,9 +183,9 @@ export function tierForLevel(level: number): number {
     return 1;
   }
   return 0;
-}
+};
 
-export function iconFor(line: TLine | null): string {
+export const iconFor = (line: TLine | null): string => {
   if (!line) {
     return "";
   }
@@ -193,13 +193,16 @@ export function iconFor(line: TLine | null): string {
     return SECRET_TREE[line].icon;
   }
   return CLASS_TREE[line].icon;
+};
+
+interface IFormForArgs {
+  line: TLine | null;
+  tier: number;
+  branch: "a" | "b" | null;
 }
 
-export function formFor(
-  line: TLine | null,
-  tier: number,
-  branch: "a" | "b" | null,
-): ClassForm {
+export const formFor = (props: IFormForArgs): ClassForm => {
+  const { line, tier, branch } = props;
   if (!line || tier === 0) {
     return ClassForm.Novice;
   }
@@ -214,13 +217,18 @@ export function formFor(
     return CLASS_TREE[line].forms[2];
   }
   return CLASS_TREE[line].forms[tier - 1];
+};
+
+interface IAdvancementPendingArgs {
+  line: TLine | null;
+  level: number;
+  branch: "a" | "b" | null;
 }
 
-export function advancementPending(
-  line: TLine | null,
-  level: number,
-  branch: "a" | "b" | null,
-): "class" | "branch" | null {
+export const advancementPending = (
+  props: IAdvancementPendingArgs,
+): "class" | "branch" | null => {
+  const { line, level, branch } = props;
   if (level >= 5 && line == null) {
     return "class";
   }
@@ -231,4 +239,4 @@ export function advancementPending(
     return "branch";
   }
   return null;
-}
+};

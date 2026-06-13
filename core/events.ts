@@ -51,7 +51,7 @@ export interface INormalizedEvent {
   model?: string; // session_start only
 }
 
-export function isNormalizedEvent(o: unknown): o is INormalizedEvent {
+export const isNormalizedEvent = (o: unknown): o is INormalizedEvent => {
   if (typeof o !== "object" || o === null) return false;
   const e = o as Record<string, unknown>;
   return (
@@ -61,4 +61,4 @@ export function isNormalizedEvent(o: unknown): o is INormalizedEvent {
     typeof e.type === "string" &&
     (Object.values(EventType) as string[]).includes(e.type)
   );
-}
+};

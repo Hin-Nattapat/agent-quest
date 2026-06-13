@@ -36,40 +36,46 @@ interface IGroupAcc {
   sessions: Set<string>;
 }
 
-function tally(
-  groups: Record<string, IGroupAcc>,
-  key: string,
-  xp: number,
-  sessionId: string,
-): void {
+interface ITallyArgs {
+  groups: Record<string, IGroupAcc>;
+  key: string;
+  xp: number;
+  sessionId: string;
+}
+
+const tally = (props: ITallyArgs): void => {
+  const { groups, key, xp, sessionId } = props;
   if (!groups[key]) {
     groups[key] = { xp: 0, sessions: new Set() };
   }
   const group = groups[key];
   group.xp += xp;
   group.sessions.add(sessionId);
-}
+};
 
-function toGroupStats(groups: Record<string, IGroupAcc>): Record<string, IGroupStat> {
+const toGroupStats = (groups: Record<string, IGroupAcc>): Record<string, IGroupStat> => {
   const stats: Record<string, IGroupStat> = {};
   for (const [key, group] of Object.entries(groups)) {
     stats[key] = { xp: Math.round(group.xp), sessions: group.sessions.size };
   }
   return stats;
-}
+};
 
-function tsOrder(ts: string): number {
+const tsOrder = (ts: string): number => {
   return Date.parse(ts) || 0;
-}
+};
 
 const ASCETIC_LEVEL = 25;
 const ASCETIC_MAX_RUN_RATIO = 0.2;
 
-function collectUnlocks(
-  earned: string[],
-  registry: Record<string, IAchievementDef>,
-  profile?: IProfile,
-): SecretLine[] {
+interface ICollectUnlocksArgs {
+  earned: string[];
+  registry: Record<string, IAchievementDef>;
+  profile?: IProfile;
+}
+
+const collectUnlocks = (props: ICollectUnlocksArgs): SecretLine[] => {
+  const { earned, registry, profile } = props;
   const set = new Set<SecretLine>();
   for (const id of earned) {
     const unlock = registry[id]?.reward?.unlocks_class;
@@ -81,14 +87,17 @@ function collectUnlocks(
     set.add(SecretLine.Trickster);
   }
   return [...set].sort();
+};
+
+interface IReduceArgs {
+  events: INormalizedEvent[];
+  config: IConfig;
+  today?: string;
+  profile?: IProfile;
 }
 
-export function reduce(
-  events: INormalizedEvent[],
-  config: IConfig,
-  today?: string,
-  profile?: IProfile,
-): TReducedState {
+export const reduce = (props: IReduceArgs): TReducedState => {
+  const { events, config, today, profile } = props;
   let prompts = 0;
   const actions: Record<string, number> = {};
   const sessions = new Set<string>();
@@ -181,9 +190,9 @@ export function reduce(
         asceticSeal = 1;
       }
     }
-    tally(bySource, e.source, gained, e.session_id);
+    tally({ groups: bySource, key: e.source, xp: gained, sessionId: e.session_id });
     if (e.repo) {
-      tally(byRepo, e.repo, gained, e.session_id);
+      tally({ groups: byRepo, key: e.repo, xp: gained, sessionId: e.session_id });
     }
   }
 
@@ -196,11 +205,11 @@ export function reduce(
   const classState: IClassState = {
     line,
     tier: classTier,
-    form: formFor(line, classTier, branch),
+    form: formFor({ line, tier: classTier, branch }),
     icon: iconFor(line),
     branch,
     affinity: computeAffinity(events),
-    advancement_pending: advancementPending(line, prog.level, branch),
+    advancement_pending: advancementPending({ line, level: prog.level, branch }),
     base_passive_pct: basePct(classTier, config.passive),
   };
 
@@ -224,7 +233,11 @@ export function reduce(
     triggers.push({ table: "streak100", seed: "streak:100" });
   }
   triggers.push(...bossTriggers);
-  const inventory = rollInventory(triggers, lootTable, config.drops ?? DROP_TABLES);
+  const inventory = rollInventory({
+    triggers,
+    lootTable,
+    dropTables: config.drops ?? DROP_TABLES,
+  });
 
   const prelim: TReducedState = {
     version: 1,
@@ -257,11 +270,11 @@ export function reduce(
     prelim.last_event = { ts: lastEv.ts, type: lastEv.type };
   }
   const achievements = evaluateAchievements(prelim, config.achievements);
-  const unlocked = collectUnlocks(
-    achievements.earned,
-    config.achievements ?? {},
+  const unlocked = collectUnlocks({
+    earned: achievements.earned,
+    registry: config.achievements ?? {},
     profile,
-  );
+  });
   const registry = config.achievements ?? {};
   const earnedTitles: Record<string, string> = {};
   for (const id of achievements.earned) {
@@ -270,34 +283,44 @@ export function reduce(
       earnedTitles[id] = title;
     }
   }
-  const cosmetics = resolveCosmetics(profile ?? {}, inventory, earnedTitles, lootTable);
+  const cosmetics = resolveCosmetics({
+    profile: profile ?? {},
+    inventory,
+    earnedTitles,
+    lootTable,
+  });
   return {
     ...prelim,
     achievements,
     cosmetics,
     unlocked_secret_classes: unlocked,
   };
-}
+};
 
-function nowStamp(): string {
+const nowStamp = (): string => {
   return new Date().toISOString().slice(0, 19) + "Z";
-}
+};
 
-export function reduceToFile(home: string): IState {
+export const reduceToFile = (home: string): IState => {
   const { events } = loadEvents(home);
-  const reduced = reduce(events, loadConfig(home), localTodayKey(), loadProfile(home));
+  const reduced = reduce({
+    events,
+    config: loadConfig(home),
+    today: localTodayKey(),
+    profile: loadProfile(home),
+  });
   const state: IState = { ...reduced, updated_at: nowStamp() };
   const dst = join(home, "state.json");
   const tmp = dst + ".tmp";
   writeFileSync(tmp, JSON.stringify(state, null, 2));
   renameSync(tmp, dst); // atomic: statusline never reads a half-written file
   return state;
-}
+};
 
-export function reduceThrottled(home: string, maxAgeMs = 2000): void {
+export const reduceThrottled = (home: string, maxAgeMs = 2000): void => {
   const p = join(home, "state.json");
   if (existsSync(p) && Date.now() - statSync(p).mtimeMs < maxAgeMs) {
     return;
   }
   reduceToFile(home);
-}
+};

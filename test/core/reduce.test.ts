@@ -17,7 +17,7 @@ test("reduce sums xp, counts stats, splits by source/repo", () => {
     ev({ session_id: "s2", type: "prompt", repo: "pos" }), // +5
     ev({ session_id: "s2", type: "session_end" }), // +20, no repo
   ];
-  const s = reduce(events, cfg);
+  const s = reduce({ events, config: cfg });
   expect(s.xp_total).toBe(37);
   expect(s.stats.prompts).toBe(2);
   expect(s.stats.actions).toEqual({ edit: 1, run: 1 }); // action_fail not counted
@@ -30,7 +30,7 @@ test("reduce sums xp, counts stats, splits by source/repo", () => {
 });
 
 test("reduce of no events is a clean level-1 zero state", () => {
-  const s = reduce([], cfg);
+  const s = reduce({ events: [], config: cfg });
   expect(s.xp_total).toBe(0);
   expect(s.level).toBe(1);
   expect(s.stats.sessions).toBe(0);
@@ -51,20 +51,20 @@ test("reduce folds a streak across consecutive local days", () => {
     evd("2026-06-10", { type: "action", action: "edit", repo: "cq" }),
     evd("2026-06-11", { type: "action", action: "edit", repo: "cq" }),
   ];
-  const s = reduce(events, cfgA, "2026-06-11");
+  const s = reduce({ events, config: cfgA, today: "2026-06-11" });
   expect(s.streak?.best_days).toBe(2);
   expect(s.streak?.current_days).toBe(2);
 });
 
 test("an explicit today with a gap breaks current_days", () => {
   const events = [evd("2026-06-01", { type: "prompt", repo: "cq" })];
-  const s = reduce(events, cfgA, "2026-06-15");
+  const s = reduce({ events, config: cfgA, today: "2026-06-15" });
   expect(s.streak?.current_days).toBe(0);
 });
 
 test("reduce earns first_blood once an action exists", () => {
   const events = [evd("2026-06-11", { type: "action", action: "edit", repo: "cq" })];
-  const s = reduce(events, cfgA, "2026-06-11");
+  const s = reduce({ events, config: cfgA, today: "2026-06-11" });
   expect(s.achievements?.earned).toContain("first_blood");
   expect(s.achievements?.points).toBeGreaterThanOrEqual(5);
 });
@@ -84,26 +84,31 @@ const promptsTo5 = Array.from(
 );
 
 test("no profile -> Novice class with affinity", () => {
-  const s = reduce(
-    [evd("2026-06-11", { type: "action", action: "run", repo: "cq" })],
-    cfgA,
-    "2026-06-11",
-  );
+  const s = reduce({
+    events: [evd("2026-06-11", { type: "action", action: "run", repo: "cq" })],
+    config: cfgA,
+    today: "2026-06-11",
+  });
   expect(s.class?.line).toBe(null);
   expect(s.class?.form).toBe(ClassForm.Novice);
   expect(s.class?.affinity.mage).toBeGreaterThan(0);
 });
 
 test("at level 5 with no line, advancement_pending is 'class'", () => {
-  const s = reduce(promptsTo5, cfgA, "2026-06-11");
+  const s = reduce({ events: promptsTo5, config: cfgA, today: "2026-06-11" });
   expect(s.level).toBe(5);
   expect(s.class?.advancement_pending).toBe("class");
 });
 
 test("a chosen line resolves to its tier form + name", () => {
-  const s = reduce(promptsTo5, cfgA, "2026-06-11", {
-    name: "Gandalf",
-    line: ClassLine.Mage,
+  const s = reduce({
+    events: promptsTo5,
+    config: cfgA,
+    today: "2026-06-11",
+    profile: {
+      name: "Gandalf",
+      line: ClassLine.Mage,
+    },
   });
   expect(s.name).toBe("Gandalf");
   expect(s.class?.line).toBe(ClassLine.Mage);
@@ -144,9 +149,14 @@ const microEvents = [
 ];
 
 test("base passive multiplies line-signal XP past Lv.5 (micro-case)", () => {
-  const classed = reduce(microEvents, microCfg, "2026-06-11", { line: ClassLine.Mage });
+  const classed = reduce({
+    events: microEvents,
+    config: microCfg,
+    today: "2026-06-11",
+    profile: { line: ClassLine.Mage },
+  });
   expect(classed.xp_total).toBe(10);
-  const novice = reduce(microEvents, microCfg, "2026-06-11");
+  const novice = reduce({ events: microEvents, config: microCfg, today: "2026-06-11" });
   expect(novice.xp_total).toBe(7);
 });
 
@@ -160,14 +170,29 @@ test("xp_total is independent of input order (the reducer sorts by ts)", () => {
     microEvents[1],
     microEvents[3],
   ];
-  const ordered = reduce(microEvents, microCfg, "2026-06-11", { line: ClassLine.Mage });
-  const out = reduce(shuffled, microCfg, "2026-06-11", { line: ClassLine.Mage });
+  const ordered = reduce({
+    events: microEvents,
+    config: microCfg,
+    today: "2026-06-11",
+    profile: { line: ClassLine.Mage },
+  });
+  const out = reduce({
+    events: shuffled,
+    config: microCfg,
+    today: "2026-06-11",
+    profile: { line: ClassLine.Mage },
+  });
   expect(out.xp_total).toBe(ordered.xp_total);
   expect(out).toEqual(ordered);
 });
 
 test("base_passive_pct reflects the resolved tier", () => {
-  const s = reduce(promptsTo5, cfgA, "2026-06-11", { name: "G", line: ClassLine.Mage });
+  const s = reduce({
+    events: promptsTo5,
+    config: cfgA,
+    today: "2026-06-11",
+    profile: { name: "G", line: ClassLine.Mage },
+  });
   expect(s.class?.tier).toBe(1);
   expect(s.class?.base_passive_pct).toBe(basePct(1));
 });
@@ -187,25 +212,34 @@ test("a clean session drops loot; a session with a fail does not", () => {
     at("01", { session_id: "s1", type: "action", action: "edit", repo: "cq" }),
     at("02", { session_id: "s1", type: "session_end", repo: "cq" }),
   ];
-  expect(reduce(clean, zeroCfg, "2026-06-11").inventory?.length).toBe(1);
+  expect(
+    reduce({ events: clean, config: zeroCfg, today: "2026-06-11" }).inventory?.length,
+  ).toBe(1);
 
   const failed = [
     at("01", { session_id: "s2", type: "action_fail", action: "run", repo: "cq" }),
     at("02", { session_id: "s2", type: "session_end", repo: "cq" }),
   ];
-  expect(reduce(failed, zeroCfg, "2026-06-11").inventory).toEqual([]);
+  expect(
+    reduce({ events: failed, config: zeroCfg, today: "2026-06-11" }).inventory,
+  ).toEqual([]);
 });
 
 test("loot is idempotent", () => {
   const ev = [at("01", { session_id: "s1", type: "session_end", repo: "cq" })];
-  expect(reduce(ev, zeroCfg, "2026-06-11").inventory).toEqual(
-    reduce(ev, zeroCfg, "2026-06-11").inventory,
+  expect(reduce({ events: ev, config: zeroCfg, today: "2026-06-11" }).inventory).toEqual(
+    reduce({ events: ev, config: zeroCfg, today: "2026-06-11" }).inventory,
   );
 });
 
 test("cosmetics resolve only when the equipped item is owned", () => {
   const ev = [at("01", { session_id: "s1", type: "action", action: "edit", repo: "cq" })];
-  const s = reduce(ev, zeroCfg, "2026-06-11", { title: "archmage_title" });
+  const s = reduce({
+    events: ev,
+    config: zeroCfg,
+    today: "2026-06-11",
+    profile: { title: "archmage_title" },
+  });
   expect(s.inventory).toEqual([]);
   expect(s.cosmetics?.title).toBe(null);
 });
@@ -237,8 +271,13 @@ test("secret base passive multiplies its thematic signal (Maestro/delegate micro
     at("06", { type: "action", action: "delegate", repo: "cq" }),
     at("07", { type: "action", action: "delegate", repo: "cq" }),
   ];
-  const maestro = reduce(maestroEvents, microCfg, "2026-06-11", {
-    line: SecretLine.Maestro,
+  const maestro = reduce({
+    events: maestroEvents,
+    config: microCfg,
+    today: "2026-06-11",
+    profile: {
+      line: SecretLine.Maestro,
+    },
   });
   expect(maestro.xp_total).toBe(10); // 4 + 2 + 2 + 2 (delegates x2 past Lv.5)
 });
@@ -248,20 +287,31 @@ test("earning an unlock achievement fills unlocked_secret_classes; balance gates
   const many = Array.from({ length: 30 }, (_, i) =>
     act(i, { source: `s${i % 3}`, action: "read" }),
   );
-  const hi = reduce(many, cfg, "2026-06-11");
+  const hi = reduce({ events: many, config: cfg, today: "2026-06-11" });
   expect(hi.unlocked_secret_classes).toContain(SecretLine.Maestro);
   const few = Array.from({ length: 3 }, (_, i) =>
     act(i, { source: `s${i}`, action: "read" }),
   );
-  expect(reduce(few, cfg, "2026-06-11").unlocked_secret_classes ?? []).not.toContain(
-    SecretLine.Maestro,
-  );
+  expect(
+    reduce({ events: few, config: cfg, today: "2026-06-11" }).unlocked_secret_classes ??
+      [],
+  ).not.toContain(SecretLine.Maestro);
 });
 
 test("xyzzy unlocks the Trickster; unlocks are stable on recompute", () => {
   const cfg = loadConfig(makeHome());
-  const a = reduce(microEvents, cfg, "2026-06-11", { xyzzy: true });
-  const b = reduce(microEvents, cfg, "2026-06-11", { xyzzy: true });
+  const a = reduce({
+    events: microEvents,
+    config: cfg,
+    today: "2026-06-11",
+    profile: { xyzzy: true },
+  });
+  const b = reduce({
+    events: microEvents,
+    config: cfg,
+    today: "2026-06-11",
+    profile: { xyzzy: true },
+  });
   expect(a.unlocked_secret_classes).toContain(SecretLine.Trickster);
   expect(b.unlocked_secret_classes).toEqual(a.unlocked_secret_classes);
 });
@@ -272,7 +322,7 @@ test("failures_recovered counts a fail then a same-kind success in one session",
     act(1, { type: "action", action: "run", session_id: "x" }),
     act(2, { type: "action_fail", action: "edit", session_id: "x" }),
   ];
-  const s = reduce(evs, microCfg, "2026-06-11");
+  const s = reduce({ events: evs, config: microCfg, today: "2026-06-11" });
   expect(s.stats.failures_recovered).toBe(1);
 });
 
@@ -307,7 +357,7 @@ test("the fold tallies cmd tags and a single rebase --onto earns Threads of Fate
       cmd: "test_run",
     },
   ] as any;
-  const s = reduce(evs, cfg, "2026-06-11");
+  const s = reduce({ events: evs, config: cfg, today: "2026-06-11" });
   expect(s.stats.cmds).toEqual({ git_rebase_onto: 1, test_run: 2 });
   expect(s.achievements?.earned).toContain("timebender");
 });
@@ -338,11 +388,13 @@ test("last_event is the latest event by ts (or undefined when empty)", () => {
       repo: "cq",
     },
   ] as any;
-  expect(reduce(evs, cfg, "2026-06-11").last_event).toEqual({
+  expect(reduce({ events: evs, config: cfg, today: "2026-06-11" }).last_event).toEqual({
     ts: "2026-06-11T12:05:00Z",
     type: EventType.SessionEnd,
   });
-  expect(reduce([], cfg, "2026-06-11").last_event).toBeUndefined();
+  expect(
+    reduce({ events: [], config: cfg, today: "2026-06-11" }).last_event,
+  ).toBeUndefined();
 });
 
 test("bosses are rate-based, seeded, and idempotent", () => {
@@ -360,28 +412,36 @@ test("bosses are rate-based, seeded, and idempotent", () => {
       }) as any,
   );
 
-  const none = reduce(acts, { ...loadConfig(home), boss_rate: 0 }, "2026-06-11");
+  const none = reduce({
+    events: acts,
+    config: { ...loadConfig(home), boss_rate: 0 },
+    today: "2026-06-11",
+  });
   expect(none.stats.boss_defeated).toBe(0);
   expect(none.stats.boss_fled).toBe(0);
 
-  const won = reduce(
-    acts,
-    { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 0 },
-    "2026-06-11",
-  );
+  const won = reduce({
+    events: acts,
+    config: { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 0 },
+    today: "2026-06-11",
+  });
   expect(won.stats.boss_defeated).toBe(20);
   expect(won.stats.boss_fled).toBe(0);
   expect((won.inventory ?? []).length).toBeGreaterThan(0);
 
-  const fled = reduce(
-    acts,
-    { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 1 },
-    "2026-06-11",
-  );
+  const fled = reduce({
+    events: acts,
+    config: { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 1 },
+    today: "2026-06-11",
+  });
   expect(fled.stats.boss_fled).toBe(20);
   expect(fled.stats.boss_defeated).toBe(0);
 
   expect(
-    reduce(acts, { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 0 }, "2026-06-11"),
+    reduce({
+      events: acts,
+      config: { ...loadConfig(home), boss_rate: 1, boss_flee_rate: 0 },
+      today: "2026-06-11",
+    }),
   ).toEqual(won);
 });

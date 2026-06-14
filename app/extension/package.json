@@ -42,6 +42,7 @@
     "copy-webview": "node scripts/copy-webview.mjs",
     "build:all": "npm --prefix .. run build && npm run copy-webview && npm run build",
     "package": "npm run build:all && vsce package --no-dependencies",
+    "reinstall": "npm run package && code --install-extension \"$(ls -t commit-quest-companion-*.vsix | head -1)\" --force",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

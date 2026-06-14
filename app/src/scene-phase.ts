@@ -39,7 +39,10 @@ export const shouldEngage = (
   return activity === ActivityState.Farming && (restUntil === null || now >= restUntil);
 };
 
-export const stepDirector = (state: IDirectorState, input: IDirectorInput): IDirectorState => {
+export const stepDirector = (
+  state: IDirectorState,
+  input: IDirectorInput,
+): IDirectorState => {
   const { now, activity, wantStrike } = input;
 
   if (state.phase === ScenePhase.Wander) {

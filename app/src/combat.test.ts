@@ -76,7 +76,12 @@ test("strike floors at 0 and never goes negative", () => {
 });
 
 test("heroAnim returns Wander only when no pulse is active", () => {
-  const base = { celebrate: false, hurt: false, attack: false, activity: ActivityState.Idle };
+  const base = {
+    celebrate: false,
+    hurt: false,
+    attack: false,
+    activity: ActivityState.Idle,
+  };
   expect(heroAnim({ ...base, wander: true })).toBe(HeroAnim.Wander);
   expect(heroAnim({ ...base, wander: true, attack: true })).toBe(HeroAnim.Attack);
   expect(heroAnim({ ...base })).toBe(HeroAnim.Idle); // wander omitted → activity base

@@ -46,6 +46,8 @@ interface ISceneView {
   effects: IHitEffect[];
 }
 
+// These clear each transient anim class after it plays; they MUST match the matching CSS keyframe
+// durations in styles.css (.hero-attack/.m-die/.floater/etc.) or the sprite snaps or leaks.
 const HERO_MS = { attack: 400, hurt: 500, celebrate: 1200 };
 const MON_MS = { hurt: 300, attack: 500, die: 600 };
 const FLOATER_MS = 900;

@@ -17,5 +17,7 @@ test("activityState maps the last event + recency to a state", () => {
   expect(activityState(ev(EventType.SessionEnd, 999_999), NOW)).toBe(ActivityState.Rest);
   expect(activityState(ev(EventType.SessionStart, 1_000), NOW)).toBe(ActivityState.Idle);
   // boundary: exactly the window is not "recent" -> idle
-  expect(activityState(ev(EventType.Action, ACTIVE_WINDOW_MS), NOW)).toBe(ActivityState.Idle);
+  expect(activityState(ev(EventType.Action, ACTIVE_WINDOW_MS), NOW)).toBe(
+    ActivityState.Idle,
+  );
 });

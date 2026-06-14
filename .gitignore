@@ -3,4 +3,6 @@ node_modules/
 *.log
 app/dist/
 app/extension/dist/
+app/extension/webview/
+*.vsix
 .superpowers/

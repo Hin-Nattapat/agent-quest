@@ -15,7 +15,7 @@ export const shouldTransition = (prevTheme: string | null, nextTheme: string): b
 };
 
 // Plays a one-shot transition whenever the scene THEME changes (never on first mount).
-export function useTransition(scene: IScene): ITransitionView {
+export const useTransition = (scene: IScene): ITransitionView => {
   const prevTheme = useRef<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [view, setView] = useState<ITransitionView>({ active: false, label: null });
@@ -45,4 +45,4 @@ export function useTransition(scene: IScene): ITransitionView {
   }, [scene.theme]);
 
   return view;
-}
+};

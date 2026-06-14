@@ -5,7 +5,7 @@ import { activityState, ActivityState } from "./activity";
 const TICK_MS = 5000;
 
 // Re-derives on a timer because, while idle, state.json doesn't change (no SSE push).
-export function useActivity(state: IState | null): ActivityState {
+export const useActivity = (state: IState | null): ActivityState => {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -17,4 +17,4 @@ export function useActivity(state: IState | null): ActivityState {
     return ActivityState.Idle;
   }
   return activityState(state.last_event, now);
-}
+};

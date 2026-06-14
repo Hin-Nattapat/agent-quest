@@ -25,7 +25,7 @@ const SceneView = (props: IProps) => {
   const [panel, setPanel] = useState<PanelId | null>(null);
   const encounter = useEncounter(state);
   const combat = useCombat(state, activity);
-  const scene = sceneFor(state.class?.tier ?? 0);
+  const scene = sceneFor(state.class?.tier ?? 0, state.class?.line, state.class?.branch);
   const line = state.class?.line ?? "novice";
 
   return (

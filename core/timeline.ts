@@ -1,10 +1,7 @@
-export enum TimelineKind {
-  LevelUp = "level_up",
-  Advance = "advance", // tier/form evolution (also a new area)
-  BossDefeated = "boss_defeated",
-  BossFled = "boss_fled",
-  Loot = "loot", // boss drops (rolled at the boss event, so time-anchored)
-}
+// TimelineKind is defined in core/events (the module the app may import at runtime); re-exported
+// here so core-internal consumers keep importing it alongside the timeline logic.
+import { TimelineKind } from "./events";
+export { TimelineKind };
 
 export interface ITimelineEntry {
   kind: TimelineKind;

@@ -1,79 +1,56 @@
 import type { IState } from "../../core/state";
-import { TimelineKind, type ITimelineEntry } from "../../core/timeline";
-import { sceneFor } from "./scene";
+import { TimelineKind } from "../../core/events";
+import type { ITimelineEntry } from "../../core/timeline";
 
-export function xpPercent(state: IState): number {
+export const xpPercent = (state: IState): number => {
   if (state.xp_to_next <= 0) {
     return 100; // MAX at the level cap
   }
   const span = state.xp_in_level + state.xp_to_next;
   return Math.round((state.xp_in_level / span) * 100);
-}
+};
 
-export function displayName(state: IState): string {
-  return state.name ?? "Adventurer";
-}
+export const displayName = (state: IState): string => state.name ?? "Adventurer";
 
-export function classLabel(state: IState): string {
-  const klass = state.class;
-  if (!klass || !klass.line) {
-    return "Novice";
-  }
-  return `${klass.icon} ${klass.form}`.trim();
+export enum TimelineTone {
+  Gold = "gold",
+  Teal = "teal",
+  Green = "green",
+  Red = "red",
+  Common = "common",
+  Rare = "rare",
+  Epic = "epic",
+  Legendary = "legendary",
 }
-
-export function titleSuffix(state: IState): string {
-  const title = state.cosmetics?.title;
-  return title ? ` the ${title}` : "";
-}
-
-export function streakText(state: IState): string {
-  const days = state.streak?.current_days ?? 0;
-  return days > 0 ? `🔥 ${days}d` : "";
-}
-
-export type TTimelineTone =
-  | "gold"
-  | "teal"
-  | "green"
-  | "red"
-  | "common"
-  | "rare"
-  | "epic"
-  | "legendary";
 
 export interface ITimelineDisplay {
   label: string;
   tag: string;
-  tone: TTimelineTone;
+  tone: TimelineTone;
 }
 
-export function formatTimeline(entry: ITimelineEntry): ITimelineDisplay {
+export const formatTimeline = (entry: ITimelineEntry): ITimelineDisplay => {
   if (entry.kind === TimelineKind.LevelUp) {
-    return { label: `Level up! → ${entry.detail}`, tag: "LVL", tone: "gold" };
+    return { label: `Level up! → ${entry.detail}`, tag: "LVL", tone: TimelineTone.Gold };
   }
   if (entry.kind === TimelineKind.Advance) {
-    return { label: `Became ${entry.detail}`, tag: "CLASS", tone: "teal" };
+    return { label: `Became ${entry.detail}`, tag: "CLASS", tone: TimelineTone.Teal };
   }
   if (entry.kind === TimelineKind.BossDefeated) {
-    return { label: "Defeated a boss", tag: "BOSS", tone: "green" };
+    return { label: "Defeated a boss", tag: "BOSS", tone: TimelineTone.Green };
   }
   if (entry.kind === TimelineKind.BossFled) {
-    return { label: "A boss fled", tag: "FLED", tone: "red" };
+    return { label: "A boss fled", tag: "FLED", tone: TimelineTone.Red };
   }
   const rarity = entry.rarity ?? "common";
   return {
     label: `Loot: ${entry.detail}`,
     tag: rarity.toUpperCase(),
-    tone: rarity as TTimelineTone,
+    tone: rarity as TimelineTone,
   };
-}
+};
 
-export function passiveMultiplier(state: IState): string {
+export const passiveMultiplier = (state: IState): string => {
   const pct = state.class?.base_passive_pct ?? 0;
   return (1 + pct).toFixed(1);
-}
-
-export function areaLabel(state: IState): string {
-  return sceneFor(state.class?.tier ?? 0, state.class?.line, state.class?.branch).label;
-}
+};

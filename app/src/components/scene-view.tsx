@@ -4,9 +4,10 @@ import { sceneFor } from "../scene";
 import { ActivityState } from "../activity";
 import { PanelId } from "../panels";
 import { useEncounter } from "../use-encounter";
-import { useCombat } from "../use-combat";
+import { useSceneDirector } from "../use-scene-director";
 import Hero from "./hero";
 import Monster from "./monster";
+import HitEffects from "./hit-effect";
 import BossEncounter from "./boss-encounter";
 import PortraitFrame from "./portrait-frame";
 import AreaTag from "./area-tag";
@@ -24,22 +25,24 @@ const SceneView = (props: IProps) => {
   const { state, activity } = props;
   const [panel, setPanel] = useState<PanelId | null>(null);
   const encounter = useEncounter(state);
-  const combat = useCombat(state, activity);
-  const scene = sceneFor(state.class?.tier ?? 0, state.class?.line, state.class?.branch);
+  const scene = useSceneDirector(state, activity);
+  const sceneInfo = sceneFor(state.class?.tier ?? 0, state.class?.line, state.class?.branch);
   const line = state.class?.line ?? "novice";
 
   return (
     <div className="companion">
-      <div className={`scene scene-${scene.theme}`}>
+      <div className={`scene scene-${sceneInfo.theme}`}>
         <div className="sky" aria-hidden="true" />
-        {activity !== ActivityState.Rest && !encounter && (
-          <Monster scene={scene} anim={combat.monster} hp={combat.hpFraction} />
-        )}
-        <Hero line={line} anim={combat.hero} />
-        <FloatingText floaters={combat.floaters} />
+        {!encounter &&
+          scene.mobs.map((m, i) => (
+            <Monster key={i} scene={sceneInfo} anim={m.anim} hp={m.hpFraction} slot={i} />
+          ))}
+        {!encounter && <HitEffects effects={scene.effects} />}
+        <Hero line={line} anim={scene.hero} />
+        <FloatingText floaters={scene.floaters} />
         {encounter && <BossEncounter encounter={encounter} />}
         <PortraitFrame state={state} />
-        <AreaTag label={scene.label} />
+        <AreaTag label={sceneInfo.label} />
         <ActivityBar activity={activity} />
         <PanelOverlay activePanel={panel} state={state} onClose={() => setPanel(null)} />
       </div>

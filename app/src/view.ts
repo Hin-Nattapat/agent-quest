@@ -75,5 +75,5 @@ export function passiveMultiplier(state: IState): string {
 }
 
 export function areaLabel(state: IState): string {
-  return sceneFor(state.class?.tier ?? 0).label;
+  return sceneFor(state.class?.tier ?? 0, state.class?.line, state.class?.branch).label;
 }

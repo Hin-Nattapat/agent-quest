@@ -19,6 +19,8 @@ export enum SceneTheme {
   FoolsMirage = "fools_mirage",
   // T4 main-line pre-branch fallback
   Ascendant = "ascendant",
+  // Home base (3.8b) — shown on Rest / fresh session_start
+  Guild = "guild",
 }
 
 export interface IScene {
@@ -26,6 +28,12 @@ export interface IScene {
   label: string;
   monster: string; // semantic name; the placeholder/sprite visual lives in styles.css
 }
+
+export const GUILD_SCENE: IScene = {
+  theme: SceneTheme.Guild,
+  label: "The Guild",
+  monster: "",
+};
 
 // Keyed by `${line}_${branch}` for main lines and by the bare line for secret classes.
 // Secret-line keys (e.g. "night_owl") and main keys (e.g. "mage_a") never collide.

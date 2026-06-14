@@ -176,14 +176,22 @@ export const classTree = (line: TLine | null): IClassTree | undefined => {
   };
 };
 
+// A pending advancement the player can claim via the rpg CLI: pick a class at Lv.5, or a T4 branch.
+export enum AdvancementKind {
+  Class = "class",
+  Branch = "branch",
+}
+
 export interface IClassState {
   line: TLine | null;
   tier: number;
   form: ClassForm;
   icon: string;
+  // branch stays an "a"|"b" string union (not an enum): the app compares it to these literals
+  // (talents-panel) and may not import core runtime enums per the seam (app/CLAUDE.md).
   branch: "a" | "b" | null;
   affinity: Record<string, number>;
-  advancement_pending: "class" | "branch" | null;
+  advancement_pending: AdvancementKind | null;
   base_passive_pct: number;
   tree?: IClassTree;
 }
@@ -246,16 +254,16 @@ interface IAdvancementPendingArgs {
 
 export const advancementPending = (
   props: IAdvancementPendingArgs,
-): "class" | "branch" | null => {
+): AdvancementKind | null => {
   const { line, level, branch } = props;
   if (level >= 5 && line == null) {
-    return "class";
+    return AdvancementKind.Class;
   }
   if (line != null && isSecret(line)) {
     return null; // secret lines have no T4 branch and aren't offered at Lv.5
   }
   if (level >= 50 && line != null && branch == null) {
-    return "branch";
+    return AdvancementKind.Branch;
   }
   return null;
 };

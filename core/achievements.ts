@@ -1,9 +1,14 @@
 import type { IState, IAchievementsState } from "./state";
 import { SecretLine } from "./classes";
 
+export enum DistinctScope {
+  Source = "source",
+  Repo = "repo",
+}
+
 export type TCond =
   | { stat: string; gte?: number; lt?: number }
-  | { distinct: "source" | "repo"; gte: number }
+  | { distinct: DistinctScope; gte: number }
   | { all: TCond[] }
   | { any: TCond[] };
 
@@ -55,7 +60,7 @@ const passes = (cond: TCond, f: TFacts): boolean => {
     return cond.any.some(c => passes(c, f));
   }
   if ("distinct" in cond) {
-    const v = cond.distinct === "source" ? f.distinct_source : f.distinct_repo;
+    const v = cond.distinct === DistinctScope.Source ? f.distinct_source : f.distinct_repo;
     return v >= cond.gte;
   }
   const v = f[cond.stat] ?? 0;
@@ -65,7 +70,7 @@ const passes = (cond: TCond, f: TFacts): boolean => {
 // Current value for a simple gte condition, for an unearned progress bar. null = no simple bar.
 const progressValue = (cond: TCond, f: TFacts): number | null => {
   if ("distinct" in cond) {
-    return cond.distinct === "source" ? f.distinct_source : f.distinct_repo;
+    return cond.distinct === DistinctScope.Source ? f.distinct_source : f.distinct_repo;
   }
   if ("stat" in cond && cond.gte != null && cond.lt == null) {
     return f[cond.stat] ?? 0;
@@ -185,20 +190,20 @@ export const DEFAULT_ACHIEVEMENTS: Record<string, IAchievementDef> = {
   wanderer: {
     name: "Wanderer",
     desc: "Work in 5 repos",
-    cond: { distinct: "repo", gte: 5 },
+    cond: { distinct: DistinctScope.Repo, gte: 5 },
     points: 15,
     reward: { title: "Explorer" },
   },
   globetrotter: {
     name: "Globetrotter",
     desc: "Work in 20 repos",
-    cond: { distinct: "repo", gte: 20 },
+    cond: { distinct: DistinctScope.Repo, gte: 20 },
     points: 25,
   },
   polyglot: {
     name: "Polyglot",
     desc: "Use 3 different agent sources",
-    cond: { distinct: "source", gte: 3 },
+    cond: { distinct: DistinctScope.Source, gte: 3 },
     points: 25,
     hidden: true,
   },
@@ -281,7 +286,7 @@ export const DEFAULT_ACHIEVEMENTS: Record<string, IAchievementDef> = {
     desc: "Conduct 3+ agent sources at high level",
     cond: {
       all: [
-        { distinct: "source", gte: 3 },
+        { distinct: DistinctScope.Source, gte: 3 },
         { stat: "level", gte: 25 },
       ],
     },

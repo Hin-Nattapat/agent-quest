@@ -6,6 +6,7 @@ import {
   formFor,
   iconFor,
   advancementPending,
+  AdvancementKind,
 } from "../../core/classes";
 
 test("tierForLevel boundaries", () => {
@@ -40,10 +41,12 @@ test("iconFor", () => {
 });
 
 test("advancementPending", () => {
-  expect(advancementPending({ line: null, level: 6, branch: null })).toBe("class");
+  expect(advancementPending({ line: null, level: 6, branch: null })).toBe(
+    AdvancementKind.Class,
+  );
   expect(advancementPending({ line: ClassLine.Mage, level: 6, branch: null })).toBe(null);
   expect(advancementPending({ line: ClassLine.Mage, level: 50, branch: null })).toBe(
-    "branch",
+    AdvancementKind.Branch,
   );
   expect(advancementPending({ line: ClassLine.Mage, level: 50, branch: "a" })).toBe(null);
   expect(advancementPending({ line: null, level: 4, branch: null })).toBe(null);

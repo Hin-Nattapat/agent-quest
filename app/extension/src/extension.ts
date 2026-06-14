@@ -16,8 +16,9 @@ const resolveView = (
   context: vscode.ExtensionContext,
   view: vscode.WebviewView,
 ): void => {
-  // app/extension/ -> app/dist (the Vite build output)
-  const distRoot = vscode.Uri.joinPath(context.extensionUri, "..", "dist");
+  // Webview assets are copied into the extension (scripts/copy-webview.mjs) so the same bundle
+  // ships in the .vsix and is loaded under F5 — one source, no drift.
+  const distRoot = vscode.Uri.joinPath(context.extensionUri, "webview");
   const { webview } = view;
   webview.options = { enableScripts: true, localResourceRoots: [distRoot] };
 

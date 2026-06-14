@@ -11,7 +11,7 @@ export interface IGameEvent {
 }
 
 // ids gained in `next.inventory` vs `prev` (counts the per-item increase).
-function newItems(prev: IState | null, next: IState): string[] {
+const newItems = (prev: IState | null, next: IState): string[] => {
   const before = new Map((prev?.inventory ?? []).map(i => [i.id, i.count]));
   const out: string[] = [];
   for (const item of next.inventory ?? []) {
@@ -21,9 +21,9 @@ function newItems(prev: IState | null, next: IState): string[] {
     }
   }
   return out;
-}
+};
 
-export function diffStates(prev: IState | null, next: IState): IGameEvent[] {
+export const diffStates = (prev: IState | null, next: IState): IGameEvent[] => {
   if (!prev) {
     return [];
   }
@@ -37,15 +37,15 @@ export function diffStates(prev: IState | null, next: IState): IGameEvent[] {
     events.push({ type: GameEventType.BossFled, items: [] });
   }
   return events;
-}
+};
 
-export interface ICombatBeats {
+interface ICombatBeats {
   xp: number; // xp_total gained since prev (clamped >= 0)
   hurt: boolean; // a new action_fail occurred
   leveledUp: boolean; // level increased
 }
 
-export function combatBeats(prev: IState | null, next: IState): ICombatBeats {
+export const combatBeats = (prev: IState | null, next: IState): ICombatBeats => {
   if (!prev) {
     return { xp: 0, hurt: false, leveledUp: false };
   }
@@ -53,4 +53,4 @@ export function combatBeats(prev: IState | null, next: IState): ICombatBeats {
   const hurt = (next.stats.action_fails ?? 0) > (prev.stats.action_fails ?? 0);
   const leveledUp = next.level > prev.level;
   return { xp, hurt, leveledUp };
-}
+};

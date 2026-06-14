@@ -36,6 +36,17 @@ export enum CmdTag {
   TestRun = "test_run",
 }
 
+// Derived (not a wire enum): timeline milestone kinds. Lives here — the events-contract module —
+// because it is part of the read-side display contract the app MAY import at runtime (app/CLAUDE.md
+// whitelists this module), while the timeline LOGIC stays in core/timeline.ts.
+export enum TimelineKind {
+  LevelUp = "level_up",
+  Advance = "advance", // tier/form evolution (also a new area)
+  BossDefeated = "boss_defeated",
+  BossFled = "boss_fled",
+  Loot = "loot", // boss drops (rolled at the boss event, so time-anchored)
+}
+
 export interface INormalizedEvent {
   ts: string; // UTC ISO8601, second precision
   source: string; // adapter id, e.g. "claude-code"
@@ -52,7 +63,9 @@ export interface INormalizedEvent {
 }
 
 export const isNormalizedEvent = (o: unknown): o is INormalizedEvent => {
-  if (typeof o !== "object" || o === null) return false;
+  if (typeof o !== "object" || o === null) {
+    return false;
+  }
   const e = o as Record<string, unknown>;
   return (
     typeof e.ts === "string" &&

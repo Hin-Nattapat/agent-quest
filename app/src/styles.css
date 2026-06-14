@@ -91,6 +91,11 @@ body {
 .scene-ascendant .sky {
   background: linear-gradient(180deg, #161227, #322a4a 60%, #161227);
 }
+.scene-guild .sky {
+  background:
+    radial-gradient(circle at 50% 78%, #6b3a1e88, transparent 60%),
+    linear-gradient(180deg, #1c1208, #3a2614 55%, #50341c);
+}
 .scene-skyforge_aether .sky {
   background: linear-gradient(180deg, #2a1a4a, #4a3a78 55%, #6b5aa0);
 }
@@ -1209,6 +1214,70 @@ body {
   transform: translateX(-50%);
 }
 
+/* ── world transition (3.8b): fade + "Now Entering" banner ── */
+.world-transition {
+  position: absolute;
+  inset: 0;
+  z-index: 30; /* top-most "curtain": paints over scene + panels during a swap */
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  animation: world-fade 1.2s ease-in-out forwards;
+}
+@keyframes world-fade {
+  0% {
+    background: #0a0712e6;
+    opacity: 0;
+  }
+  18% {
+    background: #0a0712e6;
+    opacity: 1;
+  }
+  70% {
+    background: #0a0712e6;
+    opacity: 1;
+  }
+  100% {
+    background: #0a071200;
+    opacity: 0;
+  }
+}
+.world-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: world-banner-rise 1.2s ease-out forwards;
+}
+@keyframes world-banner-rise {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.world-eyebrow {
+  font-family: "Pixelify Sans", monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+.world-realm {
+  font-family: "MedievalSharp", serif;
+  font-size: 24px;
+  color: var(--text);
+  text-shadow: 2px 2px 0 #000;
+}
+
 /* motion conveys state; honor reduced-motion by stilling it */
 @media (prefers-reduced-motion: reduce) {
   .hero-farming,
@@ -1233,5 +1302,9 @@ body {
   }
   .xpbar > i {
     transition: none;
+  }
+  .world-transition,
+  .world-banner {
+    animation: none;
   }
 }

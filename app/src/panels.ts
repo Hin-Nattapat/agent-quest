@@ -3,4 +3,6 @@ export enum PanelId {
   Talents = "talents",
   Items = "items",
   Codex = "codex",
+  Usage = "usage",
+  Settings = "settings",
 }

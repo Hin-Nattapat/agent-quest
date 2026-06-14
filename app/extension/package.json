@@ -3,6 +3,8 @@
   "displayName": "Commit Quest Companion",
   "description": "Live Commit Quest companion panel in VS Code.",
   "version": "0.0.1",
+  "publisher": "natpat",
+  "repository": { "type": "git", "url": "https://github.com/Hin-Nattapat/commit-quest" },
   "private": true,
   "engines": {
     "vscode": "^1.90.0"
@@ -37,11 +39,15 @@
   },
   "scripts": {
     "build": "node esbuild.mjs",
+    "copy-webview": "node scripts/copy-webview.mjs",
+    "build:all": "npm --prefix .. run build && npm run copy-webview && npm run build",
+    "package": "npm run build:all && vsce package --no-dependencies",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^25.0.0",
     "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.24.0",
     "typescript": "^5.6.0"
   }

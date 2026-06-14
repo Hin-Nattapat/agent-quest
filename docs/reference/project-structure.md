@@ -134,3 +134,14 @@ adapters/claude-code  ──imports type only──►  core/events.ts  ◄─�
 
 The win: adding agent #2 in Phase 5 means a new folder under `adapters/` and zero changes
 to `core/`, `hud/`, `bridge/`, or `app/`.
+
+## Packaging the VS Code extension
+
+The companion installs as a local `.vsix`:
+
+- `cd app/extension && npm run package` → builds the app (Vite), copies `app/dist/assets` into
+  `app/extension/webview/` (gitignored), bundles the extension host (esbuild), and runs `vsce package`
+  → `commit-quest-companion-<version>.vsix`.
+- Install: `code --install-extension commit-quest-companion-<version>.vsix`.
+- The webview loads its bundle from the in-extension `webview/` dir, so the same artifacts run under
+  F5 and in the installed vsix — **run `npm run build:all` before pressing F5.**

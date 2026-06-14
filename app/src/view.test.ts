@@ -72,3 +72,8 @@ test("passiveMultiplier = 1 + base_passive_pct, one decimal", () => {
 test("areaLabel comes from the tier scene", () => {
   expect(areaLabel(asState({ class: { tier: 1 } }))).toBe("Grassland outside town");
 });
+
+test("areaLabel reflects the T4 realm for the chosen branch", () => {
+  expect(areaLabel(asState({ class: { tier: 4, line: "mage", branch: "a" } }))).toBe("Skyforge Aether");
+  expect(areaLabel(asState({ class: { tier: 4, line: "mage", branch: null } }))).toBe("Ascendant Realm");
+});

@@ -10,7 +10,10 @@ export interface ITransitionView {
 
 // Fire a transition only when we have a previous theme and it actually changed — `null` prev means
 // first mount (no "from" world), so it stays quiet on load. Pure so the decision is unit-tested.
-export const shouldTransition = (prevTheme: string | null, nextTheme: string): boolean => {
+export const shouldTransition = (
+  prevTheme: string | null,
+  nextTheme: string,
+): boolean => {
   return prevTheme !== null && prevTheme !== nextTheme;
 };
 

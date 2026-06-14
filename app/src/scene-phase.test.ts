@@ -26,7 +26,11 @@ test("Wander → Engage spawns a pack when farming", () => {
 });
 
 test("stays in Wander when idle", () => {
-  const s = stepDirector(initDirector, { now: 5000, activity: ActivityState.Idle, wantStrike: false });
+  const s = stepDirector(initDirector, {
+    now: 5000,
+    activity: ActivityState.Idle,
+    wantStrike: false,
+  });
   expect(s.phase).toBe(ScenePhase.Wander);
   expect(s.pack).toEqual([]);
 });
@@ -57,8 +61,17 @@ test("clearing the pack enters a rest gap, then re-engages once it elapses", () 
 });
 
 test("going non-farming mid-wave abandons the pack", () => {
-  const engaged = { ...initDirector, phase: ScenePhase.Engage, pack: [PACK_HITS, PACK_HITS], waveIndex: 1 };
-  const s = stepDirector(engaged, { now: 3000, activity: ActivityState.Idle, wantStrike: false });
+  const engaged = {
+    ...initDirector,
+    phase: ScenePhase.Engage,
+    pack: [PACK_HITS, PACK_HITS],
+    waveIndex: 1,
+  };
+  const s = stepDirector(engaged, {
+    now: 3000,
+    activity: ActivityState.Idle,
+    wantStrike: false,
+  });
   expect(s.phase).toBe(ScenePhase.Wander);
   expect(s.pack).toEqual([]);
   expect(s.restUntil).toBeNull();

@@ -60,7 +60,8 @@ const passes = (cond: TCond, f: TFacts): boolean => {
     return cond.any.some(c => passes(c, f));
   }
   if ("distinct" in cond) {
-    const v = cond.distinct === DistinctScope.Source ? f.distinct_source : f.distinct_repo;
+    const v =
+      cond.distinct === DistinctScope.Source ? f.distinct_source : f.distinct_repo;
     return v >= cond.gte;
   }
   const v = f[cond.stat] ?? 0;

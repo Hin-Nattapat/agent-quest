@@ -1,4 +1,4 @@
-import type { IFloater } from "../use-combat";
+import type { IFloater } from "../use-scene-director";
 
 interface IProps {
   floaters: IFloater[];

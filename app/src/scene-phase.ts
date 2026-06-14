@@ -8,7 +8,6 @@ export enum ScenePhase {
 
 export const REST_GAP_MS = 4000; // calm wander between waves
 export const STRIKE_THROTTLE_MS = 700; // min gap between hero strikes (paces the fight)
-export const SPAWN_STAGGER_MS = 120; // pop-in stagger across a pack (used by the view)
 
 export interface IDirectorState {
   phase: ScenePhase;
@@ -18,7 +17,7 @@ export interface IDirectorState {
   lastStrikeAt: number;
 }
 
-export interface IDirectorInput {
+interface IDirectorInput {
   now: number;
   activity: ActivityState;
   wantStrike: boolean;

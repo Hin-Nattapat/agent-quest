@@ -5,6 +5,8 @@ import HeroPanel from "./hero-panel";
 import ItemsPanel from "./items-panel";
 import CodexPanel from "./codex-panel";
 import TalentsPanel from "./talents-panel";
+import UsagePanel from "./usage-panel";
+import SettingsPanel from "./settings-panel";
 
 interface IProps {
   activePanel: PanelId | null;
@@ -17,6 +19,8 @@ const TITLES: Record<PanelId, string> = {
   [PanelId.Talents]: "Talents",
   [PanelId.Items]: "Items",
   [PanelId.Codex]: "Codex",
+  [PanelId.Usage]: "Usage",
+  [PanelId.Settings]: "Settings",
 };
 
 const PanelOverlay = (props: IProps) => {
@@ -57,6 +61,8 @@ const PanelOverlay = (props: IProps) => {
         {activePanel === PanelId.Items ? <ItemsPanel state={state} /> : null}
         {activePanel === PanelId.Codex ? <CodexPanel state={state} /> : null}
         {activePanel === PanelId.Talents ? <TalentsPanel state={state} /> : null}
+        {activePanel === PanelId.Usage ? <UsagePanel state={state} /> : null}
+        {activePanel === PanelId.Settings ? <SettingsPanel /> : null}
       </div>
     </div>
   );

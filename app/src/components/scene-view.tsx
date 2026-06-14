@@ -13,6 +13,7 @@ import WorldTransition from "./world-transition";
 import BossEncounter from "./boss-encounter";
 import PortraitFrame from "./portrait-frame";
 import AreaTag from "./area-tag";
+import MetaMenu from "./meta-menu";
 import ActivityBar from "./activity-bar";
 import FloatingText from "./floating-text";
 import PanelOverlay from "./panel-overlay";
@@ -52,6 +53,7 @@ const SceneView = (props: IProps) => {
         {encounter && <BossEncounter encounter={encounter} />}
         <PortraitFrame state={state} />
         <AreaTag label={sceneInfo.label} />
+        <MetaMenu onOpen={setPanel} />
         <ActivityBar activity={activity} />
         <PanelOverlay activePanel={panel} state={state} onClose={() => setPanel(null)} />
         <WorldTransition active={transition.active} label={transition.label} />

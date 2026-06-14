@@ -786,8 +786,14 @@ body {
   bottom: 30%;
   width: 34px;
   height: 34px;
-  background:
-    linear-gradient(135deg, transparent 44%, #fff 47%, #ffe9a8 50%, #fff 53%, transparent 56%);
+  background: linear-gradient(
+    135deg,
+    transparent 44%,
+    #fff 47%,
+    #ffe9a8 50%,
+    #fff 53%,
+    transparent 56%
+  );
   filter: drop-shadow(0 0 4px #ffe9a8);
   animation: slash 0.32s ease-out forwards;
 }
@@ -852,6 +858,70 @@ body {
   background: var(--panel-2);
   color: var(--text);
 }
+
+/* ── meta tools menu (gear in the scene corner → Usage / Settings popover) ── */
+.meta-menu {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 15;
+}
+.meta-gear {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  color: var(--gold-soft);
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  box-shadow: inset 0 0 0 2px var(--panel-dark);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.meta-gear:hover {
+  background: var(--panel-2);
+}
+.meta-backdrop {
+  position: fixed;
+  inset: 0; /* full click-catcher so an outside click closes the popover */
+}
+.meta-popover {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  margin: 0 0 6px;
+  padding: 4px;
+  min-width: 134px;
+  list-style: none;
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  box-shadow:
+    inset 0 0 0 2px var(--panel-dark),
+    0 0 0 2px var(--ink);
+  border-radius: 3px;
+}
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 9px;
+  font-family: "Pixelify Sans", monospace;
+  font-size: 13px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: left;
+}
+.meta-item:hover {
+  background: var(--panel-2);
+}
+.meta-icon {
+  font-size: 14px;
+}
 .panel-backdrop {
   position: absolute;
   inset: 0;
@@ -862,7 +932,8 @@ body {
 }
 .panel-window {
   width: min(82%, 600px);
-  height: min(86%, 460px); /* fixed so all four panels are the same size */
+  /* content-sized up to a cap, so a short VS Code panel never clips the modal; the body scrolls */
+  max-height: min(92%, 540px);
   display: flex;
   flex-direction: column;
   background: var(--panel);
@@ -885,12 +956,16 @@ body {
 .panel-close {
   font-family: "Press Start 2P", monospace;
   font-size: 10px;
-  color: var(--text);
-  background: #c0392b;
-  border: 2px solid var(--ink);
+  color: var(--gold-soft);
+  background: var(--panel-dark);
+  border: 2px solid var(--gold);
   border-radius: 3px;
   padding: 3px 6px;
   cursor: pointer;
+}
+.panel-close:hover {
+  background: var(--ember);
+  color: var(--ink);
 }
 .panel-body {
   flex: 1;
@@ -898,6 +973,18 @@ body {
   padding: 10px 12px;
   overflow-y: auto;
   font-size: 13px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) var(--panel-dark);
+}
+.panel-body::-webkit-scrollbar {
+  width: 8px;
+}
+.panel-body::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 4px;
+}
+.panel-body::-webkit-scrollbar-track {
+  background: var(--panel-dark);
 }
 .panel-head {
   font-family: "Press Start 2P", monospace;
@@ -1263,7 +1350,139 @@ body {
   text-shadow: 2px 2px 0 #000;
 }
 
+/* ── usage / stats panel (6.1) ── */
+.usage-panel {
+  /* two columns in the short, wide VS Code panel so the 4 sections don't stack into a tall scroll */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+.usage-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.repo-list,
+.tool-list,
+.cmd-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.repo-row,
+.cmd-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+.repo-name,
+.cmd-name {
+  color: var(--text);
+}
+.repo-stat,
+.cmd-count,
+.tool-count {
+  color: var(--dim);
+  white-space: nowrap;
+}
+.tool-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 36px;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.tool-name {
+  color: var(--text);
+}
+.tool-bar {
+  height: 8px;
+  background: var(--panel-dark);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.tool-bar > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--gold-soft));
+}
+.tool-count {
+  text-align: right;
+}
+.usage-totals {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+.usage-totals > div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.usage-totals dt {
+  color: var(--dim);
+}
+.usage-totals dd {
+  margin: 0;
+  color: var(--text);
+}
+
 /* motion conveys state; honor reduced-motion by stilling it */
+/* ── settings panel (6.2 starter) + manual reduce-motion toggle ── */
+body.reduce-motion *,
+body.reduce-motion *::before,
+body.reduce-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.settings-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text);
+}
+.settings-disabled {
+  opacity: 0.5;
+}
+.settings-soon {
+  font-size: 10px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.toggle {
+  font-family: "Pixelify Sans", monospace;
+  font-size: 11px;
+  min-width: 44px;
+  padding: 3px 8px;
+  border: 2px solid var(--gold);
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.toggle.on {
+  background: var(--teal);
+}
+.toggle.off {
+  background: var(--panel-dark);
+  color: var(--dim);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-farming,
   .hero-idle,

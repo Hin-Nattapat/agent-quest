@@ -5,6 +5,8 @@ import {
   formatTimeline,
   passiveMultiplier,
   TimelineTone,
+  cmdLabel,
+  byCountDesc,
 } from "./view";
 import { TimelineKind } from "../../core/events";
 import type { IState } from "../../core/state";
@@ -60,4 +62,20 @@ test("formatTimeline maps each kind to label/tag/tone", () => {
 test("passiveMultiplier = 1 + base_passive_pct, one decimal", () => {
   expect(passiveMultiplier(asState({ class: { base_passive_pct: 0.3 } }))).toBe("1.3");
   expect(passiveMultiplier(asState({}))).toBe("1.0");
+});
+
+test("cmdLabel maps known CmdTags and Title-Cases unknown ones", () => {
+  expect(cmdLabel("force_push")).toBe("Force Pushes");
+  expect(cmdLabel("test_run")).toBe("Test Runs");
+  expect(cmdLabel("cherry_pick")).toBe("Cherry-Picks");
+  expect(cmdLabel("foo_bar")).toBe("Foo Bar"); // unknown → Title Case
+});
+
+test("byCountDesc sorts entries by value descending", () => {
+  expect(byCountDesc({ a: 1, b: 3, c: 2 })).toEqual([
+    ["b", 3],
+    ["c", 2],
+    ["a", 1],
+  ]);
+  expect(byCountDesc({})).toEqual([]);
 });

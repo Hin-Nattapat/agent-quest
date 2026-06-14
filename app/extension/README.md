@@ -7,11 +7,13 @@ loot, achievements) and an animated AFK scene, fed from `~/.agentrpg/state.json`
 
 ```bash
 cd app/extension
+npm run reinstall   # package + force-install the freshest vsix in one shot
+# or, separately:
 npm run package                                              # → commit-quest-companion-<version>.vsix
 code --install-extension commit-quest-companion-0.0.1.vsix
 ```
 
-Reload VS Code, then open the **Commit Quest** panel (next to Terminal / Output).
+Reload VS Code (`Developer: Reload Window`), then open the **Commit Quest** panel (next to Terminal / Output).
 
 To remove: `code --uninstall-extension natpat.commit-quest-companion`.
 

@@ -54,3 +54,33 @@ export const passiveMultiplier = (state: IState): string => {
   const pct = state.class?.base_passive_pct ?? 0;
   return (1 + pct).toFixed(1);
 };
+
+const CMD_LABELS: Record<string, string> = {
+  git_rebase_onto: "Rebase Onto",
+  git_rebase_i: "Interactive Rebase",
+  cherry_pick: "Cherry-Picks",
+  force_push: "Force Pushes",
+  bisect: "Bisects",
+  reflog: "Reflog Dives",
+  stash: "Stashes",
+  pr_merge: "PR Merges",
+  cowboy: "Cowboy Commits",
+  test_run: "Test Runs",
+};
+
+// Readable label for a CmdTag value; unknown tags fall back to Title Case of the snake_case key.
+export const cmdLabel = (tag: string): string => {
+  const known = CMD_LABELS[tag];
+  if (known) {
+    return known;
+  }
+  return tag
+    .split("_")
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+};
+
+// Entries of a count record sorted by value descending (Array.sort is stable, so ties keep order).
+export const byCountDesc = (rec: Record<string, number>): [string, number][] => {
+  return Object.entries(rec).sort((a, b) => b[1] - a[1]);
+};

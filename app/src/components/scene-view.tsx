@@ -1,13 +1,15 @@
 import { useState } from "react";
 import type { IState } from "../../../core/state";
-import { sceneFor } from "../scene";
+import { sceneNow } from "../scene-place";
 import { ActivityState } from "../activity";
 import { PanelId } from "../panels";
 import { useEncounter } from "../use-encounter";
 import { useSceneDirector } from "../use-scene-director";
+import { useTransition } from "../use-transition";
 import Hero from "./hero";
 import Monster from "./monster";
 import HitEffects from "./hit-effect";
+import WorldTransition from "./world-transition";
 import BossEncounter from "./boss-encounter";
 import PortraitFrame from "./portrait-frame";
 import AreaTag from "./area-tag";
@@ -26,7 +28,14 @@ const SceneView = (props: IProps) => {
   const [panel, setPanel] = useState<PanelId | null>(null);
   const encounter = useEncounter(state);
   const scene = useSceneDirector(state, activity);
-  const sceneInfo = sceneFor(state.class?.tier ?? 0, state.class?.line, state.class?.branch);
+  const sceneInfo = sceneNow({
+    activity,
+    lastEvent: state.last_event,
+    tier: state.class?.tier ?? 0,
+    line: state.class?.line,
+    branch: state.class?.branch,
+  });
+  const transition = useTransition(sceneInfo);
   const line = state.class?.line ?? "novice";
 
   return (
@@ -45,6 +54,7 @@ const SceneView = (props: IProps) => {
         <AreaTag label={sceneInfo.label} />
         <ActivityBar activity={activity} />
         <PanelOverlay activePanel={panel} state={state} onClose={() => setPanel(null)} />
+        <WorldTransition active={transition.active} label={transition.label} />
       </div>
       <Sidebar state={state} onOpen={setPanel} />
     </div>

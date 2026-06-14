@@ -349,3 +349,4 @@ The Jester Mirage:      a mischievous illusion jester splitting into mirror-imag
 - **3.7 ✅** map `sceneFor(tier=4, line, branch)` → theme key ของแดน (เช่น `skyforge_aether`) ครบ 13 แดน — โค้ดอ้าง theme key, art เสียบหลัง CSS seam (ตอนนี้เป็น gradient + emoji placeholder)
 - พื้นหลังแดน = tileset/gen แยก (PixelLab map หรือ free fantasy tileset) — มอนสเตอร์/บอสมาก่อน, ฉากตามทีหลัง
 - gen ตามลำดับ: base mob (slime/wraith/brute) → บอสสายที่เล่นอยู่ (Mage ก่อน) → ที่เหลือทยอย
+- **3.8b** ฉาก **กิล/เมือง** (home base, โทนอุ่น) + world-transition (fade + ป้าย "Now Entering") — โค้ดใช้ `.scene-guild` + `sceneNow` (Rest/fresh session_start = กิล); ตอนนี้ gradient placeholder, art เสียบหลัง CSS seam

@@ -6,13 +6,13 @@ export interface ITransport {
 }
 
 // Parse one SSE "state" payload; null on malformed JSON (the UI keeps the last good state).
-export function parseStateEvent(data: string): IState | null {
+export const parseStateEvent = (data: string): IState | null => {
   try {
     return JSON.parse(data) as IState;
   } catch {
     return null;
   }
-}
+};
 
 export interface IVsCodeApi {
   postMessage(message: unknown): void;
@@ -24,10 +24,10 @@ export interface IMessageTarget {
 }
 
 // Host posts { type: "state", json } where json is the raw state.json text (same payload SSE sends).
-export function postMessageTransport(
+export const postMessageTransport = (
   api: IVsCodeApi,
   target: IMessageTarget = window,
-): ITransport {
+): ITransport => {
   return {
     subscribe(onState) {
       const handler = (event: MessageEvent) => {
@@ -45,7 +45,7 @@ export function postMessageTransport(
       return () => target.removeEventListener("message", handler);
     },
   };
-}
+};
 
 export interface IVsCodeWindow {
   acquireVsCodeApi?: () => IVsCodeApi;
@@ -53,21 +53,12 @@ export interface IVsCodeWindow {
   removeEventListener(type: "message", handler: (event: MessageEvent) => void): void;
 }
 
-// In a VS Code webview, acquireVsCodeApi is injected and may be called only once.
-// Everywhere else (browser dev, prod SSE bridge) fall back to the SSE endpoint.
-export function selectTransport(win: IVsCodeWindow): ITransport {
-  if (typeof win.acquireVsCodeApi === "function") {
-    return postMessageTransport(win.acquireVsCodeApi(), win);
-  }
-  return sseTransport("/events");
-}
-
 type TMakeSource = (url: string) => EventSource;
 
-export function sseTransport(
+export const sseTransport = (
   url: string,
   makeSource: TMakeSource = u => new EventSource(u),
-): ITransport {
+): ITransport => {
   return {
     subscribe(onState) {
       const source = makeSource(url);
@@ -80,4 +71,13 @@ export function sseTransport(
       return () => source.close();
     },
   };
-}
+};
+
+// In a VS Code webview, acquireVsCodeApi is injected and may be called only once.
+// Everywhere else (browser dev, prod SSE bridge) fall back to the SSE endpoint.
+export const selectTransport = (win: IVsCodeWindow): ITransport => {
+  if (typeof win.acquireVsCodeApi === "function") {
+    return postMessageTransport(win.acquireVsCodeApi(), win);
+  }
+  return sseTransport("/events");
+};

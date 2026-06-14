@@ -59,15 +59,15 @@ const ASCENDANT: IScene = {
   monster: "Realm Guardian",
 };
 
-export function realmFor(line: string | null, branch: string | null): IScene {
+export const realmFor = (line: string | null, branch: string | null): IScene => {
   if (!line) {
     return ASCENDANT;
   }
   const key = branch ? `${line}_${branch}` : line;
   return REALMS[key] ?? ASCENDANT;
-}
+};
 
-export function sceneFor(tier: number, line?: string | null, branch?: string | null): IScene {
+export const sceneFor = (tier: number, line?: string | null, branch?: string | null): IScene => {
   if (tier >= 4) {
     return realmFor(line ?? null, branch ?? null);
   }
@@ -90,4 +90,4 @@ export function sceneFor(tier: number, line?: string | null, branch?: string | n
     label: "Grassland outside town",
     monster: "Bug Slime",
   };
-}
+};

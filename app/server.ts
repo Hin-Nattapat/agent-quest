@@ -7,7 +7,7 @@ const PORT = Number(process.env.AGENTRPG_PORT) || 7070;
 const DIST = join(import.meta.dir, "dist");
 
 // Raw state.json text (atomic writes from the reducer mean reads are never partial); null if absent.
-export function readState(home: string): string | null {
+export const readState = (home: string): string | null => {
   const path = join(home, "state.json");
   if (!existsSync(path)) {
     return null;
@@ -17,17 +17,17 @@ export function readState(home: string): string | null {
   } catch {
     return null;
   }
-}
+};
 
 // state.json is pretty-printed (multi-line); SSE requires a `data:` prefix on EVERY line,
 // otherwise the browser's EventSource only keeps the first line and JSON.parse fails.
-export function sseMessage(stateJson: string): string {
+export const sseMessage = (stateJson: string): string => {
   const data = stateJson
     .split("\n")
     .map(line => `data: ${line}`)
     .join("\n");
   return `event: state\n${data}\n\n`;
-}
+};
 
 if (import.meta.main) {
   const encoder = new TextEncoder();

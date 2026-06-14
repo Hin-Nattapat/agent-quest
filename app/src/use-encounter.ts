@@ -5,7 +5,7 @@ import { diffStates, type IGameEvent } from "./game-events";
 const ENCOUNTER_MS = 4500; // min on-screen battle so a real drop never flashes
 
 // Diffs each new state into encounter events and plays them one at a time.
-export function useEncounter(state: IState | null): IGameEvent | null {
+export const useEncounter = (state: IState | null): IGameEvent | null => {
   const prevRef = useRef<IState | null>(null);
   const [queue, setQueue] = useState<IGameEvent[]>([]);
   const [current, setCurrent] = useState<IGameEvent | null>(null);
@@ -33,4 +33,4 @@ export function useEncounter(state: IState | null): IGameEvent | null {
   }, [current, queue]);
 
   return current;
-}
+};

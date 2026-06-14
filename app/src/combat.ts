@@ -7,6 +7,7 @@ export enum HeroAnim {
   Attack = "attack",
   Hurt = "hurt",
   Celebrate = "celebrate",
+  Wander = "wander",
 }
 
 export enum MonsterAnim {
@@ -40,10 +41,11 @@ export interface IHeroAnimArgs {
   hurt: boolean;
   attack: boolean;
   activity: ActivityState;
+  wander?: boolean;
 }
 
 export const heroAnim = (props: IHeroAnimArgs): HeroAnim => {
-  const { celebrate, hurt, attack, activity } = props;
+  const { celebrate, hurt, attack, activity, wander } = props;
   if (celebrate) {
     return HeroAnim.Celebrate;
   }
@@ -52,6 +54,9 @@ export const heroAnim = (props: IHeroAnimArgs): HeroAnim => {
   }
   if (attack) {
     return HeroAnim.Attack;
+  }
+  if (wander) {
+    return HeroAnim.Wander;
   }
   return HERO_BASE[activity];
 };
@@ -75,3 +80,20 @@ export const monsterAnim = (props: IMonsterAnimArgs): MonsterAnim => {
   }
   return MonsterAnim.Idle;
 };
+
+export const PACK_HITS = 3; // cosmetic hits to fell one pack mob (a solo monster is MONSTER_HITS=5)
+
+// Small pure 32-bit integer hash → varied-but-deterministic wave sizes (no Math.random in logic).
+const hashInt = (n: number): number => {
+  let x = (n ^ 0x9e3779b9) >>> 0;
+  x = Math.imul(x ^ (x >>> 16), 0x45d9f3b) >>> 0;
+  x = Math.imul(x ^ (x >>> 16), 0x45d9f3b) >>> 0;
+  return (x ^ (x >>> 16)) >>> 0;
+};
+
+export const packSize = (waveIndex: number): number => 1 + (hashInt(waveIndex) % 3);
+export const makePack = (size: number): number[] => Array(size).fill(PACK_HITS);
+export const firstAlive = (pack: number[]): number => pack.findIndex(h => h > 0);
+export const strike = (pack: number[], idx: number): number[] =>
+  pack.map((h, i) => (i === idx ? Math.max(0, h - 1) : h));
+export const packCleared = (pack: number[]): boolean => pack.every(h => h <= 0);

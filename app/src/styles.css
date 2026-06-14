@@ -88,8 +88,47 @@ body {
 .scene-dungeon .sky {
   background: linear-gradient(180deg, #15121c, #28222f 60%, #15121c);
 }
-.scene-secret_realm .sky {
+.scene-ascendant .sky {
   background: linear-gradient(180deg, #161227, #322a4a 60%, #161227);
+}
+.scene-skyforge_aether .sky {
+  background: linear-gradient(180deg, #2a1a4a, #4a3a78 55%, #6b5aa0);
+}
+.scene-circuit_catacombs .sky {
+  background: linear-gradient(180deg, #14081f, #241433 60%, #0f2a14);
+}
+.scene-aurora_flux .sky {
+  background: linear-gradient(180deg, #08201f, #0f3a44 50%, #1a5a55);
+}
+.scene-geometric_sanctum .sky {
+  background: linear-gradient(180deg, #0c2230, #14506b 60%, #2a7a8c);
+}
+.scene-quantum_rift .sky {
+  background: linear-gradient(180deg, #1f0a18, #3a1430 55%, #5a1a3a);
+}
+.scene-noir_crime_scene .sky {
+  background: linear-gradient(180deg, #0c0c10, #1c1c24 60%, #2a2230);
+}
+.scene-oracles_athenaeum .sky {
+  background: linear-gradient(180deg, #2a1f0c, #4a3a18 55%, #6b5a2a);
+}
+.scene-conductors_nexus .sky {
+  background: linear-gradient(180deg, #241a08, #443414 60%, #6b5520);
+}
+.scene-grand_concert_vault .sky {
+  background: linear-gradient(180deg, #2a200a, #554216 55%, #806020);
+}
+.scene-midnight_roost .sky {
+  background: linear-gradient(180deg, #0a0e24, #1a2048 60%, #2a3060);
+}
+.scene-silent_summit .sky {
+  background: linear-gradient(180deg, #2a2e34, #4a525c 55%, #6b7480);
+}
+.scene-glitch_pit .sky {
+  background: linear-gradient(180deg, #0a1f0e, #143a1c 60%, #1a5a28);
+}
+.scene-fools_mirage .sky {
+  background: linear-gradient(180deg, #2a0a2a, #4a144a 50%, #6a1a5a);
 }
 
 /* sprite seam: emoji via ::after today; swap to a 56×56 PixelLab sheet by setting
@@ -159,8 +198,47 @@ body {
 .monster-dungeon::after {
   content: "👹";
 }
-.monster-secret_realm::after {
+.monster-ascendant::after {
   content: "👑";
+}
+.monster-skyforge_aether::after {
+  content: "⚡";
+}
+.monster-circuit_catacombs::after {
+  content: "💀";
+}
+.monster-aurora_flux::after {
+  content: "🌈";
+}
+.monster-geometric_sanctum::after {
+  content: "🛡️";
+}
+.monster-quantum_rift::after {
+  content: "🌀";
+}
+.monster-noir_crime_scene::after {
+  content: "🕵️";
+}
+.monster-oracles_athenaeum::after {
+  content: "🦁";
+}
+.monster-conductors_nexus::after {
+  content: "🤖";
+}
+.monster-grand_concert_vault::after {
+  content: "🎼";
+}
+.monster-midnight_roost::after {
+  content: "🦉";
+}
+.monster-silent_summit::after {
+  content: "🗿";
+}
+.monster-glitch_pit::after {
+  content: "👺";
+}
+.monster-fools_mirage::after {
+  content: "🃏";
 }
 @keyframes hero-bob {
   from {

@@ -2,34 +2,16 @@ import { test, expect } from "bun:test";
 import {
   HeroAnim,
   MonsterAnim,
-  MONSTER_HITS,
-  hitMonster,
-  heroAnim,
-  monsterAnim,
-} from "./combat";
-import { ActivityState } from "./activity";
-import {
   PACK_HITS,
   packSize,
   makePack,
   firstAlive,
   strike,
   packCleared,
+  heroAnim,
+  monsterAnim,
 } from "./combat";
-
-test("hitMonster increments and dies + respawns at MONSTER_HITS", () => {
-  let hits = 0;
-  let deaths = 0;
-  for (let i = 0; i < MONSTER_HITS; i++) {
-    const r = hitMonster(hits);
-    hits = r.hits;
-    if (r.died) {
-      deaths++;
-    }
-  }
-  expect(deaths).toBe(1);
-  expect(hits).toBe(0); // respawned
-});
+import { ActivityState } from "./activity";
 
 test("heroAnim resolves priority celebrate > hurt > attack > activity base", () => {
   const base = {

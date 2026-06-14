@@ -33,12 +33,12 @@ export interface IHitEffect {
   slot: number; // pack index the slash lands on
 }
 
-export interface IMobView {
+interface IMobView {
   anim: MonsterAnim;
   hpFraction: number;
 }
 
-export interface ISceneView {
+interface ISceneView {
   phase: ScenePhase;
   hero: HeroAnim;
   mobs: IMobView[]; // [] in Wander
@@ -52,7 +52,10 @@ const FLOATER_MS = 900;
 const EFFECT_MS = 320;
 const TICK_MS = 250; // advances time-driven transitions (engage start, rest-gap expiry)
 
-export function useSceneDirector(state: IState | null, activity: ActivityState): ISceneView {
+export const useSceneDirector = (
+  state: IState | null,
+  activity: ActivityState,
+): ISceneView => {
   const prevRef = useRef<IState | null>(null);
   const dirRef = useRef<IDirectorState>(initDirector);
   const seqRef = useRef(0);
@@ -180,4 +183,4 @@ export function useSceneDirector(state: IState | null, activity: ActivityState):
   });
 
   return { phase: dir.phase, hero, mobs, floaters, effects };
-}
+};

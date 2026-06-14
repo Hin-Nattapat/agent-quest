@@ -31,7 +31,9 @@ export async function runHook(
 
 export function journalLines(home: string, sid: string): any[] {
   const p = join(home, "journal", `${sid}.ndjson`);
-  if (!existsSync(p)) return [];
+  if (!existsSync(p)) {
+    return [];
+  }
   return readFileSync(p, "utf8")
     .trim()
     .split("\n")

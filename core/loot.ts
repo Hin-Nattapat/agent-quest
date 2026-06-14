@@ -18,7 +18,7 @@ export interface ILootItem {
   name: string;
   rarity: Rarity;
   kind: LootKind;
-  value?: string; // theme -> ANSI SGR code; skin -> app sprite key
+  value?: string; // theme -> ANSI SGR code (skin equip/sprite path not yet built)
 }
 
 export interface IInventoryItem {

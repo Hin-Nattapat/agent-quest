@@ -10,11 +10,11 @@ export enum ActivityState {
 export const ACTIVE_WINDOW_MS = 60_000;
 
 // `now` is wall-clock ms — kept in the app so the reducer stays time-free/idempotent.
-export function activityState(
+export const activityState = (
   lastEvent: IState["last_event"],
   now: number,
   windowMs = ACTIVE_WINDOW_MS,
-): ActivityState {
+): ActivityState => {
   if (!lastEvent) {
     return ActivityState.Idle;
   }
@@ -27,4 +27,4 @@ export function activityState(
   return now - Date.parse(lastEvent.ts) < windowMs
     ? ActivityState.Farming
     : ActivityState.Idle;
-}
+};

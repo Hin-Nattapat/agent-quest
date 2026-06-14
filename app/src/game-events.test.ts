@@ -23,7 +23,7 @@ const st = (
       boss_fled: fled,
     },
     inventory: inv,
-  }) as any;
+  }) as unknown as IState;
 
 test("diffStates emits boss outcomes with the loot delta", () => {
   const prev = st(0, 0, []);

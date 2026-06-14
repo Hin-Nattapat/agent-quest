@@ -2,34 +2,16 @@ import { test, expect } from "bun:test";
 import {
   HeroAnim,
   MonsterAnim,
-  MONSTER_HITS,
-  hitMonster,
-  heroAnim,
-  monsterAnim,
-} from "./combat";
-import { ActivityState } from "./activity";
-import {
   PACK_HITS,
   packSize,
   makePack,
   firstAlive,
   strike,
   packCleared,
+  heroAnim,
+  monsterAnim,
 } from "./combat";
-
-test("hitMonster increments and dies + respawns at MONSTER_HITS", () => {
-  let hits = 0;
-  let deaths = 0;
-  for (let i = 0; i < MONSTER_HITS; i++) {
-    const r = hitMonster(hits);
-    hits = r.hits;
-    if (r.died) {
-      deaths++;
-    }
-  }
-  expect(deaths).toBe(1);
-  expect(hits).toBe(0); // respawned
-});
+import { ActivityState } from "./activity";
 
 test("heroAnim resolves priority celebrate > hurt > attack > activity base", () => {
   const base = {
@@ -94,7 +76,12 @@ test("strike floors at 0 and never goes negative", () => {
 });
 
 test("heroAnim returns Wander only when no pulse is active", () => {
-  const base = { celebrate: false, hurt: false, attack: false, activity: ActivityState.Idle };
+  const base = {
+    celebrate: false,
+    hurt: false,
+    attack: false,
+    activity: ActivityState.Idle,
+  };
   expect(heroAnim({ ...base, wander: true })).toBe(HeroAnim.Wander);
   expect(heroAnim({ ...base, wander: true, attack: true })).toBe(HeroAnim.Attack);
   expect(heroAnim({ ...base })).toBe(HeroAnim.Idle); // wander omitted → activity base

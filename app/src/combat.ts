@@ -17,26 +17,13 @@ export enum MonsterAnim {
   Die = "die",
 }
 
-export const MONSTER_HITS = 5; // cosmetic: hits to kill the ambient monster
-
-export interface IHitResult {
-  hits: number; // hits after this strike (reset to 0 on death = respawn)
-  died: boolean;
-}
-
-export const hitMonster = (hits: number): IHitResult => {
-  const next = hits + 1;
-  const died = next >= MONSTER_HITS;
-  return { hits: died ? 0 : next, died };
-};
-
 const HERO_BASE: Record<ActivityState, HeroAnim> = {
   [ActivityState.Farming]: HeroAnim.Farming,
   [ActivityState.Idle]: HeroAnim.Idle,
   [ActivityState.Rest]: HeroAnim.Rest,
 };
 
-export interface IHeroAnimArgs {
+interface IHeroAnimArgs {
   celebrate: boolean;
   hurt: boolean;
   attack: boolean;
@@ -61,7 +48,7 @@ export const heroAnim = (props: IHeroAnimArgs): HeroAnim => {
   return HERO_BASE[activity];
 };
 
-export interface IMonsterAnimArgs {
+interface IMonsterAnimArgs {
   dying: boolean;
   attacking: boolean;
   hurt: boolean;
@@ -81,9 +68,11 @@ export const monsterAnim = (props: IMonsterAnimArgs): MonsterAnim => {
   return MonsterAnim.Idle;
 };
 
-export const PACK_HITS = 3; // cosmetic hits to fell one pack mob (a solo monster is MONSTER_HITS=5)
+export const PACK_HITS = 3; // cosmetic hits to fell one pack mob
 
 // Small pure 32-bit integer hash → varied-but-deterministic wave sizes (no Math.random in logic).
+// Intentionally re-implemented here rather than importing core/rng: app/ must not import core
+// runtime code (app/CLAUDE.md seam). Signature differs too (number→number vs string→() => number).
 const hashInt = (n: number): number => {
   let x = (n ^ 0x9e3779b9) >>> 0;
   x = Math.imul(x ^ (x >>> 16), 0x45d9f3b) >>> 0;

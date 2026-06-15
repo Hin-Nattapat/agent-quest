@@ -594,7 +594,11 @@ body {
   content: "🐉";
 }
 .boss-defeated .boss {
-  animation: boss-hit 0.5s steps(2) 8;
+  /* get pummeled (1.5s), then collapse: flash white, pop up, shrink-fall-spin out */
+  animation:
+    boss-hit 0.25s steps(2) 6,
+    boss-die 1s cubic-bezier(0.5, 0, 0.75, 0) 1.5s forwards;
+  transform-origin: center bottom;
 }
 .boss-fled .boss {
   animation: boss-flee 1s ease-in forwards;
@@ -605,6 +609,23 @@ body {
   }
   to {
     transform: translateX(5px);
+  }
+}
+@keyframes boss-die {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  20% {
+    transform: translateY(-12px) scale(1.18) rotate(0deg);
+    opacity: 1;
+    filter: brightness(2.6) saturate(0.15);
+  }
+  100% {
+    transform: translateY(30px) scale(0.12) rotate(30deg);
+    opacity: 0;
+    filter: brightness(2.6) saturate(0.15);
   }
 }
 @keyframes boss-flee {
@@ -1108,13 +1129,6 @@ body {
 }
 .item-icon {
   font-size: 24px;
-}
-.item-count {
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  font-size: 10px;
-  color: var(--dim);
 }
 .item-name {
   font-size: 10px;

@@ -86,7 +86,10 @@ const inventory = (): string => {
   }
   const table = lootTable();
   return inv
-    .map(i => `${i.rarity.padEnd(9)} ${table[i.id]?.name ?? i.id}  ×${i.count}`)
+    .map(i => {
+      const qty = i.count > 1 ? `  ×${i.count}` : "";
+      return `${i.rarity.padEnd(9)} ${table[i.id]?.name ?? i.id}${qty}`;
+    })
     .join("\n");
 };
 

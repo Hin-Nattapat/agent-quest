@@ -6,7 +6,12 @@ interface IProps {
   dispatch: (action: TClientAction) => void;
 }
 
-const KIND_ICON: Record<string, string> = { title: "👑", theme: "🎨", skin: "👕" };
+const KIND_ICON: Record<string, string> = {
+  title: "👑",
+  theme: "🎨",
+  skin: "👕",
+  name_color: "✒️",
+};
 
 // Inventory title/theme items are equippable; skins have no equip path in core.
 const equipKindOf = (kind: string | undefined): EquipKind | null => {

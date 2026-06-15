@@ -11,6 +11,7 @@ export enum LootKind {
   Title = "title",
   Theme = "theme",
   Skin = "skin",
+  NameColor = "name_color",
 }
 
 export interface ILootItem {
@@ -18,7 +19,7 @@ export interface ILootItem {
   name: string;
   rarity: Rarity;
   kind: LootKind;
-  value?: string; // theme -> ANSI SGR code (skin equip/sprite path not yet built)
+  value?: string; // theme/name-color -> ANSI SGR code (skin equip/sprite path not yet built)
 }
 
 export interface IInventoryItem {
@@ -33,6 +34,7 @@ export interface IInventoryItem {
 export interface ICosmetics {
   title: string | null;
   theme_color: string | null;
+  name_color: string | null;
 }
 
 export const LOOT_TABLE: Record<string, ILootItem> = {
@@ -53,7 +55,7 @@ export const LOOT_TABLE: Record<string, ILootItem> = {
     name: "Forest",
     rarity: Rarity.Common,
     kind: LootKind.Theme,
-    value: "32",
+    value: "38;2;46;204;78",
   },
   hoodie_skin: {
     id: "hoodie_skin",
@@ -78,14 +80,14 @@ export const LOOT_TABLE: Record<string, ILootItem> = {
     name: "Neon",
     rarity: Rarity.Rare,
     kind: LootKind.Theme,
-    value: "36",
+    value: "38;2;0;224;208",
   },
   ocean_theme: {
     id: "ocean_theme",
     name: "Ocean",
     rarity: Rarity.Rare,
     kind: LootKind.Theme,
-    value: "34",
+    value: "38;2;40;130;255",
   },
   cyber_ninja_skin: {
     id: "cyber_ninja_skin",
@@ -110,14 +112,14 @@ export const LOOT_TABLE: Record<string, ILootItem> = {
     name: "Sunset",
     rarity: Rarity.Epic,
     kind: LootKind.Theme,
-    value: "33",
+    value: "38;2;255;106;30",
   },
   matrix_theme: {
     id: "matrix_theme",
     name: "Matrix",
     rarity: Rarity.Epic,
     kind: LootKind.Theme,
-    value: "92",
+    value: "38;2;180;255;26",
   },
   wizard_robe_skin: {
     id: "wizard_robe_skin",
@@ -142,13 +144,55 @@ export const LOOT_TABLE: Record<string, ILootItem> = {
     name: "Golden",
     rarity: Rarity.Legendary,
     kind: LootKind.Theme,
-    value: "33",
+    value: "38;2;255;205;20",
   },
   golden_armor_skin: {
     id: "golden_armor_skin",
     name: "Golden Armor",
     rarity: Rarity.Legendary,
     kind: LootKind.Skin,
+  },
+  mist_ink: {
+    id: "mist_ink",
+    name: "Mist",
+    rarity: Rarity.Common,
+    kind: LootKind.NameColor,
+    value: "38;2;159;180;201",
+  },
+  azure_ink: {
+    id: "azure_ink",
+    name: "Azure",
+    rarity: Rarity.Rare,
+    kind: LootKind.NameColor,
+    value: "38;2;61;155;255",
+  },
+  jade_ink: {
+    id: "jade_ink",
+    name: "Jade",
+    rarity: Rarity.Rare,
+    kind: LootKind.NameColor,
+    value: "38;2;47;194;138",
+  },
+  royal_ink: {
+    id: "royal_ink",
+    name: "Royal",
+    rarity: Rarity.Epic,
+    kind: LootKind.NameColor,
+    value: "38;2;138;92;255",
+  },
+  ruby_ink: {
+    id: "ruby_ink",
+    name: "Ruby",
+    rarity: Rarity.Epic,
+    kind: LootKind.NameColor,
+    value: "38;2;236;59;90",
+  },
+  plasma_ink: {
+    id: "plasma_ink",
+    name: "Plasma",
+    rarity: Rarity.Legendary,
+    kind: LootKind.NameColor,
+    value: "1;38;2;255;54;255",
   },
 };
 
@@ -247,6 +291,7 @@ const OWN_ONCE_KINDS: ReadonlySet<LootKind> = new Set([
   LootKind.Title,
   LootKind.Theme,
   LootKind.Skin,
+  LootKind.NameColor,
 ]);
 
 export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
@@ -268,7 +313,7 @@ export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
 };
 
 interface IResolveCosmeticsArgs {
-  profile: { title?: string; theme?: string };
+  profile: { title?: string; theme?: string; name_color?: string };
   inventory: IInventoryItem[];
   earnedTitles?: Record<string, string>;
   lootTable?: Record<string, ILootItem>;
@@ -287,8 +332,13 @@ export const resolveCosmetics = (props: IResolveCosmeticsArgs): ICosmetics => {
     profile.title && earnedTitles[profile.title] ? earnedTitles[profile.title] : null;
   const themeItem =
     profile.theme && owned.has(profile.theme) ? lootTable[profile.theme] : null;
+  const nameItem =
+    profile.name_color && owned.has(profile.name_color)
+      ? lootTable[profile.name_color]
+      : null;
   return {
     title: lootTitle ?? earnedTitle,
     theme_color: themeItem?.kind === LootKind.Theme ? (themeItem.value ?? null) : null,
+    name_color: nameItem?.kind === LootKind.NameColor ? (nameItem.value ?? null) : null,
   };
 };

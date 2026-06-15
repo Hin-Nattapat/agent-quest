@@ -225,7 +225,11 @@ export const rollDrop = (props: IRollDropArgs): string | null => {
   }
   const rng = seededRng(trigger.seed);
   const rarity = rollRarity(rng, dropTable);
-  const pool = Object.values(lootTable).filter(item => item.rarity === rarity);
+  // Skins have no equip path yet (see ILootItem), so they never drop — keep the pool to
+  // title/theme until skin equipping exists, or they'd be dead, unusable loot.
+  const pool = Object.values(lootTable).filter(
+    item => item.rarity === rarity && item.kind !== LootKind.Skin,
+  );
   const item = pickItem(rng, pool);
   return item ? item.id : null;
 };
@@ -235,6 +239,15 @@ interface IRollInventoryArgs {
   lootTable?: Record<string, ILootItem>;
   dropTables?: Record<string, TDropTable>;
 }
+
+// Cosmetics are equip-once, so a duplicate drop adds nothing — the inventory is a collection, not
+// a stack. Count is capped at 1 for these kinds (all loot today); a future stackable kind keeps its
+// real count.
+const OWN_ONCE_KINDS: ReadonlySet<LootKind> = new Set([
+  LootKind.Title,
+  LootKind.Theme,
+  LootKind.Skin,
+]);
 
 export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
   const { triggers, lootTable = LOOT_TABLE, dropTables = DROP_TABLES } = props;
@@ -246,7 +259,11 @@ export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
     }
   }
   return Object.entries(counts)
-    .map(([id, count]) => ({ id, rarity: lootTable[id].rarity, count }))
+    .map(([id, count]) => {
+      const item = lootTable[id];
+      const ownOnce = OWN_ONCE_KINDS.has(item.kind);
+      return { id, rarity: item.rarity, count: ownOnce ? 1 : count };
+    })
     .sort((a, b) => a.id.localeCompare(b.id));
 };
 

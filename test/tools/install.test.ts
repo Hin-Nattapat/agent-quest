@@ -48,3 +48,23 @@ test("--link deploys hud/", async () => {
   await runInstall(home, ["--link"]);
   expect(existsSync(join(home, "hud/statusline.ts"))).toBe(true);
 });
+
+test("deploys the rpg wrapper + completions, and the wrapper runs", async () => {
+  const home = makeHome();
+  const { code, stdout } = await runInstall(home, ["--link"]);
+  expect(code).toBe(0);
+
+  const rpg = join(home, "bin/rpg");
+  expect(existsSync(rpg)).toBe(true);
+  expect((lstatSync(rpg).mode & 0o111) !== 0).toBe(true); // executable
+  expect(existsSync(join(home, "completions/_rpg"))).toBe(true);
+  expect(existsSync(join(home, "completions/rpg.bash"))).toBe(true);
+  expect(stdout).toContain("rpg' command");
+
+  const proc = Bun.spawn(["bash", rpg, "status"], {
+    env: { ...process.env, AGENTRPG_HOME: home },
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  expect(await proc.exited).toBe(0);
+});

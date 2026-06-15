@@ -13,6 +13,7 @@ import {
   formFor,
   iconFor,
   advancementPending,
+  advanceOption,
   classTree,
   SecretLine,
   type IClassState,
@@ -337,6 +338,12 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     earned: achievements.earned,
     registry: config.achievements ?? {},
     profile,
+  });
+  classState.advance = advanceOption({
+    line,
+    level: prog.level,
+    branch,
+    unlockedSecrets: unlocked as string[],
   });
   const registry = config.achievements ?? {};
   const earnedTitles: Record<string, string> = {};

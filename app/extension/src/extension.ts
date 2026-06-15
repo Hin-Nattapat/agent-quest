@@ -4,6 +4,7 @@ import { join } from "path";
 import { homedir } from "os";
 import { buildWebviewHtml } from "./webview-html";
 import { watchState, readStateText } from "./state-feed";
+import { applyAction } from "./host-actions";
 
 const HOME = process.env.AGENTRPG_HOME || join(homedir(), ".agentrpg");
 const VIEW_ID = "commitQuest.companion";
@@ -36,14 +37,23 @@ const resolveView = (
   });
 
   // The webview asks for the current state once it has subscribed (mount-race fix).
-  const messageSub = webview.onDidReceiveMessage((message: { type?: string }) => {
-    if (message.type === "ready") {
-      const text = readStateText(HOME);
-      if (text) {
-        webview.postMessage({ type: "state", json: text });
+  const messageSub = webview.onDidReceiveMessage(
+    (message: { type?: string; name?: string; kind?: string; id?: string }) => {
+      if (message.type === "ready") {
+        const text = readStateText(HOME);
+        if (text) {
+          webview.postMessage({ type: "state", json: text });
+        }
+        return;
       }
-    }
-  });
+      if (message.type === "action") {
+        const text = applyAction(HOME, message);
+        if (text) {
+          webview.postMessage({ type: "state", json: text });
+        }
+      }
+    },
+  );
 
   // watchState clears its pending debounce timer on dispose, so onJson never fires post-dispose.
   const disposeFeed = watchState(HOME, json => {

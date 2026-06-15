@@ -16,7 +16,7 @@ const App = (props: IProps) => {
     return <div className="loading">Connecting…</div>;
   }
 
-  return <SceneView state={state} activity={activity} />;
+  return <SceneView state={state} activity={activity} dispatch={transport.send} />;
 };
 
 export default App;

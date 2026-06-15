@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { IState } from "../../../core/state";
+import type { TClientAction } from "../actions";
 import { sceneNow } from "../scene-place";
 import { ActivityState } from "../activity";
 import { PanelId } from "../panels";
@@ -22,10 +23,11 @@ import Sidebar from "./sidebar";
 interface IProps {
   state: IState;
   activity: ActivityState;
+  dispatch: (action: TClientAction) => void;
 }
 
 const SceneView = (props: IProps) => {
-  const { state, activity } = props;
+  const { state, activity, dispatch } = props;
   const [panel, setPanel] = useState<PanelId | null>(null);
   const encounter = useEncounter(state);
   const scene = useSceneDirector(state, activity);
@@ -55,7 +57,12 @@ const SceneView = (props: IProps) => {
         <AreaTag label={sceneInfo.label} />
         <MetaMenu onOpen={setPanel} />
         <ActivityBar activity={activity} />
-        <PanelOverlay activePanel={panel} state={state} onClose={() => setPanel(null)} />
+        <PanelOverlay
+          activePanel={panel}
+          state={state}
+          onClose={() => setPanel(null)}
+          dispatch={dispatch}
+        />
         <WorldTransition active={transition.active} label={transition.label} />
       </div>
       <Sidebar state={state} onOpen={setPanel} />

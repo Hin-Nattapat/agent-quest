@@ -6,6 +6,7 @@ import {
   selectTransport,
   type IMessageTarget,
 } from "./transport";
+import { EquipKind } from "./actions";
 
 const sample = {
   version: 1,
@@ -93,4 +94,20 @@ test("selectTransport picks postMessage when acquireVsCodeApi exists", () => {
   );
   transport.subscribe(() => {});
   expect(posted).toEqual([{ type: "ready" }]); // proves the postMessage branch was chosen
+});
+
+test("postMessageTransport.send posts the action; sseTransport.send is a no-op", () => {
+  const posted: unknown[] = [];
+  const api = { postMessage: (m: unknown) => posted.push(m) };
+  const fake = new FakeTarget();
+  const t = postMessageTransport(api, fake as unknown as IMessageTarget);
+  t.send({ type: "action", name: "equip", kind: EquipKind.Title, id: "rookie" });
+  expect(posted).toEqual([
+    { type: "action", name: "equip", kind: "title", id: "rookie" },
+  ]);
+
+  const sse = sseTransport("/events", () => new FakeSource() as unknown as EventSource);
+  expect(() =>
+    sse.send({ type: "action", name: "equip", kind: EquipKind.Theme, id: "x" }),
+  ).not.toThrow();
 });

@@ -2,13 +2,8 @@
 import { defaultHome, loadConfig } from "../core/config";
 import { loadProfile, saveProfile, type IProfile } from "../core/profile";
 import { reduceToFile } from "../core/reduce";
-import {
-  ClassLine,
-  SecretLine,
-  CLASS_TREE,
-  SECRET_TREE,
-  isSecret,
-} from "../core/classes";
+import { ClassLine, SecretLine, SECRET_TREE } from "../core/classes";
+import { chooseClass, respecClass, chooseBranch } from "../core/advance";
 import { LOOT_TABLE, LootKind } from "../core/loot";
 
 const HOME = defaultHome();
@@ -18,10 +13,6 @@ const SECRETS = Object.values(SecretLine) as string[];
 const fail: (message: string) => never = message => {
   process.stderr.write(message + "\n");
   process.exit(1);
-};
-
-const currentLevel = (): number => {
-  return reduceToFile(HOME).level;
 };
 
 const persist = (profile: IProfile): void => {
@@ -36,58 +27,36 @@ const setName = (profile: IProfile, name: string): string => {
 };
 
 const setClass = (profile: IProfile, line: string): string => {
-  if (LINES.includes(line)) {
-    if (currentLevel() < 5) {
-      fail("Reach level 5 before choosing a class.");
-    }
-    profile.line = line as ClassLine;
-    profile.branch = undefined;
-    persist(profile);
-    return `Class set to ${line}.`;
+  const state = reduceToFile(HOME);
+  const r = chooseClass({
+    profile,
+    line,
+    level: state.level,
+    unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
+  });
+  if (!r.ok) {
+    fail(r.error ?? "");
   }
-  if (SECRETS.includes(line)) {
-    const unlocked = reduceToFile(HOME).unlocked_secret_classes ?? [];
-    if (!unlocked.includes(line as SecretLine)) {
-      fail(`Secret class "${line}" is locked.`);
-    }
-    profile.line = line as SecretLine;
-    profile.branch = undefined;
-    persist(profile);
-    return `Class set to ${line}.`;
-  }
-  fail(`Unknown class "${line}". Choose: ${LINES.join(", ")}.`);
+  persist(profile);
+  return `Class set to ${line}.`;
 };
 
 const setBranch = (profile: IProfile, branch: string): string => {
-  if (branch !== "a" && branch !== "b") {
-    fail(`Branch must be "a" or "b".`);
+  const state = reduceToFile(HOME);
+  const r = chooseBranch({ profile, branch, level: state.level });
+  if (!r.ok) {
+    fail(r.error ?? "");
   }
-  if (!profile.line) {
-    fail("Choose a class first.");
-  }
-  if (isSecret(profile.line)) {
-    fail("Secret classes have no branch.");
-  }
-  if (currentLevel() < 50) {
-    fail("Reach level 50 before branching.");
-  }
-  if (profile.branch) {
-    fail("Branch already chosen (locked).");
-  }
-  profile.branch = branch;
   persist(profile);
-  return `Branch locked: ${CLASS_TREE[profile.line].branches[branch]}.`;
+  return `Branch locked: ${branch}.`;
 };
 
 const respec = (profile: IProfile, line: string): string => {
-  if (!LINES.includes(line)) {
-    fail(`Unknown class "${line}".`);
+  const state = reduceToFile(HOME);
+  const r = respecClass({ profile, line, level: state.level });
+  if (!r.ok) {
+    fail(r.error ?? "");
   }
-  if (currentLevel() >= 50) {
-    fail("Cannot respec at level 50.");
-  }
-  profile.line = line as ClassLine;
-  profile.branch = undefined;
   persist(profile);
   return `Respec to ${line}.`;
 };

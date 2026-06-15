@@ -13,13 +13,16 @@ const KIND_ICON: Record<string, string> = {
   name_color: "✒️",
 };
 
-// Inventory title/theme items are equippable; skins have no equip path in core.
+// Inventory title/theme/name-color items are equippable; skins have no equip path in core.
 const equipKindOf = (kind: string | undefined): EquipKind | null => {
   if (kind === "title") {
     return EquipKind.Title;
   }
   if (kind === "theme") {
     return EquipKind.Theme;
+  }
+  if (kind === "name_color") {
+    return EquipKind.NameColor;
   }
   return null;
 };

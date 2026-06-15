@@ -42,7 +42,7 @@ test("resolveCosmetics maps owned equips, ignores unowned/wrong-kind", () => {
     inventory: inv,
   });
   expect(r.title).toBe("Rookie");
-  expect(r.theme_color).toBe("36");
+  expect(r.theme_color).toBe("38;2;0;224;208");
   expect(
     resolveCosmetics({ profile: { title: "archmage_title" }, inventory: inv }).title,
   ).toBe(null); // not owned
@@ -99,4 +99,75 @@ test("boss rate defaults are sane fractions", () => {
   expect(DEFAULT_BOSS_RATE).toBeLessThan(1);
   expect(DEFAULT_BOSS_FLEE_RATE).toBeGreaterThan(0);
   expect(DEFAULT_BOSS_FLEE_RATE).toBeLessThan(1);
+});
+
+test("resolveCosmetics resolves an owned name-color via its value; null otherwise", () => {
+  const table = {
+    azure_ink: {
+      id: "azure_ink",
+      name: "Azure",
+      rarity: Rarity.Rare,
+      kind: LootKind.NameColor,
+      value: "38;2;61;155;255",
+    },
+    rookie_title: {
+      id: "rookie_title",
+      name: "Rookie",
+      rarity: Rarity.Common,
+      kind: LootKind.Title,
+    },
+  } as Record<string, import("../../core/loot").ILootItem>;
+
+  const inv = [{ id: "azure_ink", rarity: Rarity.Rare, count: 1 }];
+  expect(
+    resolveCosmetics({
+      profile: { name_color: "azure_ink" },
+      inventory: inv,
+      lootTable: table,
+    }).name_color,
+  ).toBe("38;2;61;155;255");
+  expect(
+    resolveCosmetics({
+      profile: { name_color: "plasma_ink" },
+      inventory: inv,
+      lootTable: table,
+    }).name_color,
+  ).toBe(null); // not owned
+
+  const inv2 = [{ id: "rookie_title", rarity: Rarity.Common, count: 1 }];
+  expect(
+    resolveCosmetics({
+      profile: { name_color: "rookie_title" },
+      inventory: inv2,
+      lootTable: table,
+    }).name_color,
+  ).toBe(null); // wrong kind
+});
+
+test("name-inks exist as own-once NameColor items with truecolor values", () => {
+  expect(LOOT_TABLE.plasma_ink.kind).toBe(LootKind.NameColor);
+  expect(LOOT_TABLE.plasma_ink.rarity).toBe(Rarity.Legendary);
+  expect(LOOT_TABLE.azure_ink.value).toBe("38;2;61;155;255");
+
+  // a repeated name-color drop caps at count 1 (own-once), proved via a single-item table
+  const oneInk = { azure_ink: LOOT_TABLE.azure_ink };
+  const drops = { clean: [{ rarity: Rarity.Rare, weight: 1 }] };
+  const inv = rollInventory({
+    triggers: [
+      { table: "clean", seed: "x" },
+      { table: "clean", seed: "x" },
+    ],
+    lootTable: oneInk,
+    dropTables: drops,
+  });
+  expect(inv).toEqual([{ id: "azure_ink", rarity: Rarity.Rare, count: 1 }]);
+});
+
+test("themes use refreshed truecolor values (no two the same)", () => {
+  const themeVals = Object.values(LOOT_TABLE)
+    .filter(i => i.kind === LootKind.Theme)
+    .map(i => i.value);
+  expect(LOOT_TABLE.golden_theme.value).toBe("38;2;255;205;20");
+  expect(LOOT_TABLE.sunset_theme.value).toBe("38;2;255;106;30");
+  expect(new Set(themeVals).size).toBe(themeVals.length); // all distinct
 });

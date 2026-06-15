@@ -25,6 +25,21 @@ deploy hud
 chmod +x "$SRC"/adapters/claude-code/hooks/*.sh 2>/dev/null || true
 if [ "$MODE" = "copy" ]; then chmod +x "$RPG_HOME"/adapters/claude-code/hooks/*.sh 2>/dev/null || true; fi
 
+# CLI ergonomics: an `rpg` wrapper on PATH + shell completions (activation is printed, not auto-wired).
+mkdir -p "$RPG_HOME/bin" "$RPG_HOME/completions"
+cat > "$RPG_HOME/bin/rpg" <<EOF
+#!/usr/bin/env bash
+export AGENTRPG_HOME="\${AGENTRPG_HOME:-$RPG_HOME}"
+exec bun "$RPG_HOME/tools/rpg.ts" "\$@"
+EOF
+chmod +x "$RPG_HOME/bin/rpg"
+cp "$SRC/tools/completions/_rpg" "$SRC/tools/completions/rpg.bash" "$RPG_HOME/completions/"
+
 echo "Installed to $RPG_HOME (mode: $MODE)"
+echo ""
+echo "For the 'rpg' command + tab-completion, add to your shell rc:"
+echo "  export PATH=\"$RPG_HOME/bin:\$PATH\""
+echo "  # zsh:  source $RPG_HOME/completions/_rpg     (after compinit)"
+echo "  # bash: source $RPG_HOME/completions/rpg.bash"
 echo "Merge this into ~/.claude/settings.json:"
 cat "$SRC/adapters/claude-code/settings.snippet.json"

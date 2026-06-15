@@ -40,7 +40,6 @@ const ItemsPanel = (props: IProps) => {
                 <span className="item-icon">
                   {KIND_ICON[item.kind ?? "title"] ?? "❔"}
                 </span>
-                <span className="item-count">×{item.count}</span>
                 <span className="item-name">{item.name ?? item.id}</span>
                 {ek ? (
                   <button

@@ -4,6 +4,7 @@ import {
   rollInventory,
   resolveCosmetics,
   LOOT_TABLE,
+  LootKind,
   Rarity,
 } from "../../core/loot";
 
@@ -20,7 +21,7 @@ test("streak100 always yields a legendary item", () => {
   }
 });
 
-test("rollInventory aggregates duplicate drops and sorts by id", () => {
+test("rollInventory caps own-once cosmetics at count 1", () => {
   const inv = rollInventory({
     triggers: [
       { table: "clean", seed: "s" },
@@ -28,7 +29,7 @@ test("rollInventory aggregates duplicate drops and sorts by id", () => {
     ],
   });
   expect(inv.length).toBe(1);
-  expect(inv[0].count).toBe(2);
+  expect(inv[0].count).toBe(1); // cosmetics are equip-once — duplicate drops don't stack
 });
 
 test("resolveCosmetics maps owned equips, ignores unowned/wrong-kind", () => {
@@ -80,6 +81,17 @@ test("the boss drop table exists and rolls a valid item", () => {
   const id = rollDrop({ trigger: { table: "boss", seed: "b1" } });
   expect(id).not.toBe(null);
   expect(LOOT_TABLE[id!]).toBeDefined();
+});
+
+test("rollDrop never yields a skin (no equip path yet)", () => {
+  for (const table of Object.keys(DROP_TABLES)) {
+    for (let i = 0; i < 40; i++) {
+      const id = rollDrop({ trigger: { table, seed: `${table}-${i}` } });
+      if (id) {
+        expect(LOOT_TABLE[id].kind).not.toBe(LootKind.Skin);
+      }
+    }
+  }
 });
 
 test("boss rate defaults are sane fractions", () => {

@@ -46,9 +46,20 @@ const SceneView = (props: IProps) => {
       <div className={`scene scene-${sceneInfo.theme}`}>
         <div className="sky" aria-hidden="true" />
         {!encounter &&
-          scene.mobs.map((m, i) => (
-            <Monster key={i} scene={sceneInfo} anim={m.anim} hp={m.hpFraction} slot={i} />
-          ))}
+          scene.mobs.map((m, i) => {
+            if (m.gone) {
+              return null;
+            }
+            return (
+              <Monster
+                key={i}
+                scene={sceneInfo}
+                anim={m.anim}
+                hp={m.hpFraction}
+                slot={i}
+              />
+            );
+          })}
         {!encounter && <HitEffects effects={scene.effects} />}
         <Hero line={line} anim={scene.hero} />
         <FloatingText floaters={scene.floaters} />

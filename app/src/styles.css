@@ -180,8 +180,6 @@ body {
 }
 .monster-unit {
   position: absolute;
-  right: 18%;
-  bottom: 24%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -675,7 +673,7 @@ body {
 
 /* ── combat choreography (emoji/CSS placeholders; swap for sprite-sheets later) ── */
 .hero-attack {
-  animation: hero-attack 0.4s ease-out;
+  animation: hero-attack 0.28s cubic-bezier(0.85, 0, 0.15, 1);
 }
 .hero-hurt {
   animation: hero-hurt 0.5s steps(2) 2;
@@ -688,8 +686,14 @@ body {
   0% {
     transform: translateX(0);
   }
-  35% {
-    transform: translateX(14px) scale(1.05);
+  45% {
+    transform: translateX(40px);
+  }
+  55% {
+    transform: translateX(40px);
+  }
+  78% {
+    transform: translateX(-5px);
   }
   100% {
     transform: translateX(0);
@@ -730,7 +734,7 @@ body {
   transition: width 200ms ease;
 }
 .m-hurt {
-  animation: m-hurt 0.3s steps(2) 1;
+  animation: m-hurt 0.36s ease-out 1;
 }
 .m-attack {
   animation: m-attack 0.5s ease-out;
@@ -739,14 +743,17 @@ body {
   animation: m-die 0.6s ease-in forwards;
 }
 @keyframes m-hurt {
-  0%,
-  100% {
-    filter: none;
+  0% {
     transform: translateX(0);
+    filter: none;
   }
-  50% {
-    filter: brightness(2);
-    transform: translateX(5px);
+  30% {
+    transform: translateX(7px) scale(0.92);
+    filter: brightness(2.2) saturate(0.4);
+  }
+  100% {
+    transform: translateX(0);
+    filter: none;
   }
 }
 @keyframes m-attack {
@@ -812,7 +819,6 @@ body {
 }
 .hit-effect {
   position: absolute;
-  bottom: 30%;
   width: 34px;
   height: 34px;
   background: linear-gradient(

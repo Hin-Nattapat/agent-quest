@@ -38,10 +38,10 @@ test("stays in Wander when idle", () => {
 test("a throttled strike damages the leftmost mob; too-soon strikes are ignored", () => {
   let s = stepDirector(initDirector, farming({ now: 0 }));
   const size = s.pack.length;
-  s = stepDirector(s, farming({ now: 1000, wantStrike: true }));
+  s = stepDirector(s, farming({ now: STRIKE_THROTTLE_MS, wantStrike: true }));
   expect(s.pack[0]).toBe(PACK_HITS - 1);
   const before = s.pack[0];
-  s = stepDirector(s, farming({ now: 1000 + STRIKE_THROTTLE_MS - 1, wantStrike: true }));
+  s = stepDirector(s, farming({ now: 2 * STRIKE_THROTTLE_MS - 1, wantStrike: true }));
   expect(s.pack[0]).toBe(before);
   expect(s.pack.length).toBe(size);
 });

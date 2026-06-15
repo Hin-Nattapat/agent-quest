@@ -36,6 +36,7 @@ export interface IHitEffect {
 interface IMobView {
   anim: MonsterAnim;
   hpFraction: number;
+  gone: boolean; // felled and its die animation finished — stop rendering so the corpse doesn't linger
 }
 
 interface ISceneView {
@@ -48,8 +49,8 @@ interface ISceneView {
 
 // These clear each transient anim class after it plays; they MUST match the matching CSS keyframe
 // durations in styles.css (.hero-attack/.m-die/.floater/etc.) or the sprite snaps or leaks.
-const HERO_MS = { attack: 400, hurt: 500, celebrate: 1200 };
-const MON_MS = { hurt: 300, attack: 500, die: 600 };
+const HERO_MS = { attack: 280, hurt: 500, celebrate: 1200 };
+const MON_MS = { hurt: 360, attack: 500, die: 600 };
 const FLOATER_MS = 900;
 const EFFECT_MS = 320;
 const TICK_MS = 250; // advances time-driven transitions (engage start, rest-gap expiry)
@@ -153,9 +154,10 @@ export const useSceneDirector = (
     }
   }, [state]);
 
-  // Low-frequency tick drives time-based transitions even without new state pushes.
+  // Low-frequency tick drives transitions AND strikes: advance(true) lets Engage strike on the
+  // throttle cadence instead of waiting for an XP push, so the fight is continuous while farming.
   useEffect(() => {
-    const id = setInterval(() => advance(false), TICK_MS);
+    const id = setInterval(() => advance(true), TICK_MS);
     return () => clearInterval(id);
     // advance closes over `activity`; re-arm when it changes so transitions read fresh activity.
   }, [activity]);
@@ -181,6 +183,7 @@ export const useSceneDirector = (
         hurt: isTarget && monHurt,
       }),
       hpFraction: hits / PACK_HITS,
+      gone: hits <= 0 && !dying,
     };
   });
 

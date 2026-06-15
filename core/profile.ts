@@ -8,6 +8,7 @@ export interface IProfile {
   branch?: "a" | "b";
   title?: string;
   theme?: string;
+  name_color?: string;
   xyzzy?: boolean;
 }
 

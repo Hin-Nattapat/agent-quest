@@ -56,6 +56,16 @@ Extension Development Host first so the panel doesn't collide with the installed
 Run with Bun from the repo (`bun tools/rpg.ts <cmd>`). Writes `~/.agentrpg/profile.json` and
 refreshes `state.json`.
 
+After `bash tools/install.sh`, enable the short `rpg` command + tab-completion by adding to your
+shell rc (the installer prints these):
+
+- `export PATH="$HOME/.agentrpg/bin:$PATH"`
+- zsh: `source $HOME/.agentrpg/completions/_rpg` (after `compinit`)
+- bash: `source $HOME/.agentrpg/completions/rpg.bash`
+
+Then `rpg <cmd>` works from anywhere (and `rpg <Tab>` lists the subcommands); a repo checkout can
+still use `bun tools/rpg.ts <cmd>` directly.
+
 ```bash
 bun tools/rpg.ts status              # show the character sheet
 bun tools/rpg.ts name "Calypso"      # set the display name

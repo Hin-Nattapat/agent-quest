@@ -1,5 +1,5 @@
 import type { IHitEffect } from "../use-scene-director";
-import { slotRight } from "../mob-slots";
+import { slotPos } from "../mob-slots";
 
 interface IProps {
   effects: IHitEffect[];
@@ -10,7 +10,7 @@ const HitEffects = (props: IProps) => {
   return (
     <div className="hit-effects" aria-hidden="true">
       {effects.map(e => (
-        <span key={e.id} className="hit-effect" style={{ right: slotRight(e.slot) }} />
+        <span key={e.id} className="hit-effect" style={slotPos(e.slot)} />
       ))}
     </div>
   );

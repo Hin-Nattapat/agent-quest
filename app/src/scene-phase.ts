@@ -7,7 +7,7 @@ export enum ScenePhase {
 }
 
 export const REST_GAP_MS = 4000; // calm wander between waves
-export const STRIKE_THROTTLE_MS = 700; // min gap between hero strikes (paces the fight)
+export const STRIKE_THROTTLE_MS = 1600; // gap between hero strikes — slow enough to breathe, not spam
 
 export interface IDirectorState {
   phase: ScenePhase;

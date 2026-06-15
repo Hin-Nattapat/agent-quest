@@ -52,6 +52,9 @@ export const renderHud = (props: IRenderHudArgs): string => {
 
   const name = state.name || "Adventurer";
   const titleSuffix = state.cosmetics?.title ? ` the ${state.cosmetics.title}` : "";
+  const nameColor = state.cosmetics?.name_color;
+  const namePlate = `${name}${titleSuffix}`;
+  const coloredName = nameColor ? `\x1b[${nameColor}m${namePlate}\x1b[0m` : namePlate;
   const cls = state.class;
   const label = cls && cls.line ? `${cls.icon} ${cls.form}` : "Novice";
   const pending = cls?.advancement_pending ? " ✨" : "";
@@ -62,7 +65,7 @@ export const renderHud = (props: IRenderHudArgs): string => {
   const bagCount = (state.inventory ?? []).reduce((sum, item) => sum + item.count, 0);
   const bag = bagCount > 0 ? ` 🎒${bagCount}` : "";
   const left =
-    `${name}${titleSuffix} · ${label}${pending}  ` +
+    `${coloredName} · ${label}${pending}  ` +
     `Lv.${state.level} ${coloredBar}${maxed} ${Math.round(pct * 100)}%${fire}${bag}`;
 
   const model = tail.model || "?";

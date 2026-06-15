@@ -95,7 +95,7 @@ test("shows the fire streak when current_days >= 1, hidden at 0", () => {
 test("loot cosmetics + rate limits render; null rates are omitted", () => {
   const s = {
     ...state({ level: 5, xp_in_level: 0, xp_to_next: 100 }),
-    cosmetics: { title: "Codeweaver", theme_color: "36" },
+    cosmetics: { title: "Codeweaver", theme_color: "36", name_color: null },
     inventory: [{ id: "x", rarity: "rare", count: 3 }],
   } as any;
   const out = renderHud({
@@ -148,4 +148,22 @@ test("emoji are counted as two columns so the right group never clips", () => {
     cols: 120,
   });
   expect(out.endsWith("7d 41%")).toBe(true); // full right group, not truncated
+});
+
+test("name + title are wrapped in the name-color ANSI when equipped", () => {
+  const tail: ITail = { model: "M", cost: 0, ctx: 0 };
+  const tinted = state({
+    name: "Calypso",
+    cosmetics: { title: "Archmage", theme_color: null, name_color: "1;38;2;255;54;255" },
+  });
+  const out = renderHud({ state: tinted, tail });
+  expect(out).toContain("\x1b[1;38;2;255;54;255mCalypso the Archmage\x1b[0m");
+
+  const plain = state({
+    name: "Calypso",
+    cosmetics: { title: "Archmage", theme_color: null, name_color: null },
+  });
+  const plainOut = renderHud({ state: plain, tail });
+  expect(plainOut).toContain("Calypso the Archmage");
+  expect(plainOut).not.toContain("\x1b[1;38;2"); // no stray ANSI on the name
 });

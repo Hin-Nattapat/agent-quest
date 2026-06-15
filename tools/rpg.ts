@@ -120,6 +120,17 @@ const titles = (): string => {
   return list.map(t => `${t.id}  —  ${t.name}`).join("\n");
 };
 
+const nameColors = (): string => {
+  const table = lootTable();
+  const owned = (reduceToFile(HOME).inventory ?? []).filter(
+    i => table[i.id]?.kind === LootKind.NameColor,
+  );
+  if (owned.length === 0) {
+    return "No name colors yet.";
+  }
+  return owned.map(i => `${i.id}  —  ${table[i.id].name}`).join("\n");
+};
+
 interface IEquipArgs {
   profile: IProfile;
   kind: LootKind;
@@ -145,7 +156,11 @@ const equip = (props: IEquipArgs): string => {
   if (!owned.has(id)) {
     fail(`You don't own "${id}".`);
   }
-  profile.theme = id;
+  if (kind === LootKind.NameColor) {
+    profile.name_color = id;
+  } else {
+    profile.theme = id;
+  }
   persist(profile);
   return `Equipped ${kind}: ${item.name}.`;
 };
@@ -206,6 +221,12 @@ const main = (): void => {
     case "theme":
       out = equip({ profile, kind: LootKind.Theme, id: args[0] ?? "" });
       break;
+    case "namecolor":
+      out = equip({ profile, kind: LootKind.NameColor, id: args[0] ?? "" });
+      break;
+    case "namecolors":
+      out = nameColors();
+      break;
     case "titles":
       out = titles();
       break;
@@ -217,7 +238,7 @@ const main = (): void => {
       break;
     default:
       fail(
-        "Usage: rpg <name|class|branch|respec|status|inventory|title|theme|titles|secrets|xyzzy> …",
+        "Usage: rpg <name|class|branch|respec|status|inventory|title|theme|namecolor|titles|namecolors|secrets|xyzzy> …",
       );
   }
   console.log(out);

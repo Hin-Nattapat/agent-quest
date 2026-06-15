@@ -1130,13 +1130,6 @@ body {
 .item-icon {
   font-size: 24px;
 }
-.item-count {
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  font-size: 10px;
-  color: var(--dim);
-}
 .item-name {
   font-size: 10px;
   text-align: center;

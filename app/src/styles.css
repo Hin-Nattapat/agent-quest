@@ -1305,6 +1305,59 @@ body {
   transform: translateX(-50%);
 }
 
+.advance-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.advance-btn {
+  font-family: "Pixelify Sans", monospace;
+  font-size: 12px;
+  padding: 5px 10px;
+  color: var(--ink);
+  background: var(--gold-soft);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.advance-btn:hover {
+  background: var(--gold);
+}
+.advance-cancel {
+  font-family: "Pixelify Sans", monospace;
+  font-size: 12px;
+  padding: 5px 10px;
+  color: var(--dim);
+  background: var(--panel-dark);
+  border: 2px solid var(--gold);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.branch-pick {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.advance-foot {
+  margin-top: 8px;
+}
+.advance-confirm {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--panel-2);
+  border: 2px solid var(--gold);
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text);
+}
+.advance-confirm-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
 /* ── world transition (3.8b): fade + "Now Entering" banner ── */
 .world-transition {
   position: absolute;

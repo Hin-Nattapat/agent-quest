@@ -4,6 +4,7 @@ import { join } from "path";
 import { makeHome } from "../../../test/helpers";
 import { rollDrop, LOOT_TABLE, LootKind } from "../../../core/loot";
 import { applyAction } from "./host-actions";
+import { reduceToFile } from "../../../core/reduce";
 
 // Zero-weight config so a single session_end is the only trigger: one deterministic clean drop.
 function seedOneClean(home: string) {
@@ -15,7 +16,15 @@ function seedOneClean(home: string) {
           prompt: 0,
           turn_end: 0,
           session_end: 0,
-          actions: { edit: 0, write: 0, run: 0, read: 0, search: 0, delegate: 0, other: 0 },
+          actions: {
+            edit: 0,
+            write: 0,
+            run: 0,
+            read: 0,
+            search: 0,
+            delegate: 0,
+            other: 0,
+          },
         },
       },
     }),
@@ -28,7 +37,8 @@ function seedOneClean(home: string) {
   );
 }
 
-const profile = (home: string) => JSON.parse(readFileSync(join(home, "profile.json"), "utf8"));
+const profile = (home: string) =>
+  JSON.parse(readFileSync(join(home, "profile.json"), "utf8"));
 
 test("applyAction equips an owned title/theme, then toggles it off; rejects unowned", () => {
   const home = makeHome();
@@ -55,4 +65,37 @@ test("applyAction equips an owned title/theme, then toggles it off; rejects unow
   const bad = applyAction(home, { name: "equip", kind: "theme", id: unowned });
   expect(bad).toBeNull();
   expect(profile(home)).toEqual(before);
+});
+
+// A journal that reaches a target level via prompt xp (default config weights).
+function seedPrompts(home: string, n: number) {
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  const line = `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s","type":"prompt","repo":"cq"}`;
+  writeFileSync(join(dir, "s.ndjson"), Array(n).fill(line).join("\n") + "\n");
+}
+
+test("applyAction setClass picks a class, then respec changes it (below Lv.50)", () => {
+  const home = makeHome();
+  seedPrompts(home, 60);
+  expect(reduceToFile(home).level).toBeGreaterThanOrEqual(5);
+
+  const s1 = applyAction(home, { name: "setClass", line: "mage" });
+  expect(s1).not.toBeNull();
+  expect(JSON.parse(readFileSync(join(home, "profile.json"), "utf8")).line).toBe("mage");
+
+  const s2 = applyAction(home, { name: "setClass", line: "rogue" });
+  expect(s2).not.toBeNull();
+  expect(JSON.parse(readFileSync(join(home, "profile.json"), "utf8")).line).toBe("rogue");
+
+  const bad = applyAction(home, { name: "setClass", line: "wizard" });
+  expect(bad).toBeNull();
+});
+
+test("applyAction setBranch rejects below Lv.50", () => {
+  const home = makeHome();
+  seedPrompts(home, 60);
+  applyAction(home, { name: "setClass", line: "mage" });
+  const r = applyAction(home, { name: "setBranch", branch: "a" });
+  expect(r).toBeNull();
 });

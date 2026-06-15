@@ -4,7 +4,10 @@
   "description": "Live Commit Quest companion panel in VS Code.",
   "version": "0.0.1",
   "publisher": "natpat",
-  "repository": { "type": "git", "url": "https://github.com/Hin-Nattapat/commit-quest" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hin-Nattapat/commit-quest"
+  },
   "private": true,
   "engines": {
     "vscode": "^1.90.0"

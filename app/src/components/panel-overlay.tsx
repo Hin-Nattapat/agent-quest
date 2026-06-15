@@ -64,7 +64,9 @@ const PanelOverlay = (props: IProps) => {
           <ItemsPanel state={state} dispatch={dispatch} />
         ) : null}
         {activePanel === PanelId.Codex ? <CodexPanel state={state} /> : null}
-        {activePanel === PanelId.Talents ? <TalentsPanel state={state} /> : null}
+        {activePanel === PanelId.Talents ? (
+          <TalentsPanel state={state} dispatch={dispatch} />
+        ) : null}
         {activePanel === PanelId.Usage ? <UsagePanel state={state} /> : null}
         {activePanel === PanelId.Settings ? <SettingsPanel /> : null}
       </div>

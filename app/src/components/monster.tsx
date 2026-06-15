@@ -1,5 +1,5 @@
 import type { IScene } from "../scene";
-import { slotRight } from "../mob-slots";
+import { slotPos } from "../mob-slots";
 
 interface IProps {
   scene: IScene;
@@ -12,7 +12,7 @@ const Monster = (props: IProps) => {
   const { scene, anim, hp, slot } = props;
   // spawn-pop rides the wrapper so it never fights the sprite's own m-die/m-attack transform.
   return (
-    <div className="monster-unit mob-spawn" style={{ right: slotRight(slot) }}>
+    <div className="monster-unit mob-spawn" style={slotPos(slot)}>
       <div className="monster-hp">
         <i style={{ width: `${Math.max(0, Math.min(1, hp)) * 100}%` }} />
       </div>

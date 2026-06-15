@@ -52,7 +52,13 @@ test("advancementPending", () => {
   expect(advancementPending({ line: null, level: 4, branch: null })).toBe(null);
 });
 
-import { SecretLine, isSecret, SECRET_TREE, classTree } from "../../core/classes";
+import {
+  SecretLine,
+  isSecret,
+  SECRET_TREE,
+  classTree,
+  advanceOption,
+} from "../../core/classes";
 
 test("secret lines resolve four branchless forms; Novice at tier 0", () => {
   expect(isSecret(SecretLine.Maestro)).toBe(true);
@@ -92,4 +98,46 @@ test("classTree gives 3 forms + branches for a main line, 4 + none for secret, u
   expect(trick?.branches).toBeUndefined();
 
   expect(classTree(null)).toBeUndefined();
+});
+
+test("advanceOption: class pick, branch pick, respec, or none", () => {
+  const c = advanceOption({
+    line: null,
+    level: 6,
+    branch: null,
+    unlockedSecrets: ["maestro"],
+  });
+  expect(c?.kind).toBe("class");
+  expect(c?.options).toContain("mage");
+  expect(c?.options).toContain("maestro");
+
+  expect(
+    advanceOption({ line: ClassLine.Mage, level: 50, branch: null, unlockedSecrets: [] }),
+  ).toEqual({ kind: "branch", options: ["a", "b"] });
+
+  const r = advanceOption({
+    line: ClassLine.Mage,
+    level: 20,
+    branch: null,
+    unlockedSecrets: [],
+  });
+  expect(r?.kind).toBe("respec");
+  expect(r?.options).toEqual(["mage", "ranger", "rogue", "sage"]);
+
+  expect(
+    advanceOption({ line: ClassLine.Mage, level: 50, branch: "a", unlockedSecrets: [] }),
+  ).toBeUndefined();
+
+  expect(
+    advanceOption({
+      line: SecretLine.Maestro,
+      level: 60,
+      branch: null,
+      unlockedSecrets: [],
+    }),
+  ).toBeUndefined();
+
+  expect(
+    advanceOption({ line: null, level: 3, branch: null, unlockedSecrets: [] }),
+  ).toBeUndefined();
 });

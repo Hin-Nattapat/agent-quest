@@ -10,4 +10,16 @@ export interface IEquipAction {
   id: string;
 }
 
-export type TClientAction = IEquipAction;
+export interface ISetClassAction {
+  type: "action";
+  name: "setClass";
+  line: string;
+}
+
+export interface ISetBranchAction {
+  type: "action";
+  name: "setBranch";
+  branch: string;
+}
+
+export type TClientAction = IEquipAction | ISetClassAction | ISetBranchAction;

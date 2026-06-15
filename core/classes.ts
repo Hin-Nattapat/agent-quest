@@ -194,6 +194,7 @@ export interface IClassState {
   advancement_pending: AdvancementKind | null;
   base_passive_pct: number;
   tree?: IClassTree;
+  advance?: IAdvanceOption;
 }
 
 export const tierForLevel = (level: number): number => {
@@ -266,4 +267,35 @@ export const advancementPending = (
     return AdvancementKind.Branch;
   }
   return null;
+};
+
+// kind stays a string union (not an enum) for the same seam reason as `branch`: the app compares it
+// to these literals and may not import a core runtime enum (app/CLAUDE.md).
+export interface IAdvanceOption {
+  kind: "class" | "branch" | "respec";
+  options: string[]; // class/respec → line ids; branch → ["a","b"]
+}
+
+const MAIN_LINE_IDS = Object.values(ClassLine) as string[];
+
+interface IAdvanceOptionArgs {
+  line: TLine | null;
+  level: number;
+  branch: "a" | "b" | null;
+  unlockedSecrets: string[];
+}
+
+export const advanceOption = (props: IAdvanceOptionArgs): IAdvanceOption | undefined => {
+  const { line, level, branch, unlockedSecrets } = props;
+  const pending = advancementPending({ line, level, branch });
+  if (pending === AdvancementKind.Branch) {
+    return { kind: "branch", options: ["a", "b"] };
+  }
+  if (pending === AdvancementKind.Class) {
+    return { kind: "class", options: [...MAIN_LINE_IDS, ...unlockedSecrets] };
+  }
+  if (line !== null && !isSecret(line) && level < 50) {
+    return { kind: "respec", options: [...MAIN_LINE_IDS] };
+  }
+  return undefined;
 };

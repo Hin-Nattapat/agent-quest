@@ -9,9 +9,7 @@ const destRoot = join(ext, "webview");
 const dest = join(destRoot, "assets");
 
 if (!existsSync(src)) {
-  console.error(
-    `copy-webview: missing ${src} — run the app build first (vite build).`,
-  );
+  console.error(`copy-webview: missing ${src} — run the app build first (vite build).`);
   process.exit(1);
 }
 

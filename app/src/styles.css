@@ -165,6 +165,9 @@ body {
 .hero::after {
   content: "🧙";
 }
+.sprite.has-art::after {
+  content: none;
+}
 .hero-farming {
   animation: hero-bob 0.5s steps(2) infinite;
 }

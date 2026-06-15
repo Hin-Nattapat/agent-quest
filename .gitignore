@@ -6,3 +6,4 @@ app/extension/dist/
 app/extension/webview/
 *.vsix
 .superpowers/
+art/

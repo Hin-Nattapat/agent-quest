@@ -31,8 +31,16 @@
   box-sizing: border-box;
 }
 
+html,
+#root {
+  height: 100%;
+}
 body {
   margin: 0;
+  height: 100%;
+  /* lock the document to the webview's visible height, so height:100% chains resolve to the real
+     panel area (not a 100vh that VS Code can report taller than what's on screen) */
+  overflow: hidden;
   font-family: "Pixelify Sans", system-ui, sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -51,7 +59,7 @@ body {
 .companion {
   display: flex;
   gap: 8px;
-  height: 100vh;
+  height: 100%;
   padding: 8px;
 }
 
@@ -953,8 +961,10 @@ body {
 }
 .panel-window {
   width: min(82%, 600px);
-  /* content-sized up to a cap, so a short VS Code panel never clips the modal; the body scrolls */
-  max-height: min(92%, 540px);
+  /* one consistent window size for every panel (Hero, Talents, Items, Codex) so they don't change
+     size with their content; short panels get less, the body scrolls when content is taller.
+     dvh (not %) because a percentage height resolves to none on this grid item and would collapse. */
+  height: min(460px, calc(100dvh - 36px));
   display: flex;
   flex-direction: column;
   background: var(--panel);
@@ -991,7 +1001,7 @@ body {
 .panel-body {
   flex: 1;
   min-height: 0; /* lets overflow-y actually scroll inside the fixed window */
-  padding: 10px 12px;
+  padding: 18px 14px;
   overflow-y: auto;
   font-size: 13px;
   scrollbar-width: thin;
@@ -1117,58 +1127,86 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 8px 4px 5px;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 7px;
+  /* room for the rarity bar that sits flush at the bottom edge */
+  padding-bottom: 12px;
   background: var(--panel-2);
   border: 2px solid var(--ink);
   border-radius: 3px;
+  overflow: hidden;
 }
 .item-slot.equipped {
   border-color: var(--gold);
   box-shadow: 0 0 0 2px var(--gold-soft);
 }
+/* the icon sits in its own recessed cell, like a pixel-MMO inventory slot */
 .item-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
   font-size: 24px;
+  background: var(--panel-dark);
+  border: 1px solid var(--ink);
+  box-shadow: inset 0 0 0 1px #ffffff12;
+  border-radius: 2px;
 }
 .item-name {
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
-  line-height: 1.1;
+  line-height: 1.15;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
 }
-.rarity-common {
-  border-bottom: 3px solid #b3ad9c;
+/* rarity reads as a thin bar pinned to the card's bottom edge (tokenised, not hard-coded) */
+.item-slot::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--tone-common);
 }
-.rarity-rare {
-  border-bottom: 3px solid #6f9fcf;
+.rarity-rare::after {
+  background: var(--tone-rare);
 }
-.rarity-epic {
-  border-bottom: 3px solid #b491cf;
+.rarity-epic::after {
+  background: var(--tone-epic);
 }
-.rarity-legendary {
-  border-bottom: 3px solid #cf9f4e;
+.rarity-legendary::after {
+  background: var(--tone-legendary);
 }
 .item-equip {
-  margin-top: 4px;
+  margin-top: 1px;
   font-family: "Pixelify Sans", monospace;
   font-size: 10px;
-  padding: 2px 8px;
+  padding: 3px 10px;
   color: var(--ink);
   background: var(--gold-soft);
   border: 1px solid var(--ink);
   border-radius: 2px;
   cursor: pointer;
+  transition: background 120ms ease-out;
 }
 .item-equip:hover {
   background: var(--gold);
+}
+.item-equip:active {
+  transform: translateY(1px);
+}
+.item-equip:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 2px;
 }
 .item-equip.is-equipped {
   background: var(--panel-dark);
   color: var(--gold-soft);
   border-color: var(--gold);
+  cursor: default;
 }
 
 /* codex deeds */

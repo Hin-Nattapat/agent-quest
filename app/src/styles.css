@@ -1137,6 +1137,25 @@ body {
 .rarity-legendary {
   border-bottom: 3px solid #cf9f4e;
 }
+.item-equip {
+  margin-top: 4px;
+  font-family: "Pixelify Sans", monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  color: var(--ink);
+  background: var(--gold-soft);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.item-equip:hover {
+  background: var(--gold);
+}
+.item-equip.is-equipped {
+  background: var(--panel-dark);
+  color: var(--gold-soft);
+  border-color: var(--gold);
+}
 
 /* codex deeds */
 .deed-list {

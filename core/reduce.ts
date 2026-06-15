@@ -298,7 +298,10 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     ...item,
     name: lootTable[item.id]?.name,
     kind: lootTable[item.id]?.kind,
-    equipped: item.id === profile?.title || item.id === profile?.theme,
+    equipped:
+      item.id === profile?.title ||
+      item.id === profile?.theme ||
+      item.id === profile?.name_color,
   }));
 
   const prelim: TReducedState = {

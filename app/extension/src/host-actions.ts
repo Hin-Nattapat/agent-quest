@@ -15,6 +15,7 @@ interface IRawAction {
 const LOOT_KIND: Record<string, LootKind> = {
   title: LootKind.Title,
   theme: LootKind.Theme,
+  name_color: LootKind.NameColor,
 };
 
 // Load the profile, run a validate+mutate (from core/advance), and on ok persist + re-reduce.
@@ -77,6 +78,8 @@ export const applyAction = (home: string, action: IRawAction): string | null => 
   const profile = loadProfile(home);
   if (kind === LootKind.Title) {
     profile.title = profile.title === id ? undefined : id;
+  } else if (kind === LootKind.NameColor) {
+    profile.name_color = profile.name_color === id ? undefined : id;
   } else {
     profile.theme = profile.theme === id ? undefined : id;
   }

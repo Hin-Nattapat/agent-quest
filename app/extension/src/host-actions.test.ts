@@ -67,6 +67,35 @@ test("applyAction equips an owned title/theme, then toggles it off; rejects unow
   expect(profile(home)).toEqual(before);
 });
 
+test("applyAction equips an owned name-color, then toggles it off", () => {
+  const home = makeHome();
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  // many clean drops (one per session_end) so the inventory includes a name-color ink
+  const lines = Array.from(
+    { length: 50 },
+    (_, i) =>
+      `{"ts":"2026-06-11T12:00:00Z","source":"claude-code","session_id":"s${i}","type":"session_end","repo":"cq"}`,
+  );
+  writeFileSync(join(dir, "s.ndjson"), lines.join("\n") + "\n");
+
+  const ink = (reduceToFile(home).inventory ?? []).find(
+    i => LOOT_TABLE[i.id]?.kind === LootKind.NameColor,
+  );
+  expect(ink).toBeTruthy();
+
+  const s1 = applyAction(home, { name: "equip", kind: "name_color", id: ink!.id });
+  expect(s1).not.toBeNull();
+  expect(profile(home).name_color).toBe(ink!.id);
+  // the reduced state must mark it equipped, so the Items card shows "Equipped"
+  expect(reduceToFile(home).inventory!.find(i => i.id === ink!.id)!.equipped).toBe(true);
+
+  const s2 = applyAction(home, { name: "equip", kind: "name_color", id: ink!.id });
+  expect(s2).not.toBeNull();
+  expect(profile(home).name_color).toBeUndefined();
+  expect(reduceToFile(home).inventory!.find(i => i.id === ink!.id)!.equipped).toBe(false);
+});
+
 // A journal that reaches a target level via prompt xp (default config weights).
 function seedPrompts(home: string, n: number) {
   const dir = join(home, "journal");

@@ -1,63 +1,86 @@
+import { useState } from "react";
 import type { IState } from "../../../core/state";
+import type { TClientAction } from "../actions";
+import { AdvanceKind } from "../advance";
+import ClassPicker from "./class-picker";
+import TalentTree from "./talent-tree";
+import BranchConfirm from "./branch-confirm";
 
 interface IProps {
   state: IState;
+  dispatch: (action: TClientAction) => void;
 }
 
-const nodeState = (t: number, tier: number): string => {
-  if (t === tier) {
-    return "current";
-  }
-  if (t < tier) {
-    return "past";
-  }
-  return "locked";
-};
-
 const TalentsPanel = (props: IProps) => {
-  const { state } = props;
+  const { state, dispatch } = props;
   const klass = state.class;
-  const tree = klass?.tree;
-  const tier = klass?.tier ?? 0;
-  const branch = klass?.branch ?? null;
+  const advance = klass?.advance;
+  const [respecOpen, setRespecOpen] = useState(false);
+  const [confirmBranch, setConfirmBranch] = useState<"a" | "b" | null>(null);
 
+  const pickClass = (line: string) => {
+    dispatch({ type: "action", name: "setClass", line });
+    setRespecOpen(false);
+  };
+
+  // No class chosen yet (Lv.5+): just the picker — there is no tree to show.
+  if (advance?.kind === AdvanceKind.Class) {
+    return (
+      <div className="panel-body talents-panel">
+        <div className="panel-head">Choose your class</div>
+        <ClassPicker options={advance.options} onPick={pickClass} />
+      </div>
+    );
+  }
+
+  const tree = klass?.tree;
   if (!tree) {
     return (
       <div className="panel-body talents-panel">
-        <div className="panel-empty">Choose a class (`rpg class …`)</div>
+        <div className="panel-empty">Reach level 5 to choose a class.</div>
       </div>
     );
   }
 
   return (
     <div className="panel-body talents-panel">
-      <div className="talent-tree">
-        {tree.forms.map((form, i) => {
-          const t = i + 1;
-          return (
-            <div key={form} className={`talent-node ${nodeState(t, tier)}`}>
-              <span className="tn-tier">T{t}</span>
-              <span className="tn-form">{form}</span>
-            </div>
-          );
-        })}
-        {tree.branches ? (
-          <div className="talent-fork">
-            <div
-              className={`talent-node branch ${branch === "a" ? "current" : "locked"}`}
+      <TalentTree
+        tree={tree}
+        tier={klass?.tier ?? 0}
+        branch={klass?.branch ?? null}
+        onPickBranch={advance?.kind === AdvanceKind.Branch ? setConfirmBranch : undefined}
+      />
+
+      {advance?.kind === AdvanceKind.Respec ? (
+        <div className="advance-foot">
+          {respecOpen ? (
+            <ClassPicker
+              options={advance.options}
+              onPick={pickClass}
+              onCancel={() => setRespecOpen(false)}
+            />
+          ) : (
+            <button
+              type="button"
+              className="advance-btn"
+              onClick={() => setRespecOpen(true)}
             >
-              <span className="tn-tier">T4 · a</span>
-              <span className="tn-form">{tree.branches.a}</span>
-            </div>
-            <div
-              className={`talent-node branch ${branch === "b" ? "current" : "locked"}`}
-            >
-              <span className="tn-tier">T4 · b</span>
-              <span className="tn-form">{tree.branches.b}</span>
-            </div>
-          </div>
-        ) : null}
-      </div>
+              Change class
+            </button>
+          )}
+        </div>
+      ) : null}
+
+      {confirmBranch ? (
+        <BranchConfirm
+          formName={tree.branches?.[confirmBranch] ?? confirmBranch}
+          onConfirm={() => {
+            dispatch({ type: "action", name: "setBranch", branch: confirmBranch });
+            setConfirmBranch(null);
+          }}
+          onCancel={() => setConfirmBranch(null)}
+        />
+      ) : null}
     </div>
   );
 };

@@ -1,8 +1,11 @@
 import type { IState } from "../../core/state";
+import type { TClientAction } from "./actions";
 
 export interface ITransport {
   // Calls onState with the latest state, then on every change. Returns an unsubscribe fn.
   subscribe(onState: (state: IState) => void): () => void;
+  // Send an intent to the host (equip, …). No-op where there is no host (browser/SSE).
+  send(action: TClientAction): void;
 }
 
 // Parse one SSE "state" payload; null on malformed JSON (the UI keeps the last good state).
@@ -44,6 +47,9 @@ export const postMessageTransport = (
       api.postMessage({ type: "ready" }); // ask the host for the current state (mount-race fix)
       return () => target.removeEventListener("message", handler);
     },
+    send(action) {
+      api.postMessage(action);
+    },
   };
 };
 
@@ -69,6 +75,9 @@ export const sseTransport = (
         }
       });
       return () => source.close();
+    },
+    send() {
+      // browser/SSE dev has no host to mutate; a write bridge could be added later
     },
   };
 };

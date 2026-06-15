@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { IState } from "../../../core/state";
+import type { TClientAction } from "../actions";
 import { PanelId } from "../panels";
 import HeroPanel from "./hero-panel";
 import ItemsPanel from "./items-panel";
@@ -12,6 +13,7 @@ interface IProps {
   activePanel: PanelId | null;
   state: IState;
   onClose: () => void;
+  dispatch: (action: TClientAction) => void;
 }
 
 const TITLES: Record<PanelId, string> = {
@@ -24,7 +26,7 @@ const TITLES: Record<PanelId, string> = {
 };
 
 const PanelOverlay = (props: IProps) => {
-  const { activePanel, state, onClose } = props;
+  const { activePanel, state, onClose, dispatch } = props;
 
   useEffect(() => {
     if (!activePanel) {
@@ -58,7 +60,9 @@ const PanelOverlay = (props: IProps) => {
           </button>
         </div>
         {activePanel === PanelId.Hero ? <HeroPanel state={state} /> : null}
-        {activePanel === PanelId.Items ? <ItemsPanel state={state} /> : null}
+        {activePanel === PanelId.Items ? (
+          <ItemsPanel state={state} dispatch={dispatch} />
+        ) : null}
         {activePanel === PanelId.Codex ? <CodexPanel state={state} /> : null}
         {activePanel === PanelId.Talents ? <TalentsPanel state={state} /> : null}
         {activePanel === PanelId.Usage ? <UsagePanel state={state} /> : null}

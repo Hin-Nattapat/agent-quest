@@ -5,7 +5,7 @@ import type { IState } from "../../core/state";
 const st = (
   defeated: number,
   fled: number,
-  inv: { id: string; rarity: string; count: number }[],
+  inv: { id: string; rarity: string; count: number; name?: string }[],
 ) =>
   ({
     version: 1,
@@ -37,6 +37,17 @@ test("diffStates emits boss outcomes with the loot delta", () => {
 
   expect(diffStates(prev, prev)).toEqual([]);
   expect(diffStates(null, won)).toEqual([]); // no animation on first load
+});
+
+test("diffStates shows the loot's display name, not the raw id", () => {
+  const prev = st(0, 0, []);
+  const won = st(1, 0, [
+    { id: "archmage_title", rarity: "epic", count: 1, name: "Archmage" },
+    { id: "neon_theme", rarity: "rare", count: 1 }, // no denormalized name → falls back to id
+  ]);
+  expect(diffStates(prev, won)).toEqual([
+    { type: GameEventType.BossDefeated, items: ["Archmage", "neon_theme"] },
+  ]);
 });
 
 const mkState = (o: object): IState =>

@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import type { IScene } from "./scene";
 
 export const TRANSITION_MS = 1200;
 
 export interface ITransitionView {
   active: boolean;
   label: string | null;
+}
+
+export interface ITransitionInput {
+  theme: string;
+  label: string;
 }
 
 // Fire a transition only when we have a previous theme and it actually changed — `null` prev means
@@ -18,7 +22,7 @@ export const shouldTransition = (
 };
 
 // Plays a one-shot transition whenever the scene THEME changes (never on first mount).
-export const useTransition = (scene: IScene): ITransitionView => {
+export const useTransition = (scene: ITransitionInput): ITransitionView => {
   const prevTheme = useRef<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [view, setView] = useState<ITransitionView>({ active: false, label: null });

@@ -1645,3 +1645,104 @@ body.reduce-motion *::after {
     animation: none;
   }
 }
+
+/* ── overworld guild room (top-down) ── */
+.guild-room {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 0%, #4a3a24 0%, #3a2e1f 45%, #2a2118 100%);
+}
+.guild-floor {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 11%;
+  bottom: 9%;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(0deg, #34281a 0 31px, #2e2316 31px 32px),
+    repeating-linear-gradient(90deg, #34281a 0 31px, #2e2316 31px 32px);
+  box-shadow: inset 0 0 0 2px #1c1610, inset 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+.guild-rug {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 130px;
+  height: 130px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: linear-gradient(135deg, #6b2a3a, #8a3a4a);
+  opacity: 0.5;
+  border: 2px solid #aa5566;
+  border-radius: 8px;
+}
+.guild-banner {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  background: linear-gradient(#6a1a3a, #4a1430);
+  border: 2px solid var(--gold, #cdae57);
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+}
+.guild-table {
+  position: absolute;
+  top: 24%;
+  left: 12%;
+  width: 60px;
+  height: 38px;
+  border-radius: 5px;
+  background: linear-gradient(#5a3a1f, #3f2814);
+  border: 2px solid #6e4a26;
+}
+.guild-npc {
+  position: absolute;
+  top: 33%;
+  right: 14%;
+  font-size: 28px;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.4));
+}
+.guild-chest {
+  position: absolute;
+  bottom: 14%;
+  right: 12%;
+  font-size: 28px;
+}
+.ow-hero {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -85%);
+  image-rendering: pixelated;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center bottom;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.45));
+}
+.ow-hero:not(.has-art)::after {
+  content: "🧙";
+  font-size: 34px;
+}
+.guild-zzz {
+  position: absolute;
+  transform: translate(10px, -64px);
+  font-size: 18px;
+  animation: guild-zzz 2.4s ease-in-out infinite;
+}
+@keyframes guild-zzz {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(10px, -64px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(14px, -72px);
+  }
+}

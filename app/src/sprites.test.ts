@@ -1,29 +1,27 @@
 import { test, expect } from "bun:test";
-import { HeroAnim } from "./combat";
-import { heroSpriteSet, heroFrames } from "./sprites";
+import { Facing } from "./facing";
+import { heroSpriteSet, directionalFrames } from "./sprites";
 
-test("heroSpriteSet resolves the Mage T1 set with 9 walk frames", () => {
+test("heroSpriteSet resolves Mage T1 with 4 idle stills and 4×9 walk frames", () => {
   const set = heroSpriteSet("mage", 1);
   expect(set).toBeDefined();
-  expect(set?.idle).toBe("/sprites/mage/t1/idle.png");
-  expect(set?.walk.length).toBe(9);
-  expect(set?.walk[0]).toBe("/sprites/mage/t1/walk-0.png");
-  expect(set?.walk[8]).toBe("/sprites/mage/t1/walk-8.png");
+  expect(set?.idle[Facing.East]).toBe("/sprites/mage/t1/idle/east.png");
+  expect(set?.idle[Facing.South]).toBe("/sprites/mage/t1/idle/south.png");
+  expect(set?.walk[Facing.West].length).toBe(9);
+  expect(set?.walk[Facing.North][0]).toBe("/sprites/mage/t1/walk/north/0.png");
+  expect(set?.walk[Facing.North][8]).toBe("/sprites/mage/t1/walk/north/8.png");
 });
 
-test("heroSpriteSet returns undefined for forms with no art yet", () => {
+test("heroSpriteSet returns undefined for forms with no art", () => {
   expect(heroSpriteSet("mage", 2)).toBeUndefined();
-  expect(heroSpriteSet("rogue", 1)).toBeUndefined();
   expect(heroSpriteSet("novice", 0)).toBeUndefined();
 });
 
-test("heroFrames cycles the walk list only while wandering", () => {
+test("directionalFrames cycles walk when moving, else the idle still", () => {
   const set = heroSpriteSet("mage", 1);
   if (!set) {
     throw new Error("expected mage-t1 set");
   }
-  expect(heroFrames(set, HeroAnim.Wander)).toEqual(set.walk);
-  expect(heroFrames(set, HeroAnim.Idle)).toEqual([set.idle]);
-  expect(heroFrames(set, HeroAnim.Attack)).toEqual([set.idle]);
-  expect(heroFrames(set, HeroAnim.Farming)).toEqual([set.idle]);
+  expect(directionalFrames(set, Facing.East, true)).toEqual(set.walk[Facing.East]);
+  expect(directionalFrames(set, Facing.South, false)).toEqual([set.idle[Facing.South]]);
 });

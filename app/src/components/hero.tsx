@@ -1,7 +1,9 @@
 import { HeroAnim } from "../combat";
+import { Facing } from "../facing";
 import { assetUrl } from "../assets-base";
-import { heroSpriteSet, heroFrames } from "../sprites";
+import { heroSpriteSet, directionalFrames } from "../sprites";
 import { useSpriteFrame } from "../use-sprite-frame";
+import { usePreload } from "../use-preload";
 
 interface IProps {
   line: string;
@@ -14,8 +16,10 @@ const WALK_FPS = 10;
 const Hero = (props: IProps) => {
   const { line, tier, anim } = props;
   const set = heroSpriteSet(line, tier);
-  const frames = set ? heroFrames(set, anim) : [];
-  const frame = useSpriteFrame(frames, WALK_FPS, anim === HeroAnim.Wander);
+  usePreload(set);
+  const moving = anim === HeroAnim.Wander;
+  const frames = set ? directionalFrames(set, Facing.East, moving) : [];
+  const frame = useSpriteFrame(frames, WALK_FPS, moving);
   const style = frame ? { backgroundImage: `url(${assetUrl(frame)})` } : undefined;
   const artClass = frame ? " has-art" : "";
   return (

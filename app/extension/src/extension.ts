@@ -29,11 +29,13 @@ const resolveView = (
   const styleUri = webview
     .asWebviewUri(vscode.Uri.joinPath(distRoot, "assets", "app.css"))
     .toString();
+  const assetsBase = webview.asWebviewUri(distRoot).toString();
   webview.html = buildWebviewHtml({
     scriptUri,
     styleUri,
     cspSource: webview.cspSource,
     nonce: nonce(),
+    assetsBase,
   });
 
   // The webview asks for the current state once it has subscribed (mount-race fix).

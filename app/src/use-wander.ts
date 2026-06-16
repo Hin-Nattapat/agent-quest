@@ -29,10 +29,18 @@ export const stepWander = (
   const step = speedPctPerSec * (dtMs / 1000);
   const facing = facingFromDelta(dx, dy);
   if (dist <= step || dist < 0.5) {
-    return { pose: { xPct: targetX, yPct: targetY, facing, moving: false }, reached: true };
+    return {
+      pose: { xPct: targetX, yPct: targetY, facing, moving: false },
+      reached: true,
+    };
   }
   return {
-    pose: { xPct: xPct + (dx / dist) * step, yPct: yPct + (dy / dist) * step, facing, moving: true },
+    pose: {
+      xPct: xPct + (dx / dist) * step,
+      yPct: yPct + (dy / dist) * step,
+      facing,
+      moving: true,
+    },
     reached: false,
   };
 };
@@ -46,7 +54,7 @@ const WAYPOINTS = [
   { x: 22, y: 55 },
 ];
 const REST_SPOT = { x: 50, y: 62 };
-const SPEED_PCT_PER_SEC = 14;
+const SPEED_PCT_PER_SEC = 9;
 const PAUSE_MIN_MS = 900;
 const PAUSE_MAX_MS = 2200;
 
@@ -60,9 +68,19 @@ const prefersReducedMotion = (): boolean => {
 // roaming=false (Rest) pins the hero to the rest spot facing south. reduced-motion holds the
 // first waypoint. Otherwise the hero walks waypoint→waypoint with a varied pause between legs.
 export const useWander = (roaming: boolean): IWanderPose => {
-  const restPose: IWanderPose = { xPct: REST_SPOT.x, yPct: REST_SPOT.y, facing: Facing.South, moving: false };
+  const restPose: IWanderPose = {
+    xPct: REST_SPOT.x,
+    yPct: REST_SPOT.y,
+    facing: Facing.South,
+    moving: false,
+  };
   const first = WAYPOINTS[0];
-  const idlePose: IWanderPose = { xPct: first.x, yPct: first.y, facing: Facing.South, moving: false };
+  const idlePose: IWanderPose = {
+    xPct: first.x,
+    yPct: first.y,
+    facing: Facing.South,
+    moving: false,
+  };
   const [pose, setPose] = useState<IWanderPose>(roaming ? idlePose : restPose);
   const wpRef = useRef(0);
   const pauseRef = useRef(0);
@@ -99,7 +117,9 @@ export const useWander = (roaming: boolean): IWanderPose => {
         posRef.current = { x: r.pose.xPct, y: r.pose.yPct };
         setPose(r.pose);
         if (r.reached) {
-          pauseRef.current = PAUSE_MIN_MS + (wpRef.current / WAYPOINTS.length) * (PAUSE_MAX_MS - PAUSE_MIN_MS);
+          pauseRef.current =
+            PAUSE_MIN_MS +
+            (wpRef.current / WAYPOINTS.length) * (PAUSE_MAX_MS - PAUSE_MIN_MS);
           wpRef.current = (wpRef.current + 1) % WAYPOINTS.length;
         }
       }

@@ -9,22 +9,21 @@ interface IProps {
   tier: number;
   facing: Facing;
   moving: boolean;
-  xPct: number;
-  yPct: number;
+  xPx: number;
+  yPx: number;
 }
 
-const WALK_FPS = 10;
+const WALK_FPS = 6;
 
 const OverworldHero = (props: IProps) => {
-  const { line, tier, facing, moving, xPct, yPct } = props;
+  const { line, tier, facing, moving, xPx, yPx } = props;
   const set = heroSpriteSet(line, tier);
   usePreload(set);
   const frames = set ? directionalFrames(set, facing, moving) : [];
   const frame = useSpriteFrame(frames, WALK_FPS, moving);
   const artClass = frame ? " has-art" : "";
   const style = {
-    left: `${xPct}%`,
-    top: `${yPct}%`,
+    transform: `translate3d(${xPx}px, ${yPx}px, 0) translate(-50%, -85%)`,
     backgroundImage: frame ? `url(${assetUrl(frame)})` : undefined,
   };
   return (

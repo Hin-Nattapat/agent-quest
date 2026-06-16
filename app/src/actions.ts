@@ -1,6 +1,7 @@
 export enum EquipKind {
   Title = "title",
   Theme = "theme",
+  NameColor = "name_color",
 }
 
 export interface IEquipAction {

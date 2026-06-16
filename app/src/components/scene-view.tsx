@@ -61,7 +61,7 @@ const SceneView = (props: IProps) => {
             );
           })}
         {!encounter && <HitEffects effects={scene.effects} />}
-        <Hero line={line} anim={scene.hero} />
+        <Hero line={line} tier={state.class?.tier ?? 0} anim={scene.hero} />
         <FloatingText floaters={scene.floaters} />
         {encounter && <BossEncounter encounter={encounter} />}
         <PortraitFrame state={state} />

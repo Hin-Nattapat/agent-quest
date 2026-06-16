@@ -17,3 +17,10 @@ rmSync(destRoot, { recursive: true, force: true }); // drop stale assets so noth
 mkdirSync(dest, { recursive: true });
 cpSync(src, dest, { recursive: true });
 console.log(`copy-webview: ${src} -> ${dest}`);
+
+const spritesSrc = join(ext, "..", "dist", "sprites"); // app/dist/sprites
+if (existsSync(spritesSrc)) {
+  const spritesDest = join(destRoot, "sprites");
+  cpSync(spritesSrc, spritesDest, { recursive: true });
+  console.log(`copy-webview: ${spritesSrc} -> ${spritesDest}`);
+}

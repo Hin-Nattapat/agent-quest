@@ -33,3 +33,16 @@ test("pickAnimDir matches PixelLab's inconsistent folder names", () => {
   expect(pickAnimDir(["Casting_a_spell"], "asting")).toBe("Casting_a_spell");
   expect(pickAnimDir(names, "rotations")).toBeNull();
 });
+
+test("parseTarget reads monster name", () => {
+  expect(parseTarget("monster:grassland")).toEqual({
+    type: AssetType.Monster,
+    name: "grassland",
+  });
+});
+
+test("pickAnimDir finds monster idle/attack folders", () => {
+  const names = ["idle_breathing_loop", "attack_lunge_forward"];
+  expect(pickAnimDir(names, "dle")).toBe("idle_breathing_loop");
+  expect(pickAnimDir(names, "ttack")).toBe("attack_lunge_forward");
+});

@@ -16,6 +16,8 @@ import MetaMenu from "./meta-menu";
 import ActivityBar from "./activity-bar";
 import PanelOverlay from "./panel-overlay";
 import Sidebar from "./sidebar";
+import { hasSceneBg } from "../scene-bg";
+import { assetUrl } from "../assets-base";
 
 interface IProps {
   state: IState;
@@ -45,6 +47,15 @@ const SceneView = (props: IProps) => {
     <div className="companion">
       <div className={sceneClass}>
         <div className="sky" aria-hidden="true" />
+        {mode === SceneMode.Battle && hasSceneBg(sceneInfo.theme) && (
+          <div
+            className="scene-bg"
+            aria-hidden="true"
+            style={{
+              backgroundImage: `url(${assetUrl(`/scenes/${sceneInfo.theme}.png`)})`,
+            }}
+          />
+        )}
         {mode === SceneMode.Battle && (
           <BattleScene
             state={state}

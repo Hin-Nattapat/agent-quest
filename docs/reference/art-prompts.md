@@ -1,5 +1,7 @@
 # Commit Quest — Art & Image-Gen Prompt Pack
 
+> Importing exports into the game: see `art-import.md`.
+
 *เครื่องมือหลัก: PixelLab Character Creator · sprite ฐาน 48×48 · workflow = gen ตัวฐานครั้งเดียวแล้ว derive ที่เหลือ (ไม่ regen)*
 
 ---

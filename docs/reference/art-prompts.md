@@ -66,6 +66,25 @@ keyframes and the `.sprite` `background-image`).
 
 (Boss already has hit + flee from 3.2b.)
 
+### 3.2 ท่าโจมตี (attack) ต่อสาย — Action Description ใน PixelLab
+
+ฉากรบ side-view ฮีโร่หัน **east** → gen attack แค่ทิศ east (1 gen/อัน). Add Animation → Custom → ช่อง **Action Description** ใส่สั้นๆ บรรยาย "การเคลื่อนไหว" (ตัวละคร/อาวุธอยู่ใน base แล้ว ไม่ต้องบรรยายซ้ำ) · keep-first-frame ✓ · ~6–8 เฟรม one-shot (idle → โจมตี → กลับ idle)
+
+| สาย | แบบ | Action Description |
+|---|---|---|
+| **Mage** | ร่ายเวท (ยืน) | `casting a spell, swinging the staff up then thrusting it forward, glowing energy bursting from the crystal tip, the pointed hood stays drawn up over the head the whole time` |
+| **Ranger** | ยิงธนู (ยืน) | `drawing the bow back and loosing a glowing arrow forward` |
+| **Rogue** | ฟันมีด (พุ่งสั้น) | `a swift forward dagger slash, lunging slightly with the blade` |
+| **Sage** | เปิดตำราเสกรูน | `raising the open tome and projecting a glowing magic glyph forward` |
+| Maestro | กวัดบาตอง | `a sweeping conductor's baton flourish releasing a burst of light forward` |
+| Night Owl | ยิงจันทร์เสี้ยว | `casting a glowing crescent-moon bolt forward` |
+| Ascetic | ฝ่ามือแสง | `a calm forward palm-strike releasing a ring of light` |
+| Gremlin | ซ่าพลังกลิตช์ | `a chaotic forward glitch-zap, electric sparks bursting` |
+| Trickster | สาดไพ่ | `flinging a fan of playing cards forward` |
+
+> **โพรเจกไทล์** (ลูกเวท/ธนู/รูน) ที่ "วิ่งไปหามอน" = **VFX ฝั่งเกม** (CSS/sprite) ไม่ได้อยู่ในไฟล์ anim — PixelLab anim ทำแค่ "ท่าตัวละคร" (+ แสงปลายไม้เท้า/ธนู) · Mage/Ranger/Sage = ยืนยิง · **Rogue = melee** (พุ่งสั้นเข้าฟัน — เหมาะกับมีด ไม่ต้องมีโพรเจกไทล์)
+> **กันฮู้ด/ชุดเพี้ยนตอน gen animation:** AI วาดตัวใหม่ทุก animation บางทีฮู้ดตก/หาย → ต่อท้าย Action Description ด้วยลักษณะที่ต้องคงไว้ เช่น `…, the pointed hood stays drawn up over the head` (Mage/Rogue) หรือ `…, keeping the hood up` — ย้ำเฉพาะของที่ชอบหลุด
+
 ---
 
 ## 4. ตัวละคร — ทุกสาย ทุก tier
@@ -91,6 +110,8 @@ keyframes and the `.sprite` `background-image`).
 
 ### 4.1 Mage — Backend · purple · ไม้เท้า + server-crystal
 arc: เด็กฝึก → พ่อมดเซิร์ฟเวอร์ → อัครมหาเวท → (สายเมฆ / สายเนโครเคอร์เนล)
+palette arc: T1 ม่วงหม่น+ทองบาง → T2 ม่วงเข้ม+รูนทอง → **T3 ม่วงเข้ม+ทอง+teal เรือง (archmage)** → T4a sky-violet+teal สว่าง (ลอยบนเมฆ) · T4b ดำม่วง+cyan necrotic (lich)
+silhouette ยกระดับ: T1 robe+ไม้เท้าเรียบ → T2 robe เข้ม+rune-circle ที่เท้า → T3 mantle+crystal โคจร+rune halo → T4a ลอยตัว+cape+container-glyph รอบตัว · T4b ฮู้ดเงา+circuit-veins+core-orb ดำ
 
 **T1 — Backend Mage**
 ```
@@ -100,28 +121,30 @@ dressed as an apprentice backend wizard: muted purple hooded robe with thin gold
 **T2 — Server Sorcerer**
 ```
 a focused backend developer around 30, intellectual calm expression, lean build, medium-tan skin, dark hair, light stubble, thoughtful eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a backend sorcerer: deeper purple robe with gold rune-embroidered hem, a taller staff topped with a small floating server node, a faint glowing rune circle at the feet, limited purple palette
+dressed as a server sorcerer, a rising spellcaster: a deeper royal-purple hooded robe worn with the pointed hood drawn up over the head, gold rune-embroidered hem and trim, a taller staff topped with a small floating glowing server-node, a faint rotating rune-circle of light at the feet, wisps of arcane energy, a confident stance, deep purple with gold rune accents
 ```
 **T3 — Infra Archmage**
 ```
 a focused backend developer around 30, intellectual calm expression, lean build, medium-tan skin, dark hair, light stubble, thoughtful eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a backend archmage: rich purple robe with a shoulder mantle and gold rune trim, several small server-crystals orbiting overhead, a glowing rune halo behind the head, staff crowned with a bright teal data-orb, deep purple and gold palette
+dressed as an infra archmage, a commanding master of the backend: a rich purple robe with an ornate shoulder mantle and gold rune trim flowing behind, several glowing server-crystals orbiting overhead, a radiant rune halo behind the head, a tall staff crowned with a bright teal data-orb crackling with power, an imposing arcane stance, deep purple and gold with teal energy
 ```
 **T4a — Cloud Summoner** (สายเมฆ / distributed)
 ```
 a focused backend developer around 30, intellectual calm expression, lean build, medium-tan skin, dark hair, light stubble, thoughtful eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a cloud-summoner archmage: airy sky-violet robes with a wispy cape, standing on swirling cloud mist, glowing teal hexagonal container glyphs floating and orbiting around, light sky-violet palette
+dressed as a cloud-summoner archmage, a master of the distributed skies: airy sky-violet robes with a long wispy cape billowing, levitating atop swirling luminous cloud-mist, a constellation of glowing teal hexagonal container-glyphs floating and orbiting around the body, arms raised summoning, ethereal and radiant, light sky-violet with bright teal glow
 ```
 **T4b — Kernel Lich** (สาย performance / low-level)
 ```
 a focused backend developer around 30, intellectual calm expression, lean build, medium-tan skin, dark hair, light stubble, thoughtful eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a kernel-lich archmage: dark hood shadowing the face, deep black-purple robe with cold cyan circuit-veins glowing across it, holding a dense black core-orb, dark purple and cyan palette
+dressed as a kernel-lich archmage, a dread necromancer of the low level: a deep black-purple robe with a shadowed hood concealing glowing eyes, cold cyan circuit-veins pulsing across the fabric and skeletal hands, clutching a dense black core-orb radiating dark energy, a sinister looming presence, dark purple and necrotic cyan
 ```
 
 ---
 
 ### 4.2 Ranger — Frontend · teal · ธนูสาย-slider
 arc: นักธนูฝึก → มือแม่นปืน → นักล่าพิกเซล → (สายโมชั่น / สายผู้คุมดีไซน์)
+palette arc (ให้แต่ละ tier ต่างชัด ไม่ใช่ teal ซ้ำ): T1 teal เรียบ → T2 teal+white (visor) → **T3 teal เข้ม+ไซแอนเรือง+ทองelite (มาสเตอร์คลุมฮู้ด, energy-bow ใหญ่)** → T4a อิเล็กทริกไซแอน+ชมพูม่วง (afterimage) · T4b teal+ขาว+rainbow swatch (การ์เดียนถือโล่)
+silhouette ต้องยกระดับ: T3 = คลุมยาว+ธนูพลังงาน+glyph ลอยรอบหัว · T4a = เบลอหลายร่าง (เร็ว) · T4b = จอมเวทเสกโครงสร้างเรขาคณิตลอย+รัศมี prismatic (อลังแบบ archmage ไม่ใช่ถือโล่)
 
 **T1 — Frontend Ranger**
 ```
@@ -136,23 +159,25 @@ dressed as a UI sharpshooter: fitted teal outfit with a targeting visor, a refin
 **T3 — Pixel Hunter**
 ```
 an energetic frontend developer around 24, lively alert expression, agile slim build, light skin with freckles, bright copper-ginger hair, bright eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a pixel hunter: layered teal cloak, a glowing bow in one hand and a light-stylus in the other, a HUD-like glowing crosshair framing the character, full quiver, teal and cyan palette
+dressed as a pixel hunter, an elite master archer: a long hooded ranger cloak with a high collar billowing behind, drawing a large radiant energy-bow with a bright white-cyan light arrow nocked, a sleek HUD targeting visor over one eye, twin quivers crossed on the back, small glowing crosshair glyphs orbiting overhead, deep teal cloak with bright cyan energy glow and thin gold elite trim
 ```
 **T4a — Motion Trickster** (สาย interaction / animation)
 ```
 an energetic frontend developer around 24, lively alert expression, agile slim build, light skin with freckles, bright copper-ginger hair, bright eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a motion trickster: sleek teal-cyan outfit caught mid-motion, trailing afterimage blur and streaking motion particles, bright teal-cyan palette
+dressed as a motion trickster, caught mid-dash between frames: several translucent afterimage duplicates trailing behind the body, streaking neon motion-lines and dissolving light particles, a light-bow blurring into motion streaks, weightless dynamic pose, electric cyan body with vivid magenta-pink motion trails
 ```
 **T4b — Design Warden** (สาย design system / token)
 ```
 an energetic frontend developer around 24, lively alert expression, agile slim build, light skin with freckles, bright copper-ginger hair, bright eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a design warden: stately teal robes, carrying a shield made of a UI grid of color swatches, a belt of design-token color chips, teal with controlled swatch accents
+dressed as a design warden, a regal master of order: flowing structured teal-and-white robes traced with luminous blueprint grid-lines, summoning large floating holographic geometric constructs and glowing wireframe shapes that orbit the body, a radiant halo of prismatic design-token color swatches arranged like a constellation behind the head, one gauntleted hand raised projecting a lattice of light, an imposing commanding stance, teal and crisp white with iridescent prismatic accents
 ```
 
 ---
 
 ### 4.3 Rogue — Debugger · coral · มีด + แว่นขยาย
 arc: โรกฝึก → นักลอบสังหารบั๊ก → นักสะกดรอยสแต็ก → (สายล่าไฮเซนบั๊ก / สายนิติเวช)
+palette arc: T1 ดำ+coral เรียบ → T2 ดำสนิท+coral คม (assassin) → **T3 เงาดำ+coral พิษเรือง (predator)** → T4a coral+glitch-magenta/cyan (พังๆ) · T4b นัวร์ดำ+coral+amber spotlight (นักสืบ)
+silhouette ยกระดับ: T1 มีดเล็ก → T2 ทวินแด็กเกอร์+หน้ากาก → T3 คลุมเงาขาด+เส้น stack-trace เรือง → T4a ร่างพังครึ่งโปร่ง · T4b เทรนช์โค้ตยาว+หมวกปีก (นักสืบนัวร์)
 
 **T1 — Debugger Rogue**
 ```
@@ -162,28 +187,30 @@ dressed as a debugger rogue: dark hooded cloak with coral-red accents, a small d
 **T2 — Bug Assassin**
 ```
 a sharp debugger around 27, wary keen expression, wiry build, pale cool skin, messy black hair, a small scar over one eyebrow, narrow eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a bug assassin: sleek dark gear with a coral mask over the lower face, twin daggers, a small captured-bug jar on the belt, dark coral palette
+dressed as a bug assassin, a sleek deadly killer: matte-black assassin gear with a hooded cowl and a sharp coral mask over the lower face, dual curved coral-glowing daggers in a reverse grip, a bandolier of captured-bug vials across the chest, a low crouched ready stance, deep black with vivid coral accents
 ```
 **T3 — Stack Stalker**
 ```
 a sharp debugger around 27, wary keen expression, wiry build, pale cool skin, messy black hair, a small scar over one eyebrow, narrow eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a stack stalker: cloaked in layered shadow, a glowing coral stack-trace thread trailing from one hand, a scanning visor, several bug-jars on the belt, dark coral palette
+dressed as a stack stalker, a shadow-cloaked predator: a tattered layered shadow-cloak fraying into wisps, a glowing coral stack-trace thread coiling from one raised hand like a whip, a single coral scanning eye-visor, rows of bug-vials on the belt, an ominous looming silhouette, near-black with toxic coral glow
 ```
 **T4a — Heisenbug Hunter** (สาย flaky / race)
 ```
 a sharp debugger around 27, wary keen expression, wiry build, pale cool skin, messy black hair, a small scar over one eyebrow, narrow eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a heisenbug hunter: rogue gear flickering half-translucent and glitching in places, coral and glitch-cyan distortion particles, coral and cyan palette
+dressed as a heisenbug hunter, phasing in and out of reality: the body flickering half-translucent and double-exposed, fragments of the silhouette glitching and displacing sideways, swirling coral-and-magenta distortion particles and scan-lines, daggers leaving uncertain after-trails, coral with glitch-magenta and cyan distortion
 ```
 **T4b — Forensics Shadow** (สาย log / observability)
 ```
 a sharp debugger around 27, wary keen expression, wiry build, pale cool skin, messy black hair, a small scar over one eyebrow, narrow eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a forensics shadow: a long investigator coat, a glowing magnifier, floating log-scroll and timeline ribbons orbiting, small evidence tags, coral and amber palette
+dressed as a forensics shadow, a noir investigator: a long flowing trench coat with an upturned collar and a wide-brim hat shadowing the face, a glowing amber magnifier raised, floating translucent log-scrolls, evidence tags and timeline ribbons orbiting, a single spotlight beam cutting across, moody black-and-coral noir with warm amber light
 ```
 
 ---
 
 ### 4.4 Sage — Architect · amber · ตำรา + พิมพ์เขียว
 arc: ปราชญ์ → ผู้หยั่งรู้ระบบ → เมไจแห่งแพตเทิร์น → (สายผู้พยากรณ์โดเมน / สายผู้บัญชาการ)
+palette arc: T1 amber เรียบ → T2 amber+ทอง (third eye) → **T3 amber เข้ม+ทองสว่าง+เส้นแพตเทิร์นเรือง** → T4a amber+ขาว celestial (พยากรณ์) · T4b amber+ทอง+เส้นด้ายหลากสี (วาทยกร)
+silhouette ยกระดับ: T1 ตำรา → T2 robe ใหญ่+third eye+ไดอะแกรมลอย → T3 mandala+glyph หมุนรอบ+quill-staff → T4a ร่างลอย+halo โหนดดาว · T4b mantle บาน+ด้ายแสงโยงหุ่นรอบตัว
 
 **T1 — Architect Sage**
 ```
@@ -193,22 +220,22 @@ dressed as an architect sage: amber-trimmed robe, holding an open glowing tome a
 **T2 — System Oracle**
 ```
 a wise architect around 45, composed calm expression, average build, warm brown skin, gray-streaked hair and short beard, round glasses, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a system oracle: grander amber robe, a glowing forehead gem like a third eye, a floating constellation diagram hovering above an open tome, amber palette
+dressed as a system oracle, a far-seeing mystic: a grander layered amber-and-gold robe with a high mantle, a glowing third-eye gem on the forehead, a floating constellation system-diagram hovering above an open levitating tome, faint golden runes circling, a serene knowing pose, amber with radiant gold
 ```
 **T3 — Pattern Magus**
 ```
 a wise architect around 45, composed calm expression, average build, warm brown skin, gray-streaked hair and short beard, round glasses, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a pattern magus: robe with geometric pattern embroidery, floating sacred-geometry pattern glyphs orbiting, a quill-staff of light, amber and gold palette
+dressed as a pattern magus, a sorcerer of sacred patterns: an ornate robe embroidered with glowing geometric patterns, intricate sacred-geometry glyph-rings rotating and orbiting around the body, a tall quill-staff crowned with crystallizing light, a faint mandala halo behind the head, an arcane commanding stance, deep amber and bright gold with luminous pattern-lines
 ```
 **T4a — Domain Prophet** (สาย modeling / DDD)
 ```
 a wise architect around 45, composed calm expression, average build, warm brown skin, gray-streaked hair and short beard, round glasses, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a domain prophet: flowing robes, a constellation of linked entity-relation nodes forming a halo around the head, amber and soft white palette
+dressed as a domain prophet, an ascended seer: flowing celestial robes lifting weightlessly, a vast halo-constellation of linked glowing entity nodes and relation-lines forming a crown around the head, eyes alight, hands cupping a small radiant world-model, ethereal and serene, amber and soft luminous white with celestial highlights
 ```
 **T4b — Orchestration Master** (สาย agent-teams)
 ```
 a wise architect around 45, composed calm expression, average build, warm brown skin, gray-streaked hair and short beard, round glasses, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as an orchestration master: amber robes, glowing amber threads connecting from the hands to small floating familiar-sprites arranged around, amber with multi-color thread accents
+dressed as an orchestration master, a grand conductor of many: regal amber-and-gold robes with a flared mantle, glowing multi-colored thread-strands streaming from each raised hand to a ring of small floating familiar-sprites arranged like an orchestra, a commanding baton-staff of light, an imposing radiant stance, amber and gold with vivid multi-color orchestration threads
 ```
 
 ---
@@ -241,6 +268,24 @@ dressed as a gremlin: patched-up gear, electric sparks and glitch artifacts arou
 ```
 a heroic rubber duck (not human) wearing tiny knight armor and a small cape, holding a toothpick sword, standing proud, full body head-to-toe, centered, clean 1px black outline, legendary joke cosmetic
 ```
+
+### 4.5.1 Tier-up ผ่าน Create State (เพิ่มความเข้ม ไม่ redesign)
+
+gen ตัวฐาน 1 ครั้ง (prompt ข้างบน) → tier สูงขึ้น = เปิด **Create State** วาง "describe the new state" สั้นๆ (เพิ่ม glow / อนุภาค / สีเข้ม) **คนเดิม ท่าเดิม** ไม่ต้องบรรยายตัวละครซ้ำ
+- checkbox **"Use color palette from reference"**: **ติ๊ก** = เพิ่ม glow โทนเดิม (ไม่มีสีใหม่) · **ไม่ติ๊ก** = เพิ่ม/เข้มสีใหม่ (เช่น eclipse, glitch, daemon)
+- T1 = ตัวฐานเลย (ไม่ต้อง Create State) · T2–T4 = ไล่ตามตาราง
+
+| สาย | T2 | T3 | T4 (apex) |
+|---|---|---|---|
+| **Maestro** | a brighter golden glow and a few more floating glowing music-note orbs | richer ornate gold attire with a radiant aura, many swirling golden notes and light-ribbons orbiting | a blazing radiant golden aura, a full swirling orchestra of glowing instruments and notes surrounding, majestic |
+| **Night Owl** | a brighter moonlight glow and a few drifting glowing stars | deeper indigo, a luminous crescent-moon halo behind, streaming stardust, the owl familiar glowing brighter | a dark eclipse aura with a glowing ringed eclipse-moon behind the head, a swirling starfield, intense cosmic indigo glow |
+| **The Ascetic** | a faint serene white aura and a second floating glyph | a calm glowing halo, several softly floating glyphs orbiting, gentle light | a radiant white enlightenment aura, a full ring of glowing glyphs orbiting, levitating slightly, transcendent |
+| **The Gremlin** | more electric sparks and glitchy distortion artifacts | a semi-translucent flickering form, swirling glitch artifacts and floating broken-pixel debris, eerie green glow | a chaotic storm of corrupted glitch energy, a menacing daemonic aura, glowing toxic-green eyes, larger and more monstrous |
+
+วิธีใช้ช่อง Create State: วางข้อความใน column ของ tier นั้น เช่น Maestro T4 → วาง `a blazing radiant golden aura, a full swirling orchestra of glowing instruments and notes surrounding, majestic` (ติ๊ก use-palette เพราะยังทอง)
+
+> **Trickster (✦ legendary)** ยังไม่มี base ใน §4.5 — ธีม jester/เป็ดลวงตา (ดู §7.3 The Jester Mirage). base แนะนำ: `a mischievous illusion jester, harlequin diamond pattern, holding fanned playing cards, mother-of-pearl rainbow palette` → escalate T3 `splitting into mirror-image duplicates, playing-card confetti` · T4 `a dazzling carnival of mirror-illusions, swirling confetti and prismatic shimmer`
+> **Sir Quacks-a-lot** = cosmetic ตัวเดียว ไม่มี tier (gen ครั้งเดียวจบ)
 
 ---
 

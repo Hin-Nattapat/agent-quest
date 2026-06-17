@@ -27,3 +27,13 @@ test("monsterFrames picks attack on attack anim, else idle", () => {
 test("monsterSet returns undefined for an unwired theme", () => {
   expect(monsterSet(SceneTheme.Guild)).toBeUndefined();
 });
+
+test("starter themes (T1-T3) resolve to 9+9 frame sets", () => {
+  for (const theme of [SceneTheme.Grassland, SceneTheme.Forest, SceneTheme.Dungeon]) {
+    expect(monsterSet(theme)?.idle.length).toBe(9);
+    expect(monsterSet(theme)?.attack.length).toBe(9);
+  }
+  expect(monsterSet(SceneTheme.Grassland)?.idle[0]).toBe(
+    "/sprites/monsters/grassland/idle/0.png",
+  );
+});

@@ -6,6 +6,8 @@ import {
   HeroAnim,
   MonsterAnim,
   PACK_HITS,
+  AttackStyle,
+  attackStyleFor,
   firstAlive,
   heroAnim,
   monsterAnim,
@@ -22,6 +24,11 @@ export enum FloaterKind {
   Hurt = "hurt",
 }
 
+export enum EffectKind {
+  Slash = "slash",
+  Zap = "zap",
+}
+
 export interface IFloater {
   id: number;
   kind: FloaterKind;
@@ -30,7 +37,8 @@ export interface IFloater {
 
 export interface IHitEffect {
   id: number;
-  slot: number; // pack index the slash lands on
+  slot: number; // pack index the effect lands on
+  kind: EffectKind;
 }
 
 interface IMobView {
@@ -51,6 +59,7 @@ interface ISceneView {
 // durations in styles.css (.hero-attack/.m-die/.floater/etc.) or the sprite snaps or leaks.
 const HERO_MS = { attack: 280, hurt: 500, celebrate: 1200 };
 const MON_MS = { hurt: 360, attack: 500, die: 600 };
+const CAST_MS = 600; // mage cast pulse — long enough to play the 9 cast frames at CAST_FPS
 const FLOATER_MS = 900;
 const EFFECT_MS = 320;
 const TICK_MS = 250; // advances time-driven transitions (engage start, rest-gap expiry)
@@ -73,6 +82,8 @@ export const useSceneDirector = (
   const [dyingSlot, setDyingSlot] = useState<number | null>(null);
   const [floaters, setFloaters] = useState<IFloater[]>([]);
   const [effects, setEffects] = useState<IHitEffect[]>([]);
+  const styleRef = useRef<AttackStyle>(AttackStyle.Melee);
+  styleRef.current = attackStyleFor(state?.class?.line ?? "");
 
   useEffect(() => {
     const set = timers.current;
@@ -104,9 +115,9 @@ export const useSceneDirector = (
     setFloaters(f => [...f, { id, kind, text }]);
     later(() => setFloaters(f => f.filter(x => x.id !== id)), FLOATER_MS);
   };
-  const addEffect = (slot: number) => {
+  const addEffect = (slot: number, kind: EffectKind) => {
     const id = nextId();
-    setEffects(e => [...e, { id, slot }]);
+    setEffects(e => [...e, { id, slot, kind }]);
     later(() => setEffects(e => e.filter(x => x.id !== id)), EFFECT_MS);
   };
 
@@ -120,8 +131,9 @@ export const useSceneDirector = (
     if (wantStrike && next.phase === ScenePhase.Engage) {
       const idx = firstAlive(before.pack);
       if (idx >= 0 && next.pack[idx] !== before.pack[idx]) {
-        pulse(setAttacking, HERO_MS.attack);
-        addEffect(idx);
+        const cast = styleRef.current === AttackStyle.Cast;
+        pulse(setAttacking, cast ? CAST_MS : HERO_MS.attack);
+        addEffect(idx, cast ? EffectKind.Zap : EffectKind.Slash);
         if (next.pack[idx] <= 0) {
           setDyingSlot(idx);
           later(() => setDyingSlot(null), MON_MS.die);

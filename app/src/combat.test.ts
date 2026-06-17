@@ -2,6 +2,7 @@ import { test, expect } from "bun:test";
 import {
   HeroAnim,
   MonsterAnim,
+  AttackStyle,
   PACK_HITS,
   packSize,
   makePack,
@@ -10,6 +11,7 @@ import {
   packCleared,
   heroAnim,
   monsterAnim,
+  attackStyleFor,
 } from "./combat";
 import { ActivityState } from "./activity";
 
@@ -85,4 +87,11 @@ test("heroAnim returns Wander only when no pulse is active", () => {
   expect(heroAnim({ ...base, wander: true })).toBe(HeroAnim.Wander);
   expect(heroAnim({ ...base, wander: true, attack: true })).toBe(HeroAnim.Attack);
   expect(heroAnim({ ...base })).toBe(HeroAnim.Idle); // wander omitted → activity base
+});
+
+test("attackStyleFor: mage casts, everyone else melees", () => {
+  expect(attackStyleFor("mage")).toBe(AttackStyle.Cast);
+  expect(attackStyleFor("ranger")).toBe(AttackStyle.Melee);
+  expect(attackStyleFor("novice")).toBe(AttackStyle.Melee);
+  expect(attackStyleFor("")).toBe(AttackStyle.Melee);
 });

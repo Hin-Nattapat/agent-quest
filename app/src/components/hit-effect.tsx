@@ -1,4 +1,4 @@
-import type { IHitEffect } from "../use-scene-director";
+import { type IHitEffect, EffectKind } from "../use-scene-director";
 import { slotPos } from "../mob-slots";
 
 interface IProps {
@@ -9,9 +9,10 @@ const HitEffects = (props: IProps) => {
   const { effects } = props;
   return (
     <div className="hit-effects" aria-hidden="true">
-      {effects.map(e => (
-        <span key={e.id} className="hit-effect" style={slotPos(e.slot)} />
-      ))}
+      {effects.map(e => {
+        const cls = e.kind === EffectKind.Zap ? "hit-zap" : "hit-effect";
+        return <span key={e.id} className={cls} style={slotPos(e.slot)} />;
+      })}
     </div>
   );
 };

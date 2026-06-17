@@ -138,6 +138,52 @@ const importBg = (raw: string, target: ITarget): void =>
 const importItem = (raw: string, target: ITarget): void =>
   importSingle(raw, target, "items");
 
+// Monster anims may be single-direction (frames directly in the anim folder) or multi-direction
+// (frames under west/south/…). The battle mob faces the hero on the left, so prefer the west view.
+const animFrameDir = (animPath: string): string => {
+  const west = join(animPath, "west");
+  if (existsSync(west)) {
+    return west;
+  }
+  return animPath;
+};
+
+// PixelLab creature export -> sprites/monsters/<theme>/{idle/N, attack/N} (west = faces the hero).
+const importMonster = (rawDir: string, target: ITarget): void => {
+  const theme = target.name ?? "";
+  const out = join(PUBLIC, "sprites", "monsters", theme);
+  const animDir = join(rawDir, "animations");
+  if (!existsSync(animDir)) {
+    throw new Error(`monster export missing animations/ in ${rawDir}`);
+  }
+  const animNames = readdirSync(animDir);
+  const idle = pickAnimDir(animNames, "dle");
+  const attack = pickAnimDir(animNames, "ttack");
+  if (!idle) {
+    throw new Error(`monster export has no idle animation in ${animDir}`);
+  }
+
+  rmSync(out, { recursive: true, force: true });
+  const copyAnim = (animName: string, sub: string): number => {
+    const src = animFrameDir(join(animDir, animName));
+    mkdirSync(join(out, sub), { recursive: true });
+    const files = pngs(src);
+    for (const f of files) {
+      copyFileSync(join(src, f), join(out, sub, `${frameIndex(f)}.png`));
+    }
+    return files.length;
+  };
+
+  const idleN = copyAnim(idle, "idle");
+  let attackN = 0;
+  if (attack) {
+    attackN = copyAnim(attack, "attack");
+  } else {
+    console.warn("  (no attack animation found — skipping attack/)");
+  }
+  console.log(`monster ${theme} -> ${out}  (idle: ${idleN}, attack: ${attackN})`);
+};
+
 const notImplemented = (name: string) => (): void => {
   throw new Error(
     `${name} import not implemented yet — see docs/reference/art-import.md (Adding a type)`,
@@ -148,7 +194,7 @@ const TYPES: Record<AssetType, (raw: string, target: ITarget) => void> = {
   [AssetType.Hero]: importHero,
   [AssetType.Bg]: importBg,
   [AssetType.Item]: importItem,
-  [AssetType.Monster]: notImplemented("monster"),
+  [AssetType.Monster]: importMonster,
   [AssetType.Boss]: notImplemented("boss"),
 };
 

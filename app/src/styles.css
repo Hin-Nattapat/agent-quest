@@ -193,8 +193,8 @@ body {
   image-rendering: pixelated;
 }
 .hero {
-  left: 30%;
-  bottom: 24%;
+  left: 22%;
+  bottom: 18%;
   width: 30cqh;
   height: 30cqh;
 }
@@ -227,8 +227,8 @@ body {
 /* sprite sits inside the unit, so drop the absolute placement from .sprite */
 .monster-unit .monster {
   position: static;
-  width: 22cqh;
-  height: 22cqh;
+  width: 30cqh;
+  height: 30cqh;
   font-size: 34px;
 }
 .monster-grassland::after {

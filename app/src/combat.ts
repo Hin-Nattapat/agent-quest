@@ -17,6 +17,20 @@ export enum MonsterAnim {
   Die = "die",
 }
 
+export enum AttackStyle {
+  Cast = "cast",
+  Melee = "melee",
+}
+
+// Which battle attack a class plays. Mage stands and casts; others keep the dash-jab until their
+// own attack art lands (add a style + frames then).
+export const attackStyleFor = (line: string): AttackStyle => {
+  if (line === "mage") {
+    return AttackStyle.Cast;
+  }
+  return AttackStyle.Melee;
+};
+
 const HERO_BASE: Record<ActivityState, HeroAnim> = {
   [ActivityState.Farming]: HeroAnim.Farming,
   [ActivityState.Idle]: HeroAnim.Idle,

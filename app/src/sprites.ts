@@ -3,12 +3,14 @@ import { Facing } from "./facing";
 export interface ISpriteSet {
   idle: Record<Facing, string>;
   walk: Record<Facing, string[]>;
+  cast?: string[]; // east-facing cast frames; present only where the art exists
 }
 
 const DIRS: Facing[] = [Facing.South, Facing.North, Facing.East, Facing.West];
 
 // Build a set whose files live at /sprites/<root>/idle/<dir>.png and walk/<dir>/<0..8>.png.
-const buildSet = (root: string, walkFrames: number): ISpriteSet => {
+// castFrames > 0 adds east-facing cast frames at cast/<0..n-1>.png.
+const buildSet = (root: string, walkFrames: number, castFrames = 0): ISpriteSet => {
   const idle = {} as Record<Facing, string>;
   const walk = {} as Record<Facing, string[]>;
   for (const dir of DIRS) {
@@ -18,17 +20,24 @@ const buildSet = (root: string, walkFrames: number): ISpriteSet => {
       (_, i) => `/sprites/${root}/walk/${dir}/${i}.png`,
     );
   }
-  return { idle, walk };
+  const set: ISpriteSet = { idle, walk };
+  if (castFrames > 0) {
+    set.cast = Array.from(
+      { length: castFrames },
+      (_, i) => `/sprites/${root}/cast/${i}.png`,
+    );
+  }
+  return set;
 };
 
 // key = `${line}-t${tier}`, or `${line}-t4a`/`-t4b` at tier 4 (the form splits by branch). Partial:
 // only forms with real art appear; a missing key returns undefined so the renderer keeps the emoji.
 export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
-  "mage-t1": buildSet("mage/t1", 9),
-  "mage-t2": buildSet("mage/t2", 9),
-  "mage-t3": buildSet("mage/t3", 9),
-  "mage-t4a": buildSet("mage/t4a", 9),
-  "mage-t4b": buildSet("mage/t4b", 9),
+  "mage-t1": buildSet("mage/t1", 9, 9),
+  "mage-t2": buildSet("mage/t2", 9, 9),
+  "mage-t3": buildSet("mage/t3", 9, 9),
+  "mage-t4a": buildSet("mage/t4a", 9, 9),
+  "mage-t4b": buildSet("mage/t4b", 9, 9),
 };
 
 // At tier 4 the form branches (a/b) so the key carries it; below tier 4 the branch is ignored.

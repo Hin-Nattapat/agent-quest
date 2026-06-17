@@ -359,11 +359,12 @@ gen ตัวฐาน 1 ครั้ง (prompt ข้างบน) → tier �
 - **พื้นโล่งราบเต็มความกว้าง** ที่โซนล่าง (lower third) = ที่ยืน/สู้
 - **ซ้าย ~30% เปิดโล่ง** = โซนฮีโร่ · **ขวา ~15–25% เปิดโล่ง + มีระยะลึก** = โซนมอน (รองรับ **3 ตัว**)
 - ของตกแต่ง (ต้นไม้/กำแพง/เสา/หิน) = **ขอบซ้าย-ขวาสุด + แบ็คกราวด์เท่านั้น** — ห้ามบังโซนยืน · กลาง+foreground โล่ง
+- ⚠️ **ใน prompt บรรยายโซนว่างเป็น "ภูมิประเทศ" ล้วน** (open flat ground, clear foreground) — **ห้ามเอ่ยคำว่า hero/enemies/characters/stand/fight** ไม่งั้น AI วาดตัวละครออกมา (คำ positive ชนะ negative) · ปิดท้ายด้วย `completely empty with no people, no characters, no creatures, no figures`
 
 template (ฝัง composition แล้ว — เติม `<SCENE>`/`<decor>`/`<bg>`/`<palette + mood>`):
 
 ```
-a side-view pixel-art battle background of <SCENE>, a wide open flat <ground> clearing across the entire lower third where characters stand and fight, the foreground and center kept clear and unobstructed (the left side open for a hero, the right side open and roomy for up to three enemies), <decor> only at the far left and right edges, <background> behind, no characters, no creatures, <palette + mood>, limited palette, clean pixel art, slightly stylized
+a side-view pixel-art battle background of <SCENE>, a wide open flat <ground> clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, <decor> only at the far left and right edges, <background> behind, completely empty with no people, no characters, no creatures, no figures, <palette + mood>, limited palette, clean pixel art, slightly stylized
 ```
 
 ### 7.1 ฉากพื้น T1–T3 (ใช้ร่วมทุกสาย) — มอน + ฉาก
@@ -373,17 +374,17 @@ a side-view pixel-art battle background of <SCENE>, a wide open flat <ground> cl
 **T1 · `grassland` · Bug Slime** — Mode **Humanoid**
 
 - 🟢 monster: `a small round slime creature, translucent sickly-green jelly speckled with tiny glitch pixels, two big round cartoon eyes, tiny and slightly menacing, not human, full body, centered, slightly stylized, clean 1px black outline`
-- 🖼️ scene (400×128): `a side-view pixel-art battle background of a grassy meadow outside a town, a wide open flat grassy clearing across the entire lower third where characters stand and fight, the foreground and center kept clear and unobstructed (left side open for a hero, right side open and roomy for up to three enemies), framing trees only at the far left and right edges, distant weathered stone town walls and rolling green hills in the background, clear blue sky with a few soft clouds, no characters, no creatures, cheerful, limited palette, clean pixel art, slightly stylized`
+- 🖼️ scene (400×128): `a side-view pixel-art battle background of a grassy meadow outside a town, a wide open flat grassy clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, framing trees only at the far left and right edges, distant weathered stone town walls and rolling green hills in the background, clear blue sky with a few soft clouds, completely empty with no people, no characters, no creatures, no figures, cheerful, limited palette, clean pixel art, slightly stylized`
 
 **T2 · `forest` · Error Wraith** — Mode **Humanoid**
 
 - 👻 monster: `a floating ghostly wraith, tattered cloak woven from fragmented red error-glyphs, hollow glowing red eyes, wispy crimson smoke trail, eerie, not human, full body, centered, slightly stylized, clean 1px black outline`
-- 🖼️ scene (400×128): `a side-view pixel-art battle background of a dark whispering forest, a wide open flat mossy clearing across the entire lower third where characters stand and fight, the foreground and center kept clear and unobstructed (left side open for a hero, right side open and roomy for up to three enemies), tall framing trees only at the far left and right edges, deep green foliage and drifting fog in the background, dim light filtering through the canopy, no characters, no creatures, eerie, limited palette, clean pixel art, slightly stylized`
+- 🖼️ scene (400×128): `a side-view pixel-art battle background of a dark whispering forest, a wide open flat mossy clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, tall framing trees only at the far left and right edges, deep green foliage and drifting fog in the background, dim light filtering through the canopy, completely empty with no people, no characters, no creatures, no figures, eerie, limited palette, clean pixel art, slightly stylized`
 
 **T3 · `dungeon` · Dungeon Brute** — Mode **Humanoid**
 
 - 👹 monster: `a hulking armored troll brute, cracked iron-grey stone skin, heavy spiked club, glowing orange eyes, imposing, not human, full body, centered, slightly stylized, clean 1px black outline`
-- 🖼️ scene (400×128): `a side-view pixel-art battle background of a deep stone dungeon, a wide open flat stone-floor clearing across the entire lower third where characters stand and fight, the foreground and center kept clear and unobstructed (left side open for a hero, right side open and roomy for up to three enemies), framing stone pillars only at the far left and right edges, grey brick walls with flickering torches and heavy shadows in the background, no characters, no creatures, oppressive, limited palette, clean pixel art, slightly stylized`
+- 🖼️ scene (400×128): `a side-view pixel-art battle background of a deep stone dungeon, a wide open flat stone-floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, framing stone pillars only at the far left and right edges, grey brick walls with flickering torches and heavy shadows in the background, completely empty with no people, no characters, no creatures, no figures, oppressive, limited palette, clean pixel art, slightly stylized`
 
 **idle/attack (วางเหมือนกันทุกตัว — §7.A):**
 

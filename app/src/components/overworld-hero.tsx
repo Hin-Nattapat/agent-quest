@@ -7,6 +7,7 @@ import { usePreload } from "../use-preload";
 interface IProps {
   line: string;
   tier: number;
+  branch: string | null;
   facing: Facing;
   moving: boolean;
   xPx: number;
@@ -16,8 +17,8 @@ interface IProps {
 const WALK_FPS = 6;
 
 const OverworldHero = (props: IProps) => {
-  const { line, tier, facing, moving, xPx, yPx } = props;
-  const set = heroSpriteSet(line, tier);
+  const { line, tier, branch, facing, moving, xPx, yPx } = props;
+  const set = heroSpriteSet(line, tier, branch);
   usePreload(set);
   const frames = set ? directionalFrames(set, facing, moving) : [];
   const frame = useSpriteFrame(frames, WALK_FPS, moving);

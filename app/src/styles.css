@@ -161,6 +161,8 @@ body {
 .hero {
   left: 30%;
   bottom: 24%;
+  width: 92px;
+  height: 92px;
 }
 .hero::after {
   content: "🧙";
@@ -847,6 +849,32 @@ body {
   100% {
     transform: rotate(-12deg) scale(1.3);
     opacity: 0;
+  }
+}
+
+/* cast zap: a teal burst detonating on the mob itself (positioned at the slot like the slash, so it
+   lands accurately) — no beam/travel/dash. */
+.hit-zap {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #dffff5 18%, #36c9a3cc 48%, transparent 70%);
+  filter: drop-shadow(0 0 8px #36c9a3);
+  animation: zap 0.32s ease-out forwards;
+}
+@keyframes zap {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
   }
 }
 

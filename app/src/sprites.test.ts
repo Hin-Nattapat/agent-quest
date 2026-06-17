@@ -38,3 +38,9 @@ test("directionalFrames cycles walk when moving, else the idle still", () => {
   expect(directionalFrames(set, Facing.East, true)).toEqual(set.walk[Facing.East]);
   expect(directionalFrames(set, Facing.South, false)).toEqual([set.idle[Facing.South]]);
 });
+
+test("Mage forms carry 9 east cast frames", () => {
+  expect(heroSpriteSet("mage", 1)?.cast?.length).toBe(9);
+  expect(heroSpriteSet("mage", 1)?.cast?.[0]).toBe("/sprites/mage/t1/cast/0.png");
+  expect(heroSpriteSet("mage", 4, "b")?.cast?.[8]).toBe("/sprites/mage/t4b/cast/8.png");
+});

@@ -84,6 +84,13 @@ body {
     radial-gradient(circle at 82% 20%, #d8d0b4 0 9px, transparent 10px),
     linear-gradient(180deg, #1a1730 0%, #2a2742 54%, #33532c 66%, #21391b 100%);
 }
+/* Full-panel scene image; paints over the .sky gradient (DOM order) and sits behind the actors. */
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  background: center / cover no-repeat;
+  image-rendering: pixelated;
+}
 .scene-grassland .sky {
   background:
     radial-gradient(2px 2px at 20% 18%, #ffffffaa, transparent),
@@ -859,7 +866,13 @@ body {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: radial-gradient(circle, #ffffff 0%, #dffff5 18%, #36c9a3cc 48%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    #dffff5 18%,
+    #36c9a3cc 48%,
+    transparent 70%
+  );
   filter: drop-shadow(0 0 8px #36c9a3);
   animation: zap 0.32s ease-out forwards;
 }

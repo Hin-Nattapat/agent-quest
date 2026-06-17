@@ -20,7 +20,9 @@ const Hero = (props: IProps) => {
   const set = heroSpriteSet(line, tier, branch);
   usePreload(set);
   const casting =
-    anim === HeroAnim.Attack && attackStyleFor(line) === AttackStyle.Cast && Boolean(set?.cast);
+    anim === HeroAnim.Attack &&
+    attackStyleFor(line) === AttackStyle.Cast &&
+    Boolean(set?.cast);
   const moving = anim === HeroAnim.Wander;
   const battleFrames = set ? directionalFrames(set, Facing.East, moving) : [];
   const frames = casting ? (set?.cast ?? []) : battleFrames;

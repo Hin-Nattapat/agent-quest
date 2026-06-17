@@ -26,7 +26,7 @@ test("heroSpriteSet resolves every Mage form (T1-T3 + both T4 branches)", () => 
 
 test("heroSpriteSet returns undefined for forms with no art", () => {
   expect(heroSpriteSet("mage", 4, null)).toBeUndefined(); // tier 4 before a branch is chosen
-  expect(heroSpriteSet("rogue", 1)).toBeUndefined();
+  expect(heroSpriteSet("sage", 1)).toBeUndefined(); // sage has no art yet
   expect(heroSpriteSet("novice", 0)).toBeUndefined();
 });
 
@@ -52,4 +52,12 @@ test("Ranger forms resolve (walk + idle, no cast)", () => {
   expect(heroSpriteSet("ranger", 1)?.walk[Facing.South].length).toBe(9);
   expect(heroSpriteSet("ranger", 1)?.cast).toBeUndefined();
   expect(heroSpriteSet("ranger", 4, "a")).toBeDefined();
+});
+
+test("Rogue forms resolve (walk + idle, no cast)", () => {
+  expect(heroSpriteSet("rogue", 1)?.idle[Facing.East]).toBe(
+    "/sprites/rogue/t1/idle/east.png",
+  );
+  expect(heroSpriteSet("rogue", 1)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("rogue", 4, "b")).toBeDefined();
 });

@@ -13,19 +13,38 @@ const buildSet = (root: string, walkFrames: number): ISpriteSet => {
   const walk = {} as Record<Facing, string[]>;
   for (const dir of DIRS) {
     idle[dir] = `/sprites/${root}/idle/${dir}.png`;
-    walk[dir] = Array.from({ length: walkFrames }, (_, i) => `/sprites/${root}/walk/${dir}/${i}.png`);
+    walk[dir] = Array.from(
+      { length: walkFrames },
+      (_, i) => `/sprites/${root}/walk/${dir}/${i}.png`,
+    );
   }
   return { idle, walk };
 };
 
-// key = `${line}-t${tier}`. Partial: only forms with real art appear; a missing key returns
-// undefined so the renderer keeps the emoji placeholder (today only Mage T1 exists).
+// key = `${line}-t${tier}`, or `${line}-t4a`/`-t4b` at tier 4 (the form splits by branch). Partial:
+// only forms with real art appear; a missing key returns undefined so the renderer keeps the emoji.
 export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
   "mage-t1": buildSet("mage/t1", 9),
+  "mage-t2": buildSet("mage/t2", 9),
+  "mage-t3": buildSet("mage/t3", 9),
+  "mage-t4a": buildSet("mage/t4a", 9),
+  "mage-t4b": buildSet("mage/t4b", 9),
 };
 
-export const heroSpriteSet = (line: string, tier: number): ISpriteSet | undefined => {
-  return HERO_SPRITES[`${line}-t${tier}`];
+// At tier 4 the form branches (a/b) so the key carries it; below tier 4 the branch is ignored.
+export const heroKey = (line: string, tier: number, branch?: string | null): string => {
+  if (tier >= 4 && branch) {
+    return `${line}-t${tier}${branch}`;
+  }
+  return `${line}-t${tier}`;
+};
+
+export const heroSpriteSet = (
+  line: string,
+  tier: number,
+  branch?: string | null,
+): ISpriteSet | undefined => {
+  return HERO_SPRITES[heroKey(line, tier, branch)];
 };
 
 export const directionalFrames = (

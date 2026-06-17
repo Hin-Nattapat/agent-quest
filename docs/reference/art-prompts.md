@@ -100,7 +100,7 @@ keyframes and the `.sprite` `background-image`).
 | สาย | Action Description |
 |---|---|
 | **Mage** | `walking forward with a steady natural gait, legs striding and the free arm swinging slightly, keeping the purple hood drawn up over the head, the muted-purple hooded robe and thin gold trim unchanged, still holding the wooden staff with the glowing teal crystal upright in one hand` |
-| **Ranger** | `walking forward with a light agile gait, keeping the teal tunic and hooded scarf unchanged, the small quiver on the back, the short bow held low in one hand and pointing downward at the side, the arm relaxed and hanging (not raised, not across the body, not drawn)` |
+| **Ranger** | `walking forward with a light agile gait, the short bow and small quiver slung together on the back, both hands free and the arms swinging naturally at the sides, keeping the teal tunic and hooded scarf unchanged` |
 | **Rogue** | `walking forward in a low wary prowl, keeping the dark hooded cloak with coral accents unchanged, still holding the small dagger in one hand and the magnifying glass in the other` |
 | **Sage** | `walking forward with a slow measured gait, keeping the amber-trimmed robe and round glasses unchanged, the gray-streaked beard, still holding the open glowing tome in one hand` |
 
@@ -108,7 +108,10 @@ keyframes and the `.sprite` `background-image`).
 1. **Start Frame = idle** + ติ๊ก **"Keep first frame (idle pose)"** → anchor หน้าตา/ทรงจากเฟรมแรก
 2. ระบุ `the <สี> <item> unchanged` เฉพาะของที่ชอบเพี้ยน (ฮู้ด/อาวุธ/เคป)
 3. อย่าใส่ของใหม่ที่ base ไม่มี — แค่ `keeping`/`still holding` ของเดิม
-4. **ท่าถืออาวุธตอนเดิน = ผ่อน/ลดข้างตัว** ไม่งั้น AI ชอบยกขวางตัวดูเกร็ง: ระบุ `held low … pointing downward at the side, arm relaxed (not raised, not across the body, not drawn)` — bow/มีด/แว่นขยาย ชี้ลง · staff ตั้งตรงได้ (เหมือนไม้เท้า) · ตอน **attack** ค่อยยก/เล็ง/ดึง
+4. **ท่าถืออาวุธตอนเดิน = ผ่อน/ลดข้างตัว** ไม่งั้น AI ชอบยกขวางตัวดูเกร็ง · staff ตั้งตรงได้ (เหมือนไม้เท้า) · มีด/แว่นขยาย ลดข้างตัว · ตอน **attack** ค่อยยก/เล็ง/ดึง
+5. ⚠️ **ถ้า pose อาวุธยังเพี้ยนทั้งที่บรรยายแล้ว** = มัน **anchor มาจาก base/idle** (V3 ยึดเฟรมแรกจาก "Keep first frame" + negatives อย่าง `not across the body` โมเดลภาพมักเมิน) → ต้องแก้ที่ **ตัวฐาน** ไม่ใช่แค่คำบรรยาย anim:
+   - **archer (Ranger):** ตอนเดินให้ **`bow slung on the back, hands free`** (เหมือน Zelda) แล้วค่อย "ดึงธนู" ตอน attack — ธรรมชาติสุด เลี่ยงท่าถือเกร็ง · ถ้า base/idle ถือธนูยื่นหน้าอยู่ **ต้อง regen base/idle** ให้สะพายหลังด้วย
+   - ใช้ **positive phrasing เป๊ะ** แทน negatives (บอกท่าที่ "ต้องการ" ตรงๆ ไม่ใช่ "ห้าม")
 
 ---
 

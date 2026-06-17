@@ -47,24 +47,28 @@ const SceneView = (props: IProps) => {
     <div className="companion">
       <div className={sceneClass}>
         <div className="sky" aria-hidden="true" />
-        {mode === SceneMode.Battle && hasSceneBg(sceneInfo.theme) && (
-          <div
-            className="scene-bg"
-            aria-hidden="true"
-            style={{
-              backgroundImage: `url(${assetUrl(`/scenes/${sceneInfo.theme}.png`)})`,
-            }}
-          />
-        )}
         {mode === SceneMode.Battle && (
-          <BattleScene
-            state={state}
-            activity={activity}
-            sceneInfo={sceneInfo}
-            line={line}
-            tier={tier}
-            branch={branch}
-          />
+          <div className="battle-frame">
+            <div className="battle-stage">
+              {hasSceneBg(sceneInfo.theme) && (
+                <div
+                  className="scene-bg"
+                  aria-hidden="true"
+                  style={{
+                    backgroundImage: `url(${assetUrl(`/scenes/${sceneInfo.theme}.png`)})`,
+                  }}
+                />
+              )}
+              <BattleScene
+                state={state}
+                activity={activity}
+                sceneInfo={sceneInfo}
+                line={line}
+                tier={tier}
+                branch={branch}
+              />
+            </div>
+          </div>
         )}
         {mode === SceneMode.Overworld && (
           <OverworldRoom line={line} tier={tier} branch={branch} activity={activity} />

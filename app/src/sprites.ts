@@ -44,6 +44,12 @@ export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
   "ranger-t3": buildSet("ranger/t3", 9),
   "ranger-t4a": buildSet("ranger/t4a", 9),
   "ranger-t4b": buildSet("ranger/t4b", 9),
+  // Rogue: walk + idle only for now (no cast art wired — rogue uses the melee dash).
+  "rogue-t1": buildSet("rogue/t1", 9),
+  "rogue-t2": buildSet("rogue/t2", 9),
+  "rogue-t3": buildSet("rogue/t3", 9),
+  "rogue-t4a": buildSet("rogue/t4a", 9),
+  "rogue-t4b": buildSet("rogue/t4b", 9),
 };
 
 // At tier 4 the form branches (a/b) so the key carries it; below tier 4 the branch is ignored.

@@ -21,10 +21,13 @@ export const buildMonsterSet = (
   ),
 });
 
-// Empty until art lands. After importing a theme's art (the importer prints idle/attack frame
-// counts), add e.g. `[SceneTheme.Grassland]: buildMonsterSet("grassland", 4, 3),`. A missing theme
-// returns undefined → the renderer keeps the emoji placeholder.
-export const MONSTER_SPRITES: Partial<Record<SceneTheme, IMonsterSet>> = {};
+// Starter mobs (T1-T3, idle 9 + attack 9, west-facing). Add a theme here after importing its art
+// (the importer prints the frame counts). A missing theme returns undefined → emoji placeholder.
+export const MONSTER_SPRITES: Partial<Record<SceneTheme, IMonsterSet>> = {
+  [SceneTheme.Grassland]: buildMonsterSet("grassland", 9, 9),
+  [SceneTheme.Forest]: buildMonsterSet("forest", 9, 9),
+  [SceneTheme.Dungeon]: buildMonsterSet("dungeon", 9, 9),
+};
 
 export const monsterSet = (theme: SceneTheme): IMonsterSet | undefined =>
   MONSTER_SPRITES[theme];

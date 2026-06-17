@@ -84,18 +84,41 @@ body {
     radial-gradient(circle at 82% 20%, #d8d0b4 0 9px, transparent 10px),
     linear-gradient(180deg, #1a1730 0%, #2a2742 54%, #33532c 66%, #21391b 100%);
 }
-/* Full-panel scene image; paints over the .sky gradient (DOM order) and sits behind the actors. */
+/* Battle-only layer over the panel: fits + bottom-centers the aspect-locked stage so the scene
+   image never distorts. The .sky gradient behind it (full panel) shows around the stage as a
+   themed letterbox. */
+.battle-frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* a size container so the stage can pick the largest 400:128 box that fits BOTH frame axes */
+  container-type: size;
+}
+/* Locked to the scene image ratio (400x128). width = the smaller of full frame width (100cqw) and
+   the width a full-height box would need (height x 3.125 = 312.5cqh) → the largest box that always
+   fits without distortion. Its own container-type lets actors size in cqh (% of stage height). */
+.battle-stage {
+  position: relative;
+  width: min(100cqw, 312.5cqh);
+  aspect-ratio: 400 / 128;
+  overflow: hidden;
+  container-type: size;
+}
+/* Scene image; fills the aspect-locked .battle-stage exactly (matching ratio → no zoom/crop) and
+   sits behind the actors. Anchored bottom so any sub-pixel rounding trims the sky, not the ground. */
 .scene-bg {
   position: absolute;
   inset: 0;
-  background: center / cover no-repeat;
+  background: center bottom / cover no-repeat;
   image-rendering: pixelated;
 }
+/* Stage is centered, so the letterbox shows above + below the grassland image. Continue the image's
+   tones: sky-blue at the top, green→dark-earth at the bottom. The mid transition hides behind the
+   centered image. */
 .scene-grassland .sky {
-  background:
-    radial-gradient(2px 2px at 20% 18%, #ffffffaa, transparent),
-    radial-gradient(circle at 82% 20%, #d8d0b4 0 9px, transparent 10px),
-    linear-gradient(180deg, #1a1730, #2a2742 55%, #33532c 66%, #21391b);
+  background: linear-gradient(180deg, #6fb7e3 0%, #9fd1ea 40%, #2e4a26 56%, #1c1409 100%);
 }
 .scene-forest .sky {
   background: linear-gradient(180deg, #0e1b12, #18301d 60%, #0e1b12);
@@ -168,8 +191,8 @@ body {
 .hero {
   left: 30%;
   bottom: 24%;
-  width: 92px;
-  height: 92px;
+  width: 30cqh;
+  height: 30cqh;
 }
 .hero::after {
   content: "🧙";
@@ -200,6 +223,8 @@ body {
 /* sprite sits inside the unit, so drop the absolute placement from .sprite */
 .monster-unit .monster {
   position: static;
+  width: 22cqh;
+  height: 22cqh;
   font-size: 34px;
 }
 .monster-grassland::after {
@@ -734,7 +759,7 @@ body {
 }
 
 .monster-hp {
-  width: 46px;
+  width: 16cqh;
   height: 5px;
   border: 1px solid var(--ink);
   background: #241636;
@@ -831,8 +856,8 @@ body {
 }
 .hit-effect {
   position: absolute;
-  width: 34px;
-  height: 34px;
+  width: 12cqh;
+  height: 12cqh;
   background: linear-gradient(
     135deg,
     transparent 44%,
@@ -863,8 +888,8 @@ body {
    lands accurately) — no beam/travel/dash. */
 .hit-zap {
   position: absolute;
-  width: 46px;
-  height: 46px;
+  width: 16cqh;
+  height: 16cqh;
   border-radius: 50%;
   background: radial-gradient(
     circle,

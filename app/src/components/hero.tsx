@@ -8,14 +8,15 @@ import { usePreload } from "../use-preload";
 interface IProps {
   line: string;
   tier: number;
+  branch: string | null;
   anim: HeroAnim;
 }
 
 const WALK_FPS = 10;
 
 const Hero = (props: IProps) => {
-  const { line, tier, anim } = props;
-  const set = heroSpriteSet(line, tier);
+  const { line, tier, branch, anim } = props;
+  const set = heroSpriteSet(line, tier, branch);
   usePreload(set);
   const moving = anim === HeroAnim.Wander;
   const frames = set ? directionalFrames(set, Facing.East, moving) : [];

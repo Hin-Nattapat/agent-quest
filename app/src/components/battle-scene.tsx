@@ -15,10 +15,11 @@ interface IProps {
   sceneInfo: IScene;
   line: string;
   tier: number;
+  branch: string | null;
 }
 
 const BattleScene = (props: IProps) => {
-  const { state, activity, sceneInfo, line, tier } = props;
+  const { state, activity, sceneInfo, line, tier, branch } = props;
   const encounter = useEncounter(state);
   const scene = useSceneDirector(state, activity);
   return (
@@ -28,10 +29,12 @@ const BattleScene = (props: IProps) => {
           if (m.gone) {
             return null;
           }
-          return <Monster key={i} scene={sceneInfo} anim={m.anim} hp={m.hpFraction} slot={i} />;
+          return (
+            <Monster key={i} scene={sceneInfo} anim={m.anim} hp={m.hpFraction} slot={i} />
+          );
         })}
       {!encounter && <HitEffects effects={scene.effects} />}
-      <Hero line={line} tier={tier} anim={scene.hero} />
+      <Hero line={line} tier={tier} branch={branch} anim={scene.hero} />
       <FloatingText floaters={scene.floaters} />
       {encounter && <BossEncounter encounter={encounter} />}
     </>

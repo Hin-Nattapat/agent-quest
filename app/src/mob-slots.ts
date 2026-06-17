@@ -6,9 +6,9 @@ export interface ISlotPos {
 }
 
 const MOB_SLOTS: ISlotPos[] = [
-  { right: "13%", bottom: "20%" }, // front
-  { right: "22%", bottom: "30%" }, // mid
-  { right: "16%", bottom: "42%" }, // back
+  { right: "13%", bottom: "14%" }, // front
+  { right: "22%", bottom: "24%" }, // mid
+  { right: "16%", bottom: "36%" }, // back
 ];
 
 export const slotPos = (slot: number): ISlotPos => {

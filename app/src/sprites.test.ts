@@ -1,19 +1,32 @@
 import { test, expect } from "bun:test";
 import { Facing } from "./facing";
-import { heroSpriteSet, directionalFrames } from "./sprites";
+import { heroSpriteSet, heroKey, directionalFrames } from "./sprites";
 
-test("heroSpriteSet resolves Mage T1 with 4 idle stills and 4×9 walk frames", () => {
-  const set = heroSpriteSet("mage", 1);
-  expect(set).toBeDefined();
-  expect(set?.idle[Facing.East]).toBe("/sprites/mage/t1/idle/east.png");
-  expect(set?.idle[Facing.South]).toBe("/sprites/mage/t1/idle/south.png");
-  expect(set?.walk[Facing.West].length).toBe(9);
-  expect(set?.walk[Facing.North][0]).toBe("/sprites/mage/t1/walk/north/0.png");
-  expect(set?.walk[Facing.North][8]).toBe("/sprites/mage/t1/walk/north/8.png");
+test("heroKey carries the branch only at tier 4", () => {
+  expect(heroKey("mage", 1)).toBe("mage-t1");
+  expect(heroKey("mage", 3, "a")).toBe("mage-t3"); // branch ignored below tier 4
+  expect(heroKey("mage", 4, "a")).toBe("mage-t4a");
+  expect(heroKey("mage", 4, "b")).toBe("mage-t4b");
+  expect(heroKey("mage", 4, null)).toBe("mage-t4"); // pre-branch (no art)
+});
+
+test("heroSpriteSet resolves every Mage form (T1-T3 + both T4 branches)", () => {
+  expect(heroSpriteSet("mage", 1)?.idle[Facing.East]).toBe(
+    "/sprites/mage/t1/idle/east.png",
+  );
+  expect(heroSpriteSet("mage", 2)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("mage", 3)).toBeDefined();
+  expect(heroSpriteSet("mage", 4, "a")?.idle[Facing.West]).toBe(
+    "/sprites/mage/t4a/idle/west.png",
+  );
+  expect(heroSpriteSet("mage", 4, "b")?.walk[Facing.North][8]).toBe(
+    "/sprites/mage/t4b/walk/north/8.png",
+  );
 });
 
 test("heroSpriteSet returns undefined for forms with no art", () => {
-  expect(heroSpriteSet("mage", 2)).toBeUndefined();
+  expect(heroSpriteSet("mage", 4, null)).toBeUndefined(); // tier 4 before a branch is chosen
+  expect(heroSpriteSet("rogue", 1)).toBeUndefined();
   expect(heroSpriteSet("novice", 0)).toBeUndefined();
 });
 

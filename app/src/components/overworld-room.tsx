@@ -6,11 +6,12 @@ import OverworldHero from "./overworld-hero";
 interface IProps {
   line: string;
   tier: number;
+  branch: string | null;
   activity: ActivityState;
 }
 
 const OverworldRoom = (props: IProps) => {
-  const { line, tier, activity } = props;
+  const { line, tier, branch, activity } = props;
   const roaming = activity !== ActivityState.Rest;
   const pose = useWander(roaming);
   const resting = activity === ActivityState.Rest;
@@ -52,6 +53,7 @@ const OverworldRoom = (props: IProps) => {
       <OverworldHero
         line={line}
         tier={tier}
+        branch={branch}
         facing={pose.facing}
         moving={pose.moving}
         xPx={xPx}

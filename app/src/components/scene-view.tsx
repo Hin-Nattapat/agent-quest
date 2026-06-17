@@ -37,6 +37,7 @@ const SceneView = (props: IProps) => {
   const transition = useTransition(bannerScene(mode, sceneInfo.theme));
   const line = state.class?.line ?? "novice";
   const tier = state.class?.tier ?? 0;
+  const branch = state.class?.branch ?? null;
   const sceneClass =
     mode === SceneMode.Battle ? `scene scene-${sceneInfo.theme}` : "scene scene-guild";
 
@@ -51,10 +52,11 @@ const SceneView = (props: IProps) => {
             sceneInfo={sceneInfo}
             line={line}
             tier={tier}
+            branch={branch}
           />
         )}
         {mode === SceneMode.Overworld && (
-          <OverworldRoom line={line} tier={tier} activity={activity} />
+          <OverworldRoom line={line} tier={tier} branch={branch} activity={activity} />
         )}
         <PortraitFrame state={state} />
         <AreaTag label={mode === SceneMode.Battle ? sceneInfo.label : "Guild Hall"} />

@@ -120,8 +120,10 @@ body {
 .scene-grassland .sky {
   background: linear-gradient(180deg, #6fb7e3 0%, #9fd1ea 40%, #2e4a26 56%, #1c1409 100%);
 }
+/* Centered forest image is dark green canopy (top) over a mossy clearing (bottom); the letterbox
+   continues those tones — dark forest above, dark moss/earth below. */
 .scene-forest .sky {
-  background: linear-gradient(180deg, #0e1b12, #18301d 60%, #0e1b12);
+  background: linear-gradient(180deg, #0b140e 0%, #16281a 46%, #15301d 56%, #0c160e 100%);
 }
 .scene-dungeon .sky {
   background: linear-gradient(180deg, #15121c, #28222f 60%, #15121c);

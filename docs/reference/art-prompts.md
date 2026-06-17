@@ -87,6 +87,28 @@ keyframes and the `.sprite` `background-image`).
 > **โพรเจกไทล์** (ลูกเวท/ธนู/รูน) ที่ "วิ่งไปหามอน" = **VFX ฝั่งเกม** (CSS/sprite) ไม่ได้อยู่ในไฟล์ anim — PixelLab anim ทำแค่ "ท่าตัวละคร" (+ แสงปลายไม้เท้า/ธนู) · Mage/Ranger/Sage = ยืนยิง · **Rogue = melee** (พุ่งสั้นเข้าฟัน — เหมาะกับมีด ไม่ต้องมีโพรเจกไทล์)
 > **กันฮู้ด/ชุดเพี้ยนตอน gen animation:** AI วาดตัวใหม่ทุก animation บางทีฮู้ดตก/หาย → ต่อท้าย Action Description ด้วยลักษณะที่ต้องคงไว้ เช่น `…, the pointed hood stays drawn up over the head` (Mage/Rogue) หรือ `…, keeping the hood up` — ย้ำเฉพาะของที่ชอบหลุด
 
+### 3.3 Action Description ละเอียด กันชุด/อาวุธเพี้ยน (walk + ทุก anim)
+
+ใส่แค่ `walking forward` → V3 วาดตัวใหม่ทุกเฟรม ชุด/อาวุธ/ฮู้ดดริฟต์ ต้องบรรยาย **การเคลื่อนไหว + ย้ำของที่ต้องคงไว้** เสมอ
+
+**Template** (ใช้กับทุก animation — walk/cast/idle):
+```
+<การเคลื่อนไหว/ท่า>, keeping <ฮู้ด/ของบนหัว [up over the head]>, the <ชุด+สี> unchanged, still holding the <อาวุธ> in <มือ>
+```
+
+**Walk forward ต่อสาย:**
+| สาย | Action Description |
+|---|---|
+| **Mage** | `walking forward with a steady natural gait, legs striding and the free arm swinging slightly, keeping the purple hood drawn up over the head, the muted-purple hooded robe and thin gold trim unchanged, still holding the wooden staff with the glowing teal crystal upright in one hand` |
+| **Ranger** | `walking forward with a light agile gait, keeping the teal tunic and hooded scarf unchanged, the small quiver on the back, still holding the short bow at the side in one hand` |
+| **Rogue** | `walking forward in a low wary prowl, keeping the dark hooded cloak with coral accents unchanged, still holding the small dagger in one hand and the magnifying glass in the other` |
+| **Sage** | `walking forward with a slow measured gait, keeping the amber-trimmed robe and round glasses unchanged, the gray-streaked beard, still holding the open glowing tome in one hand` |
+
+**เสริมกันดริฟต์:**
+1. **Start Frame = idle** + ติ๊ก **"Keep first frame (idle pose)"** → anchor หน้าตา/ทรงจากเฟรมแรก
+2. ระบุ `the <สี> <item> unchanged` เฉพาะของที่ชอบเพี้ยน (ฮู้ด/อาวุธ/เคป)
+3. อย่าใส่ของใหม่ที่ base ไม่มี — แค่ `keeping`/`still holding` ของเดิม
+
 ---
 
 ## 4. ตัวละคร — ทุกสาย ทุก tier

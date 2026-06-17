@@ -68,24 +68,43 @@ keyframes and the `.sprite` `background-image`).
 
 (Boss already has hit + flee from 3.2b.)
 
-### 3.2 ท่าโจมตี (attack) ต่อสาย — Action Description ใน PixelLab
+### 3.2 Action Description ต่อสาย — walk + attack (อาวุธคนละแบบ)
 
-ฉากรบ side-view ฮีโร่หัน **east** → gen attack แค่ทิศ east (1 gen/อัน). Add Animation → Custom → ช่อง **Action Description** ใส่สั้นๆ บรรยาย "การเคลื่อนไหว" (ตัวละคร/อาวุธอยู่ใน base แล้ว ไม่ต้องบรรยายซ้ำ) · keep-first-frame ✓ · ~6–8 เฟรม one-shot (idle → โจมตี → กลับ idle)
+**หลัก:** เดิน = พกอาวุธ**ผ่อน** (สะพายหลัง / ตั้งไม้เท้า / เก็บฝัก) · โจมตี = **ดึง/ยก/เล็ง** · gen ทิศ **east** (battle side-view) · **keep-first-frame ✓** · ~8 เฟรม · ต้องย้ำ "keeping … unchanged" กันชุด/ฮู้ดดริฟต์ทุกครั้ง
 
-| สาย | แบบ | Action Description |
-|---|---|---|
-| **Mage** | ร่ายเวท (ยืน) | `casting a spell, swinging the staff up then thrusting it forward, glowing energy bursting from the crystal tip, the pointed hood stays drawn up over the head the whole time` |
-| **Ranger** | ยิงธนู (ยืน) | `drawing the bow back and loosing a glowing arrow forward` |
-| **Rogue** | ฟันมีด (พุ่งสั้น) | `a swift forward dagger slash, lunging slightly with the blade` |
-| **Sage** | เปิดตำราเสกรูน | `raising the open tome and projecting a glowing magic glyph forward` |
-| Maestro | กวัดบาตอง | `a sweeping conductor's baton flourish releasing a burst of light forward` |
-| Night Owl | ยิงจันทร์เสี้ยว | `casting a glowing crescent-moon bolt forward` |
-| Ascetic | ฝ่ามือแสง | `a calm forward palm-strike releasing a ring of light` |
-| Gremlin | ซ่าพลังกลิตช์ | `a chaotic forward glitch-zap, electric sparks bursting` |
-| Trickster | สาดไพ่ | `flinging a fan of playing cards forward` |
+**Mage ⚔ — ไม้เท้า + คริสตัล teal**
+- walk: `walking forward with a steady natural gait, the wooden staff held upright in one hand like a walking stick, the free arm swinging slightly, keeping the purple hood drawn up over the head, the muted-purple robe and gold trim unchanged`
+- attack (ร่ายเวท, ยืน): `casting a spell in place, raising the staff and thrusting it forward, glowing teal energy bursting from the crystal tip, keeping the purple hood up and the robe unchanged`
 
-> **โพรเจกไทล์** (ลูกเวท/ธนู/รูน) ที่ "วิ่งไปหามอน" = **VFX ฝั่งเกม** (CSS/sprite) ไม่ได้อยู่ในไฟล์ anim — PixelLab anim ทำแค่ "ท่าตัวละคร" (+ แสงปลายไม้เท้า/ธนู) · Mage/Ranger/Sage = ยืนยิง · **Rogue = melee** (พุ่งสั้นเข้าฟัน — เหมาะกับมีด ไม่ต้องมีโพรเจกไทล์)
-> **กันฮู้ด/ชุดเพี้ยนตอน gen animation:** AI วาดตัวใหม่ทุก animation บางทีฮู้ดตก/หาย → ต่อท้าย Action Description ด้วยลักษณะที่ต้องคงไว้ เช่น `…, the pointed hood stays drawn up over the head` (Mage/Rogue) หรือ `…, keeping the hood up` — ย้ำเฉพาะของที่ชอบหลุด
+**Ranger 🏹 — ธนู (เดิน=สะพายหลัง / ยิง=ดึงออก)**
+- walk: `walking forward with a light agile gait, the short bow and quiver slung together on the back, both hands free and the arms swinging naturally at the sides, keeping the teal tunic and hooded scarf unchanged`
+- attack (ยิง, ยืน): `a side-on archer's stance, the front bow-arm fully extended straight ahead in the direction the character is facing, the rear hand drawing the glowing bowstring back to the cheek, then loosing the arrow straight ahead — the arrow points the same way the character looks, keeping the teal tunic and hooded scarf unchanged`
+
+**Rogue 🗡 — มีด + แว่นขยาย (เดิน=เก็บฝัก / ฟัน=ชัก)**
+- walk: `walking forward in a low wary prowl, the dagger sheathed at the belt and the magnifying glass clipped at the side, both hands free and ready, keeping the dark hooded cloak with coral accents unchanged`
+- attack (melee, พุ่งสั้น): `drawing the dagger and lunging a short step forward in a swift downward slash, keeping the dark hooded cloak and coral accents unchanged`
+
+**Sage 📖 — ตำรา (เดิน=หนีบใต้แขน / เสก=เปิดยก)**
+- walk: `walking forward with a slow measured gait, the glowing tome closed and carried under one arm, the other arm swinging gently, keeping the amber-trimmed robe and round glasses unchanged`
+- attack (เสกรูน, ยืน): `standing and raising the open glowing tome, projecting a bright amber rune-glyph forward, keeping the amber robe and round glasses unchanged`
+
+**สายลับ (attack — walk = พกของผ่อนข้างตัวแบบเดียวกัน):**
+| สาย | attack |
+|---|---|
+| Maestro | `a sweeping conductor's baton flourish releasing a burst of light forward` |
+| Night Owl | `casting a glowing crescent-moon bolt forward` |
+| Ascetic | `a calm forward palm-strike releasing a ring of light` |
+| Gremlin | `a chaotic forward glitch-zap, electric sparks bursting` |
+| Trickster | `flinging a fan of playing cards forward` |
+
+> **โพรเจกไทล์** (ลูกเวท/ธนู/รูน) ที่วิ่งไปหามอน = **VFX ฝั่งเกม** (CSS/sprite) anim ทำแค่ "ท่าตัวละคร" (+ แสงปลายอาวุธ) · Mage/Ranger/Sage = ยืนยิง · **Rogue = melee** (พุ่งสั้นเข้าฟัน)
+
+**เสริมกันดริฟต์ (สำคัญ):**
+1. **Start Frame = idle** + ติ๊ก **"Keep first frame (idle pose)"** → anchor หน้าตา/ทรงจากเฟรมแรก
+2. ใช้ **positive phrasing เป๊ะ** บอกท่าที่ "ต้องการ" ตรงๆ — **negatives ("not across the body") โมเดลภาพมักเมิน**
+3. ⚠️ **pose อาวุธ anchor มาจาก base/idle** — ถ้าฐานถืออาวุธผิดท่า แก้คำบรรยาย anim อย่างเดียวไม่พอ ต้อง **regen base/idle**: archer ให้ `bow slung on the back, hands free`; rogue ให้ `dagger sheathed at the belt`; sage ให้ `tome carried under one arm` — แล้ว anim ค่อย "ดึง/ชัก/เปิด" ตอน attack
+4. อย่าใส่ของใหม่ที่ base ไม่มี — แค่ `keeping` ของเดิม
+5. **ทิศโจมตี/เล็ง อย่าใช้แค่ `forward`** — AI สับสนทิศ (ธนูยิงย้อนหลังได้) ระบุ `straight ahead in the direction the character is facing` / `the arrow points the same way the character looks` · ระบุกลไก: archer = **แขนถือธนูเหยียดไปหน้า + มือดึงสายไปหลัง** (ไม่งั้นกลับด้าน)
 
 ---
 

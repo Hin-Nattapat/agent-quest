@@ -78,7 +78,7 @@ keyframes and the `.sprite` `background-image`).
 
 **Ranger 🏹 — ธนู (เดิน=สะพายหลัง / ยิง=ดึงออก)**
 - walk: `walking forward with a light agile gait, the short bow and quiver slung together on the back, both hands free and the arms swinging naturally at the sides, keeping the teal tunic and hooded scarf unchanged`
-- attack (ยิง, ยืน): `drawing the short bow off the back into both hands, pulling the glowing bowstring back to the cheek and loosing an arrow forward, keeping the teal tunic and hooded scarf unchanged`
+- attack (ยิง, ยืน): `a side-on archer's stance, the front bow-arm fully extended straight ahead in the direction the character is facing, the rear hand drawing the glowing bowstring back to the cheek, then loosing the arrow straight ahead — the arrow points the same way the character looks, keeping the teal tunic and hooded scarf unchanged`
 
 **Rogue 🗡 — มีด + แว่นขยาย (เดิน=เก็บฝัก / ฟัน=ชัก)**
 - walk: `walking forward in a low wary prowl, the dagger sheathed at the belt and the magnifying glass clipped at the side, both hands free and ready, keeping the dark hooded cloak with coral accents unchanged`
@@ -104,6 +104,7 @@ keyframes and the `.sprite` `background-image`).
 2. ใช้ **positive phrasing เป๊ะ** บอกท่าที่ "ต้องการ" ตรงๆ — **negatives ("not across the body") โมเดลภาพมักเมิน**
 3. ⚠️ **pose อาวุธ anchor มาจาก base/idle** — ถ้าฐานถืออาวุธผิดท่า แก้คำบรรยาย anim อย่างเดียวไม่พอ ต้อง **regen base/idle**: archer ให้ `bow slung on the back, hands free`; rogue ให้ `dagger sheathed at the belt`; sage ให้ `tome carried under one arm` — แล้ว anim ค่อย "ดึง/ชัก/เปิด" ตอน attack
 4. อย่าใส่ของใหม่ที่ base ไม่มี — แค่ `keeping` ของเดิม
+5. **ทิศโจมตี/เล็ง อย่าใช้แค่ `forward`** — AI สับสนทิศ (ธนูยิงย้อนหลังได้) ระบุ `straight ahead in the direction the character is facing` / `the arrow points the same way the character looks` · ระบุกลไก: archer = **แขนถือธนูเหยียดไปหน้า + มือดึงสายไปหลัง** (ไม่งั้นกลับด้าน)
 
 ---
 

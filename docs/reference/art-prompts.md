@@ -384,7 +384,7 @@ a side-view pixel-art battle background of <SCENE>, a wide open flat <ground> cl
 **T3 · `dungeon` · Dungeon Brute** — Mode **Humanoid**
 
 - 👹 monster: `a hulking armored troll brute, cracked iron-grey stone skin, heavy spiked club, glowing orange eyes, imposing, not human, full body, centered, slightly stylized, clean 1px black outline`
-- 🖼️ scene (400×128): `a side-view pixel-art battle background of a deep stone dungeon, a wide open flat stone-floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, framing stone pillars only at the far left and right edges, grey brick walls with flickering torches and heavy shadows in the background, completely empty with no people, no characters, no creatures, no figures, oppressive, limited palette, clean pixel art, slightly stylized`
+- 🖼️ scene (400×128): `a side-view pixel-art battle background of an empty abandoned deep stone dungeon chamber, a wide open flat stone-floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, framing stone pillars only at the far left and right edges, grey brick walls with flickering torches and heavy shadows in the background, completely empty, no people, no characters, no creatures, no figures, no adventurers, no skeletons, no guards, oppressive, limited palette, clean pixel art, slightly stylized`
 
 **idle/attack (วางเหมือนกันทุกตัว — §7.A):**
 

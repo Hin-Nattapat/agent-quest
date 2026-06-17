@@ -125,8 +125,10 @@ body {
 .scene-forest .sky {
   background: linear-gradient(180deg, #0b140e 0%, #16281a 46%, #15301d 56%, #0c160e 100%);
 }
+/* Centered dungeon image is dark stone + torchlight; the letterbox continues those tones — dark
+   stone/ceiling above, warm-shadowed stone below. */
 .scene-dungeon .sky {
-  background: linear-gradient(180deg, #15121c, #28222f 60%, #15121c);
+  background: linear-gradient(180deg, #131119 0%, #221e25 46%, #2a241f 56%, #15110d 100%);
 }
 .scene-ascendant .sky {
   background: linear-gradient(180deg, #161227, #322a4a 60%, #161227);

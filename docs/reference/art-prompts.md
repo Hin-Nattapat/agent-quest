@@ -485,7 +485,51 @@ The Orchestration Construct: a multi-armed conductor golem of gilded clockwork, 
 - 🤖 monster: `a multi-armed conductor golem of gilded clockwork, each hand holding a glowing light-baton, golden threads radiating outward, commanding, not human, full body, centered, slightly stylized, clean 1px black outline`
 - 🖼️ scene: `a side-view pixel-art battle background of a grand orchestration control hall, an open flat clearing of polished gold floor across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, gilded clockwork pillars and glowing golden light-threads only at the far left and right edges, radiating multicolored control threads in the background, amber and gold with multicolored thread accents, completely empty, no people, no characters, no creatures, no figures, commanding, limited palette, clean pixel art, slightly stylized`
 
-> import แต่ละแดน: `--as monster:<key>` + `--as bg:<key>` → wire `MONSTER_SPRITES`/`SCENE_BGS` + `.scene-<key> .sky` letterbox · idle/attack = §7.A
+> import แต่ละแดน: `--as monster:<key>` + `--as bg:<key>` → wire `MONSTER_SPRITES`/`SCENE_BGS` + `.scene-<key> .sky` letterbox
+
+#### T4 monster idle + attack — per-creature (boss-tier, grand)
+
+T4 มอน = บอสประจำแดน → **อลังกว่า §7.A generic**: idle/attack เขียนตามฟอร์ม+สีของแต่ละตัว. กฎเดิม — Add Animation, **Start Frame = idle + "Keep first frame" ✓**, ~9 เฟรม, **facing left** (battle side-view), ปิดท้ายด้วย "keeping … unchanged" กันฟอร์ม/สีดริฟต์.
+
+`skyforge_aether` · **Storm Archon**
+
+- idle: `hovering in place wreathed in slow swirling storm clouds, golden lightning crackling softly across its armor and the violet core pulsing, the body facing left, keeping its towering form, gold plates and purple-gold colors unchanged`
+- attack: `rearing back then hurling both arms forward to the left, unleashing a great fork of golden lightning from the violet core, the body fully facing left the whole time, keeping its form and purple-gold colors unchanged`
+
+`circuit_catacombs` · **The Kernel Lich**
+
+- idle: `floating in place with tattered robes drifting, the toxic-green core in its exposed ribcage pulsing and circuit-veins flickering across its body, facing left, keeping its lich form and deep-purple and toxic-green colors unchanged`
+- attack: `raising a skeletal hand and thrusting it forward to the left, casting a surge of toxic-green necrotic circuit-energy, the body fully facing left the whole time, keeping its form and deep-purple and toxic-green colors unchanged`
+
+`aurora_flux` · **Prism Wisp**
+
+- idle: `drifting and shimmering in place, refracted rainbow light rippling through its semi-transparent body with faint motion-blur trails behind it and the teal core glowing, facing left, keeping its elusive form and teal and rainbow colors unchanged`
+- attack: `darting back then streaking forward to the left in a graceful blur, loosing a lance of refracted rainbow light from the teal core, the body facing left the whole time, keeping its form and teal and rainbow colors unchanged`
+
+`geometric_sanctum` · **The Grid Warden**
+
+- idle: `standing firm and immovable, its geometric panels slowly rotating in place and blueprint grid-lines pulsing with light, facing left, keeping its crisp angular form and teal, blueprint-blue and white colors unchanged`
+- attack: `reassembling its geometric panels and driving a massive blueprint-blue fist forward to the left, grid-lines flaring on impact, the body fully facing left the whole time, keeping its form and teal, blueprint-blue and white colors unchanged`
+
+`quantum_rift` · **The Heisenbug**
+
+- idle: `flickering and phasing in and out in place, the double-exposed body splitting and re-merging unsettlingly with fragments drifting, facing left, keeping its glitch form and coral and glitch-magenta colors unchanged`
+- attack: `glitching forward to the left in a stuttering teleport, splitting into overlapping copies that lash out together, the body facing left the whole time, keeping its form and coral and glitch-magenta colors unchanged`
+
+`noir_crime_scene` · **The Phantom Culprit**
+
+- idle: `standing in shadow with its trench coat shifting like smoke and only the two coral eyes glowing steadily, the living-shadow body seeping faintly, facing left, keeping its noir form and black-grey and coral colors unchanged`
+- attack: `surging forward to the left as a streak of living shadow, the coral eyes flaring and a clawed shadow-strike lashing out, the body facing left the whole time, keeping its form and black-grey and coral colors unchanged`
+
+`oracles_athenaeum` · **The Domain Sphinx**
+
+- idle: `seated regally with stone wings shifting slightly, the amber runes carved across its body glowing and dimming in a slow pulse, facing left, keeping its sphinx form and amber-gold and parchment colors unchanged`
+- attack: `rising and sweeping a great stone paw forward to the left, the amber runes blazing as a wave of golden rune-light bursts out, the body fully facing left the whole time, keeping its form and amber-gold and parchment colors unchanged`
+
+`conductors_nexus` · **The Orchestration Construct**
+
+- idle: `hovering with its many gilded clockwork arms weaving slow conducting motions, the light-batons glowing and golden threads swaying, facing left, keeping its construct form and amber-gold and multicolored-thread colors unchanged`
+- attack: `sweeping every baton-arm forward to the left in a grand conductor's flourish, loosing a radiating burst of golden light and multicolored threads, the body facing left the whole time, keeping its form and amber-gold and multicolored colors unchanged`
 
 ### 7.3 แดนลับสายลับ (secret class — ไม่มี branch, 1 แดน/บอส ต่อสาย)
 

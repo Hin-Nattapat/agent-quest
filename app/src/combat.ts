@@ -121,3 +121,18 @@ export const firstAlive = (pack: number[]): number => pack.findIndex(h => h > 0)
 export const strike = (pack: number[], idx: number): number[] =>
   pack.map((h, i) => (i === idx ? Math.max(0, h - 1) : h));
 export const packCleared = (pack: number[]): boolean => pack.every(h => h <= 0);
+
+// Deterministic pick among the still-alive pack slots (no Math.random — matches packSize/hashInt).
+// Returns -1 if the pack is empty or fully cleared.
+export const randAlive = (pack: number[], seed: number): number => {
+  const alive: number[] = [];
+  pack.forEach((h, i) => {
+    if (h > 0) {
+      alive.push(i);
+    }
+  });
+  if (alive.length === 0) {
+    return -1;
+  }
+  return alive[hashInt(seed) % alive.length];
+};

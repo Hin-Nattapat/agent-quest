@@ -13,6 +13,7 @@ import {
   monsterAnim,
   attackStyleFor,
   isRanged,
+  randAlive,
 } from "./combat";
 import { ActivityState } from "./activity";
 
@@ -109,4 +110,24 @@ test("isRanged: cast/shoot/invoke stand; stab/melee dash", () => {
   expect(isRanged(AttackStyle.Invoke)).toBe(true);
   expect(isRanged(AttackStyle.Stab)).toBe(false);
   expect(isRanged(AttackStyle.Melee)).toBe(false);
+});
+
+test("randAlive returns -1 for a cleared pack", () => {
+  expect(randAlive([0, 0, 0], 1)).toBe(-1);
+  expect(randAlive([], 1)).toBe(-1);
+});
+
+test("randAlive only ever returns an alive index", () => {
+  const pack = [0, 3, 0, 2]; // alive: 1 and 3
+  for (let seed = 0; seed < 50; seed++) {
+    const idx = randAlive(pack, seed);
+    expect([1, 3]).toContain(idx);
+  }
+});
+
+test("randAlive is stable for a fixed (pack, seed) and varies by seed", () => {
+  const pack = [3, 3, 3];
+  expect(randAlive(pack, 7)).toBe(randAlive(pack, 7));
+  const picks = new Set([0, 1, 2, 3, 4, 5].map(s => randAlive(pack, s)));
+  expect(picks.size).toBeGreaterThan(1);
 });

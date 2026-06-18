@@ -6,12 +6,14 @@ export enum ScenePhase {
   Engage = "engage",
 }
 
-export const REST_GAP_MS = 4000; // calm wander between waves
-export const STRIKE_THROTTLE_MS = 1600; // gap between hero strikes — slow enough to breathe, not spam
+export const REST_GAP_MS = 4500; // calm wander between waves
+export const STRIKE_THROTTLE_MS = 2600; // gap between hero strikes — a hero-then-mob exchange, then
+// a clear idle beat before the next, so the fight reads as semi-turn-based rather than a continuous spar
 
 export interface IDirectorState {
   phase: ScenePhase;
-  pack: number[]; // remaining hits per mob; [] in Wander
+  pack: number[]; // remaining hits per mob; [] in Wander (a just-cleared pack lingers at 0 hits so
+  // its die animation can play, then the next engage replaces it)
   waveIndex: number;
   restUntil: number | null; // wall-clock ms the rest gap ends (null = not resting)
   lastStrikeAt: number;
@@ -74,10 +76,13 @@ export const stepDirector = (
   }
 
   if (packCleared(pack)) {
+    // Keep the cleared pack (mobs at 0 hits) instead of emptying it, so the killing blow's die
+    // animation can play out in the view — the gone-gate drops each corpse after its die anim, and
+    // the next engage replaces the pack wholesale. Emptying here unmounts the last mob instantly.
     return {
       ...state,
       phase: ScenePhase.Wander,
-      pack: [],
+      pack,
       restUntil: now + REST_GAP_MS,
       lastStrikeAt,
     };

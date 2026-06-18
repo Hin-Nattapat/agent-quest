@@ -409,6 +409,20 @@ Storm Archon:    a towering storm elemental archon, body of swirling cloud and c
 The Kernel Lich: an undead lich sorcerer fused with glowing circuit-board veins, tattered royal robes, exposed ribcage with a pulsing toxic-green core, floating, necromantic-tech — deep-purple + toxic-green palette
 ```
 
+**Mage T4 — copy-paste พร้อม import** (Mode **Humanoid** · monster 56×56 หันซ้าย + idle/attack §7.A · scene 400×128 Sidescroller, remove-bg OFF)
+
+`skyforge_aether` (T4a · Skyforge Aether)
+
+- 🌩️ monster: `a towering storm elemental archon, body of swirling storm cloud and crackling golden lightning, ornate floating gold armor plates, a glowing violet core, majestic, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of a floating skyforge isle high in a stormy sky, an open flat clearing of golden stone across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, drifting storm clouds and glowing golden runes only at the far left and right edges, distant floating islands and crackling lightning in the background, deep violet sky with warm gold light, completely empty, no people, no characters, no creatures, no figures, majestic, limited palette, clean pixel art, slightly stylized`
+
+`circuit_catacombs` (T4b · Circuit Catacombs)
+
+- 💀 monster: `an undead lich sorcerer fused with glowing circuit-board veins, tattered royal robes, an exposed ribcage with a pulsing toxic-green core, floating, necromantic-tech, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of a deep underground catacomb, an open flat clearing of cracked dark stone across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, glowing toxic-green circuit-board veins threading the stone walls only at the far left and right edges, ancient tombs and deep purple shadows in the background, dark stone with toxic-green glow, completely empty, no people, no characters, no creatures, no figures, no skeletons, eerie, limited palette, clean pixel art, slightly stylized`
+
+> import: `--as monster:skyforge_aether` / `--as bg:skyforge_aether` (และ `circuit_catacombs`) → wire `MONSTER_SPRITES`/`SCENE_BGS` + `.scene-<key> .sky` letterbox
+
 **Ranger 🏹 (teal)**
 | branch | แดน | บอส |
 |---|---|---|

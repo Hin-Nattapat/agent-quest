@@ -138,11 +138,13 @@ body {
     radial-gradient(circle at 50% 78%, #6b3a1e88, transparent 60%),
     linear-gradient(180deg, #1c1208, #3a2614 55%, #50341c);
 }
+/* T4 Skyforge Aether: violet storm sky over a golden-stone floor — letterbox continues both. */
 .scene-skyforge_aether .sky {
-  background: linear-gradient(180deg, #2a1a4a, #4a3a78 55%, #6b5aa0);
+  background: linear-gradient(180deg, #2a1a4a 0%, #463468 44%, #4a3418 56%, #1e1606 100%);
 }
+/* T4 Circuit Catacombs: dark teal-grey stone + toxic-green circuit glow — letterbox continues it. */
 .scene-circuit_catacombs .sky {
-  background: linear-gradient(180deg, #14081f, #241433 60%, #0f2a14);
+  background: linear-gradient(180deg, #0d1518 0%, #16242a 46%, #16261e 56%, #0c1410 100%);
 }
 .scene-aurora_flux .sky {
   background: linear-gradient(180deg, #08201f, #0f3a44 50%, #1a5a55);

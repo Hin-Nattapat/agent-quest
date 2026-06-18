@@ -46,3 +46,12 @@ test("pickAnimDir finds monster idle/attack folders", () => {
   expect(pickAnimDir(names, "dle")).toBe("idle_breathing_loop");
   expect(pickAnimDir(names, "ttack")).toBe("attack_lunge_forward");
 });
+
+test("pickAnimDir finds both casting (mage) and attack (others)", () => {
+  expect(pickAnimDir(["casting_a_spell_swinging"], "asting")).toBe(
+    "casting_a_spell_swinging",
+  );
+  expect(pickAnimDir(["a_forward_attack_loosing"], "ttack")).toBe(
+    "a_forward_attack_loosing",
+  );
+});

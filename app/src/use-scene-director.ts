@@ -8,10 +8,12 @@ import {
   PACK_HITS,
   AttackStyle,
   attackStyleFor,
+  isRanged,
   firstAlive,
   heroAnim,
   monsterAnim,
 } from "./combat";
+import { heroSpriteSet } from "./sprites";
 import {
   ScenePhase,
   initDirector,
@@ -27,7 +29,22 @@ export enum FloaterKind {
 export enum EffectKind {
   Slash = "slash",
   Zap = "zap",
+  Arrow = "arrow",
+  Glyph = "glyph",
 }
+
+export const effectKindFor = (style: AttackStyle): EffectKind => {
+  if (style === AttackStyle.Cast) {
+    return EffectKind.Zap;
+  }
+  if (style === AttackStyle.Shoot) {
+    return EffectKind.Arrow;
+  }
+  if (style === AttackStyle.Invoke) {
+    return EffectKind.Glyph;
+  }
+  return EffectKind.Slash;
+};
 
 export interface IFloater {
   id: number;
@@ -83,7 +100,12 @@ export const useSceneDirector = (
   const [floaters, setFloaters] = useState<IFloater[]>([]);
   const [effects, setEffects] = useState<IHitEffect[]>([]);
   const styleRef = useRef<AttackStyle>(AttackStyle.Melee);
-  styleRef.current = attackStyleFor(state?.class?.line ?? "");
+  const cls = state?.class;
+  const clsLine = cls?.line ?? null;
+  const heroSet =
+    cls && clsLine ? heroSpriteSet(clsLine, cls.tier, cls.branch) : undefined;
+  // No attack frames yet → behave as Melee (dash + slash), so unwired lines don't regress.
+  styleRef.current = heroSet?.attack ? attackStyleFor(clsLine ?? "") : AttackStyle.Melee;
 
   useEffect(() => {
     const set = timers.current;
@@ -131,9 +153,10 @@ export const useSceneDirector = (
     if (wantStrike && next.phase === ScenePhase.Engage) {
       const idx = firstAlive(before.pack);
       if (idx >= 0 && next.pack[idx] !== before.pack[idx]) {
-        const cast = styleRef.current === AttackStyle.Cast;
-        pulse(setAttacking, cast ? CAST_MS : HERO_MS.attack);
-        addEffect(idx, cast ? EffectKind.Zap : EffectKind.Slash);
+        const style = styleRef.current;
+        const ranged = isRanged(style);
+        pulse(setAttacking, ranged ? CAST_MS : HERO_MS.attack);
+        addEffect(idx, effectKindFor(style));
         if (next.pack[idx] <= 0) {
           setDyingSlot(idx);
           later(() => setDyingSlot(null), MON_MS.die);

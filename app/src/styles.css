@@ -230,7 +230,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 1.6cqh; /* cqh so the nameplate stack scales with the sprite (was a fixed 3px) */
 }
 /* sprite sits inside the unit, so drop the absolute placement from .sprite */
 .monster-unit .monster {
@@ -770,10 +770,30 @@ body {
   }
 }
 
+/* Mob nameplate above the HP bar. Sized in cqh so it scales with the sprite (was an oversized 7cqh
+   that ran wider than the mob); a restrained ink pill + hard shadow keep it legible over any scene,
+   and ellipsis caps long realm names ("The Orchestration Construct") instead of letting them sprawl. */
+.monster-name {
+  max-width: 52cqh;
+  padding: 0.4cqh 1.4cqh;
+  font-family: "Pixelify Sans", monospace;
+  font-size: 5cqh;
+  line-height: 1.1;
+  color: var(--text);
+  background: rgba(20, 17, 28, 0.55);
+  border-radius: 2px;
+  text-shadow: 0 1px 1px #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.2px;
+}
+
 .monster-hp {
-  width: 16cqh;
-  height: 5px;
+  width: 20cqh;
+  height: 2.4cqh; /* cqh so the bar thickness scales with the sprite (was a fixed 5px) */
   border: 1px solid var(--ink);
+  border-radius: 1px;
   background: #241636;
 }
 .monster-hp > i {
@@ -858,6 +878,44 @@ body {
   }
   100% {
     transform: scale(1);
+  }
+}
+/* Mob counter-attack impact on the hero — hand-made, no art. Anchored over the hero (.hero). */
+.hero-hits {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero-hit {
+  position: absolute;
+  left: 22%;
+  bottom: 26%;
+  width: 16cqh;
+  height: 16cqh;
+  transform: translate(-50%, 50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #ffe9e0 0%,
+    #e8694d 36%,
+    #b83a2acc 56%,
+    transparent 74%
+  );
+  filter: drop-shadow(0 0 5px #d4502e);
+  animation: hero-hit 0.36s ease-out forwards;
+}
+@keyframes hero-hit {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 50%) scale(0.4);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, 50%) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 50%) scale(1.5);
   }
 }
 .hit-effects {
@@ -1767,6 +1825,7 @@ body.reduce-motion *::after {
   .m-die,
   .hero-wander,
   .mob-spawn,
+  .hero-hit,
   .hit-effect,
   .floater {
     animation: none;

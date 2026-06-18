@@ -453,6 +453,40 @@ The Domain Sphinx:           a winged sphinx oracle carved from amber stone, bod
 The Orchestration Construct: a multi-armed conductor golem of gilded clockwork, each hand a glowing light-baton, golden threads radiating to unseen puppets, commanding — amber + gold + multicolored threads
 ```
 
+**Ranger / Rogue / Sage T4 — copy-paste พร้อม import** (Mode **Humanoid** · monster 56×56 หันซ้าย + idle/attack §7.A · scene 400×128 Sidescroller, remove-bg OFF)
+
+`aurora_flux` (Ranger T4a · Aurora Flux)
+
+- ✨ monster: `a shimmering wisp tyrant made of refracted rainbow light and motion-blur trails, a semi-transparent shifting form, a glowing teal core, graceful and elusive, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of a weightless aurora realm, an open flat clearing of pale translucent crystal across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, flowing ribbons of teal and rainbow aurora light only at the far left and right edges, drifting light motes and soft glows in the background, teal sky with rainbow shimmer, completely empty, no people, no characters, no creatures, no figures, ethereal, limited palette, clean pixel art, slightly stylized`
+
+`geometric_sanctum` (Ranger T4b · Geometric Sanctum)
+
+- 🛡️ monster: `a stoic golem guardian built from perfect geometric panels and glowing blueprint grid-lines, a crisp angular form, orderly and imposing, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of a pristine geometric sanctum, an open flat clearing of clean white tile across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, tall blueprint-blue geometric pillars and glowing grid-lines only at the far left and right edges, floating angular platforms in the background, crisp teal and blueprint-blue and white palette, completely empty, no people, no characters, no creatures, no figures, orderly, limited palette, clean pixel art, slightly stylized`
+
+`quantum_rift` (Rogue T4a · Quantum Rift)
+
+- 🌀 monster: `an elusive glitch-creature that phases in and out, a double-exposed flickering body, a fragmented half-transparent form, unsettling, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of a glitching quantum rift, an open flat clearing of fractured dark glass across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, double-exposed phase-shifting shards and coral-magenta glitch streaks only at the far left and right edges, an unstable flickering void in the background, coral and glitch-magenta palette, completely empty, no people, no characters, no creatures, no figures, unstable, limited palette, clean pixel art, slightly stylized`
+
+`noir_crime_scene` (Rogue T4b · Noir Crime Scene)
+
+- 🕵️ monster: `a shadowy noir culprit in a long trench coat and hat, a body of living shadow, only two glowing coral eyes visible, mysterious, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of a rainy noir back-alley crime scene at night, an open flat clearing of wet dark cobblestone across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, brick walls, fire escapes and a single coral spotlight beam only at the far left and right edges, falling rain and deep black-grey shadows in the background, monochrome noir with a coral accent, completely empty, no people, no characters, no creatures, no figures, moody, limited palette, clean pixel art, slightly stylized`
+
+`oracles_athenaeum` (Sage T4a · Oracle's Athenaeum)
+
+- 🦁 monster: `a winged sphinx oracle carved from amber stone, a body etched with glowing runes, wise all-seeing eyes, regal, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of an ancient floating library athenaeum, an open flat clearing of warm amber stone across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, towering bookshelves, floating scrolls and glowing amber runes only at the far left and right edges, drifting tomes and soft golden light in the background, amber gold and parchment palette, completely empty, no people, no characters, no creatures, no figures, scholarly, limited palette, clean pixel art, slightly stylized`
+
+`conductors_nexus` (Sage T4b · Conductor's Nexus)
+
+- 🤖 monster: `a multi-armed conductor golem of gilded clockwork, each hand holding a glowing light-baton, golden threads radiating outward, commanding, not human, full body, centered, slightly stylized, clean 1px black outline`
+- 🖼️ scene: `a side-view pixel-art battle background of a grand orchestration control hall, an open flat clearing of polished gold floor across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, gilded clockwork pillars and glowing golden light-threads only at the far left and right edges, radiating multicolored control threads in the background, amber and gold with multicolored thread accents, completely empty, no people, no characters, no creatures, no figures, commanding, limited palette, clean pixel art, slightly stylized`
+
+> import แต่ละแดน: `--as monster:<key>` + `--as bg:<key>` → wire `MONSTER_SPRITES`/`SCENE_BGS` + `.scene-<key> .sky` letterbox · idle/attack = §7.A
+
 ### 7.3 แดนลับสายลับ (secret class — ไม่มี branch, 1 แดน/บอส ต่อสาย)
 
 > idle/attack action + ขนาด 56×56 = §7.A · scene background prompt = §7.B (เติม \<SCENE\> ตามแดน)

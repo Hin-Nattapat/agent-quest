@@ -846,24 +846,6 @@ body {
 }
 
 /* ── living-scene: wander + pack entrance + slash effect (3.8a) ── */
-.hero-wander {
-  animation: hero-wander 6s ease-in-out infinite;
-}
-@keyframes hero-wander {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-14px);
-  }
-  50% {
-    transform: translateX(10px);
-  }
-  75% {
-    transform: translateX(-6px);
-  }
-}
 .mob-spawn {
   animation: mob-spawn 0.32s ease-out;
 }
@@ -1823,7 +1805,6 @@ body.reduce-motion *::after {
   .m-hurt,
   .m-attack,
   .m-die,
-  .hero-wander,
   .mob-spawn,
   .hero-hit,
   .hit-effect,

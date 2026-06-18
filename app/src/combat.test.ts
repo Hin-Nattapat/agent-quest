@@ -79,16 +79,16 @@ test("strike floors at 0 and never goes negative", () => {
   expect(strike([0], 0)).toEqual([0]);
 });
 
-test("heroAnim returns Wander only when no pulse is active", () => {
+test("heroAnim falls back to the activity base when no pulse is active", () => {
   const base = {
     celebrate: false,
     hurt: false,
     attack: false,
     activity: ActivityState.Idle,
   };
-  expect(heroAnim({ ...base, wander: true })).toBe(HeroAnim.Wander);
-  expect(heroAnim({ ...base, wander: true, attack: true })).toBe(HeroAnim.Attack);
-  expect(heroAnim({ ...base })).toBe(HeroAnim.Idle); // wander omitted → activity base
+  expect(heroAnim({ ...base })).toBe(HeroAnim.Idle);
+  expect(heroAnim({ ...base, activity: ActivityState.Farming })).toBe(HeroAnim.Farming);
+  expect(heroAnim({ ...base, attack: true })).toBe(HeroAnim.Attack);
 });
 
 test("attackStyleFor: unknown/fallback lines melee", () => {

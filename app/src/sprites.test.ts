@@ -40,9 +40,11 @@ test("directionalFrames cycles walk when moving, else the idle still", () => {
 });
 
 test("Mage forms carry 9 east cast frames", () => {
-  expect(heroSpriteSet("mage", 1)?.cast?.length).toBe(9);
-  expect(heroSpriteSet("mage", 1)?.cast?.[0]).toBe("/sprites/mage/t1/cast/0.png");
-  expect(heroSpriteSet("mage", 4, "b")?.cast?.[8]).toBe("/sprites/mage/t4b/cast/8.png");
+  expect(heroSpriteSet("mage", 1)?.attack?.length).toBe(9);
+  expect(heroSpriteSet("mage", 1)?.attack?.[0]).toBe("/sprites/mage/t1/attack/0.png");
+  expect(heroSpriteSet("mage", 4, "b")?.attack?.[8]).toBe(
+    "/sprites/mage/t4b/attack/8.png",
+  );
 });
 
 test("Ranger forms resolve (walk + idle, no cast)", () => {
@@ -50,7 +52,7 @@ test("Ranger forms resolve (walk + idle, no cast)", () => {
     "/sprites/ranger/t1/idle/east.png",
   );
   expect(heroSpriteSet("ranger", 1)?.walk[Facing.South].length).toBe(9);
-  expect(heroSpriteSet("ranger", 1)?.cast).toBeUndefined();
+  expect(heroSpriteSet("ranger", 1)?.attack).toBeUndefined();
   expect(heroSpriteSet("ranger", 4, "a")).toBeDefined();
 });
 

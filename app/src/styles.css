@@ -920,6 +920,62 @@ body {
   }
 }
 
+/* shoot: a fast teal arrow streak landing on the mob from the hero's side (no projectile travel). */
+.hit-arrow {
+  position: absolute;
+  width: 22cqh;
+  height: 3cqh;
+  transform-origin: right center;
+  background: linear-gradient(90deg, transparent, #36c9a3 55%, #dffff5);
+  border-radius: 2px;
+  filter: drop-shadow(0 0 4px #36c9a3);
+  animation: arrow 0.16s ease-out forwards;
+}
+@keyframes arrow {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%) scaleX(0.3);
+  }
+  35% {
+    opacity: 1;
+    transform: translateX(-100%) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100%) scaleX(1);
+  }
+}
+/* invoke: an amber rune burst detonating on the mob. */
+.hit-glyph {
+  position: absolute;
+  width: 18cqh;
+  height: 18cqh;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff4d6 0%,
+    #f0c460 30%,
+    #c98a36cc 52%,
+    transparent 72%
+  );
+  filter: drop-shadow(0 0 8px #d9a441);
+  animation: glyph 0.34s ease-out forwards;
+}
+@keyframes glyph {
+  0% {
+    opacity: 0;
+    transform: rotate(0deg) scale(0.3);
+  }
+  35% {
+    opacity: 1;
+    transform: rotate(45deg) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(90deg) scale(1.5);
+  }
+}
+
 .floaters {
   position: absolute;
   inset: 0;

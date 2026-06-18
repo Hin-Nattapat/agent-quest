@@ -12,6 +12,7 @@ import {
   heroAnim,
   monsterAnim,
   attackStyleFor,
+  isRanged,
 } from "./combat";
 import { ActivityState } from "./activity";
 
@@ -89,9 +90,23 @@ test("heroAnim returns Wander only when no pulse is active", () => {
   expect(heroAnim({ ...base })).toBe(HeroAnim.Idle); // wander omitted → activity base
 });
 
-test("attackStyleFor: mage casts, everyone else melees", () => {
-  expect(attackStyleFor("mage")).toBe(AttackStyle.Cast);
-  expect(attackStyleFor("ranger")).toBe(AttackStyle.Melee);
+test("attackStyleFor: unknown/fallback lines melee", () => {
   expect(attackStyleFor("novice")).toBe(AttackStyle.Melee);
   expect(attackStyleFor("")).toBe(AttackStyle.Melee);
+});
+
+test("attackStyleFor maps every line to its style", () => {
+  expect(attackStyleFor("mage")).toBe(AttackStyle.Cast);
+  expect(attackStyleFor("ranger")).toBe(AttackStyle.Shoot);
+  expect(attackStyleFor("rogue")).toBe(AttackStyle.Stab);
+  expect(attackStyleFor("sage")).toBe(AttackStyle.Invoke);
+  expect(attackStyleFor("novice")).toBe(AttackStyle.Melee);
+});
+
+test("isRanged: cast/shoot/invoke stand; stab/melee dash", () => {
+  expect(isRanged(AttackStyle.Cast)).toBe(true);
+  expect(isRanged(AttackStyle.Shoot)).toBe(true);
+  expect(isRanged(AttackStyle.Invoke)).toBe(true);
+  expect(isRanged(AttackStyle.Stab)).toBe(false);
+  expect(isRanged(AttackStyle.Melee)).toBe(false);
 });

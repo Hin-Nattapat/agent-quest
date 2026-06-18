@@ -3,14 +3,14 @@ import { Facing } from "./facing";
 export interface ISpriteSet {
   idle: Record<Facing, string>;
   walk: Record<Facing, string[]>;
-  cast?: string[]; // east-facing cast frames; present only where the art exists
+  attack?: string[]; // east-facing attack frames (cast/shoot/stab/invoke); present where art exists
 }
 
 const DIRS: Facing[] = [Facing.South, Facing.North, Facing.East, Facing.West];
 
 // Build a set whose files live at /sprites/<root>/idle/<dir>.png and walk/<dir>/<0..8>.png.
-// castFrames > 0 adds east-facing cast frames at cast/<0..n-1>.png.
-const buildSet = (root: string, walkFrames: number, castFrames = 0): ISpriteSet => {
+// attackFrames > 0 adds east-facing attack frames at attack/<0..n-1>.png.
+const buildSet = (root: string, walkFrames: number, attackFrames = 0): ISpriteSet => {
   const idle = {} as Record<Facing, string>;
   const walk = {} as Record<Facing, string[]>;
   for (const dir of DIRS) {
@@ -21,10 +21,10 @@ const buildSet = (root: string, walkFrames: number, castFrames = 0): ISpriteSet 
     );
   }
   const set: ISpriteSet = { idle, walk };
-  if (castFrames > 0) {
-    set.cast = Array.from(
-      { length: castFrames },
-      (_, i) => `/sprites/${root}/cast/${i}.png`,
+  if (attackFrames > 0) {
+    set.attack = Array.from(
+      { length: attackFrames },
+      (_, i) => `/sprites/${root}/attack/${i}.png`,
     );
   }
   return set;

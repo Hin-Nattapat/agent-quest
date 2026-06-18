@@ -19,16 +19,37 @@ export enum MonsterAnim {
 
 export enum AttackStyle {
   Cast = "cast",
+  Shoot = "shoot",
+  Stab = "stab",
+  Invoke = "invoke",
   Melee = "melee",
 }
 
-// Which battle attack a class plays. Mage stands and casts; others keep the dash-jab until their
-// own attack art lands (add a style + frames then).
+// Which battle attack a class plays. The director gates this on attack-art presence, so a line
+// with no attack frames yet falls back to the Melee dash.
 export const attackStyleFor = (line: string): AttackStyle => {
   if (line === "mage") {
     return AttackStyle.Cast;
   }
+  if (line === "ranger") {
+    return AttackStyle.Shoot;
+  }
+  if (line === "rogue") {
+    return AttackStyle.Stab;
+  }
+  if (line === "sage") {
+    return AttackStyle.Invoke;
+  }
   return AttackStyle.Melee;
+};
+
+// Ranged styles stand and fire a projectile-like VFX; melee styles dash in.
+export const isRanged = (style: AttackStyle): boolean => {
+  return (
+    style === AttackStyle.Cast ||
+    style === AttackStyle.Shoot ||
+    style === AttackStyle.Invoke
+  );
 };
 
 const HERO_BASE: Record<ActivityState, HeroAnim> = {

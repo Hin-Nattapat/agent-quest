@@ -1,4 +1,4 @@
-import { HeroAnim, AttackStyle, attackStyleFor } from "../combat";
+import { HeroAnim, attackStyleFor, isRanged } from "../combat";
 import { Facing } from "../facing";
 import { assetUrl } from "../assets-base";
 import { heroSpriteSet, directionalFrames } from "../sprites";
@@ -13,26 +13,25 @@ interface IProps {
 }
 
 const WALK_FPS = 10;
-const CAST_FPS = 15; // 9 cast frames ≈ one cycle over CAST_MS (600ms) in the director
+const ATTACK_FPS = 15; // ~9 attack frames over the ranged pulse (CAST_MS 600ms in the director)
 
 const Hero = (props: IProps) => {
   const { line, tier, branch, anim } = props;
   const set = heroSpriteSet(line, tier, branch);
   usePreload(set);
-  const casting =
-    anim === HeroAnim.Attack &&
-    attackStyleFor(line) === AttackStyle.Cast &&
-    Boolean(set?.cast);
+  const attacking = anim === HeroAnim.Attack && Boolean(set?.attack);
+  const ranged = isRanged(attackStyleFor(line));
   const moving = anim === HeroAnim.Wander;
   const battleFrames = set ? directionalFrames(set, Facing.East, moving) : [];
-  const frames = casting ? (set?.cast ?? []) : battleFrames;
-  const playing = casting || moving;
-  const fps = casting ? CAST_FPS : WALK_FPS;
+  const frames = attacking ? (set?.attack ?? []) : battleFrames;
+  const playing = attacking || moving;
+  const fps = attacking ? ATTACK_FPS : WALK_FPS;
   const frame = useSpriteFrame(frames, fps, playing);
   const style = frame ? { backgroundImage: `url(${assetUrl(frame)})` } : undefined;
   const artClass = frame ? " has-art" : "";
-  // While casting, use a `cast` anim class so the .hero-attack dash keyframe never fires.
-  const animClass = casting ? "cast" : anim;
+  // Ranged attack stands (the `cast` class drops the .hero-attack dash); a melee attack keeps the
+  // dash class AND cycles the stab frames (transform + background-image are independent).
+  const animClass = attacking && ranged ? "cast" : anim;
   return (
     <div
       className={`sprite hero hero-${line} hero-${animClass}${artClass}`}

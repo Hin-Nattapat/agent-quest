@@ -79,7 +79,8 @@ const importHero = (rawDir: string, target: ITarget): void => {
   if (!walk) {
     throw new Error(`hero export has no walking animation in ${animDir}`);
   }
-  const cast = pickAnimDir(animNames, "asting");
+  // Prefer "attack" folder (ranger/rogue/sage); fall back to "casting" for mage — both output to attack/.
+  const attack = pickAnimDir(animNames, "ttack") ?? pickAnimDir(animNames, "asting");
 
   rmSync(out, { recursive: true, force: true });
   mkdirSync(join(out, "idle"), { recursive: true });
@@ -98,14 +99,14 @@ const importHero = (rawDir: string, target: ITarget): void => {
       copyFileSync(join(srcWalk, f), join(out, "walk", dir, `${frameIndex(f)}.png`));
     }
   }
-  if (cast) {
-    const srcCast = join(animDir, cast, "east");
-    mkdirSync(join(out, "cast"), { recursive: true });
-    for (const f of pngs(srcCast)) {
-      copyFileSync(join(srcCast, f), join(out, "cast", `${frameIndex(f)}.png`));
+  if (attack) {
+    const srcAttack = join(animDir, attack, "east");
+    mkdirSync(join(out, "attack"), { recursive: true });
+    for (const f of pngs(srcAttack)) {
+      copyFileSync(join(srcAttack, f), join(out, "attack", `${frameIndex(f)}.png`));
     }
   } else {
-    console.warn("  (no casting animation found — skipping cast/)");
+    console.warn("  (no attack/casting animation found — skipping attack/)");
   }
   console.log(`hero ${target.line}/${target.tier} -> ${out}`);
 };

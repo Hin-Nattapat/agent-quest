@@ -8,6 +8,12 @@ test("hasSceneBg is true for a wired theme, false otherwise", () => {
   expect(hasSceneBg(SceneTheme.Dungeon)).toBe(true);
   expect(hasSceneBg(SceneTheme.SkyforgeAether)).toBe(true);
   expect(hasSceneBg(SceneTheme.CircuitCatacombs)).toBe(true);
+  expect(hasSceneBg(SceneTheme.AuroraFlux)).toBe(true);
+  expect(hasSceneBg(SceneTheme.GeometricSanctum)).toBe(true);
+  expect(hasSceneBg(SceneTheme.QuantumRift)).toBe(true);
+  expect(hasSceneBg(SceneTheme.NoirCrimeScene)).toBe(true);
+  expect(hasSceneBg(SceneTheme.OraclesAthenaeum)).toBe(true);
+  expect(hasSceneBg(SceneTheme.ConductorsNexus)).toBe(true);
   expect(hasSceneBg(SceneTheme.Guild)).toBe(false);
   expect(hasSceneBg(SceneTheme.Ascendant)).toBe(false);
 });

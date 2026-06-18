@@ -50,7 +50,7 @@ test("clearing the pack enters a rest gap, then re-engages once it elapses", () 
   let s = { ...initDirector, phase: ScenePhase.Engage, pack: [1], waveIndex: 1 };
   s = stepDirector(s, farming({ now: 10_000, wantStrike: true }));
   expect(s.phase).toBe(ScenePhase.Wander);
-  expect(s.pack).toEqual([]);
+  expect(s.pack).toEqual([0]); // cleared pack lingers at 0 hits so the die animation can play
   expect(s.restUntil).toBe(10_000 + REST_GAP_MS);
 
   const resting = stepDirector(s, farming({ now: 10_000 + REST_GAP_MS - 1 }));

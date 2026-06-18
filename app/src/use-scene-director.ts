@@ -12,6 +12,8 @@ import {
   firstAlive,
   heroAnim,
   monsterAnim,
+  randAlive,
+  packCleared,
 } from "./combat";
 import { heroSpriteSet } from "./sprites";
 import {
@@ -70,6 +72,7 @@ interface ISceneView {
   mobs: IMobView[]; // [] in Wander
   floaters: IFloater[];
   effects: IHitEffect[];
+  heroHits: number[];
 }
 
 // These clear each transient anim class after it plays; they MUST match the matching CSS keyframe
@@ -80,6 +83,10 @@ const CAST_MS = 600; // mage cast pulse — long enough to play the 9 cast frame
 const FLOATER_MS = 900;
 const EFFECT_MS = 320;
 const TICK_MS = 250; // advances time-driven transitions (engage start, rest-gap expiry)
+const COUNTER_DELAY_MS = 1000; // mob bites back ~1s after the hero strike (throttle 2600) → the pair
+// of blows lands, then the rest of the window is idle breathing before the next strike
+const CONTACT_MS = 180; // delay the impact to the attacker's contact frame, not its windup → smooth
+const HERO_HIT_MS = 360; // clears the .hero-hit class; matches its CSS keyframe
 
 export const useSceneDirector = (
   state: IState | null,
@@ -95,7 +102,8 @@ export const useSceneDirector = (
   const [heroHurt, setHeroHurt] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const [monHurt, setMonHurt] = useState(false);
-  const [monAttack, setMonAttack] = useState(false);
+  const [attackSlot, setAttackSlot] = useState<number | null>(null);
+  const [heroHits, setHeroHits] = useState<number[]>([]);
   const [dyingSlot, setDyingSlot] = useState<number | null>(null);
   const [floaters, setFloaters] = useState<IFloater[]>([]);
   const [effects, setEffects] = useState<IHitEffect[]>([]);
@@ -142,6 +150,24 @@ export const useSceneDirector = (
     setEffects(e => [...e, { id, slot, kind }]);
     later(() => setEffects(e => e.filter(x => x.id !== id)), EFFECT_MS);
   };
+  const addHeroHit = () => {
+    const id = nextId();
+    setHeroHits(h => [...h, id]);
+    later(() => setHeroHits(h => h.filter(x => x !== id)), HERO_HIT_MS);
+  };
+  // A mob plays its attack frames; CONTACT_MS later its blow connects → hero-hit VFX + flinch.
+  const counterAttack = () => {
+    const idx = randAlive(dirRef.current.pack, seqRef.current);
+    if (idx < 0) {
+      return;
+    }
+    setAttackSlot(idx);
+    later(() => setAttackSlot(null), MON_MS.attack);
+    later(() => {
+      addHeroHit();
+      pulse(setHeroHurt, HERO_MS.hurt);
+    }, CONTACT_MS);
+  };
 
   // Apply one director step and fan out the CSS pulses implied by the state diff.
   const advance = (wantStrike: boolean) => {
@@ -150,18 +176,31 @@ export const useSceneDirector = (
     dirRef.current = next;
     setDir(next);
 
-    if (wantStrike && next.phase === ScenePhase.Engage) {
+    // Gate on the pre-step phase: the killing blow flips next.phase to Wander, so checking next would
+    // skip fanning out the final strike's die animation + hit effect.
+    if (wantStrike && before.phase === ScenePhase.Engage) {
       const idx = firstAlive(before.pack);
       if (idx >= 0 && next.pack[idx] !== before.pack[idx]) {
         const style = styleRef.current;
         const ranged = isRanged(style);
+        const killed = next.pack[idx] <= 0;
         pulse(setAttacking, ranged ? CAST_MS : HERO_MS.attack);
-        addEffect(idx, effectKindFor(style));
-        if (next.pack[idx] <= 0) {
+        // A killing blow drops the mob's hits to 0 synchronously (setDir above), so mark it dying in
+        // the SAME render — otherwise the `gone` gate (hits<=0 && !dying) hides the mob during the
+        // contact window and it vanishes before its die animation (and final strike) ever play.
+        if (killed) {
           setDyingSlot(idx);
           later(() => setDyingSlot(null), MON_MS.die);
-        } else {
-          pulse(setMonHurt, MON_MS.hurt);
+        }
+        // The blow lands on the hero's contact frame, not the windup, so the trade reads smoothly.
+        later(() => {
+          addEffect(idx, effectKindFor(style));
+          if (!killed) {
+            pulse(setMonHurt, MON_MS.hurt);
+          }
+        }, CONTACT_MS);
+        if (!packCleared(next.pack)) {
+          later(counterAttack, COUNTER_DELAY_MS);
         }
       }
     }
@@ -180,8 +219,15 @@ export const useSceneDirector = (
       advance(true);
     }
     if (beats.hurt) {
-      pulse(setHeroHurt, HERO_MS.hurt);
-      pulse(setMonAttack, MON_MS.attack);
+      const idx = firstAlive(dirRef.current.pack);
+      if (idx >= 0) {
+        setAttackSlot(idx);
+        later(() => setAttackSlot(null), MON_MS.attack);
+      }
+      later(() => {
+        addHeroHit();
+        pulse(setHeroHurt, HERO_MS.hurt);
+      }, CONTACT_MS);
       addFloater(FloaterKind.Hurt, "");
     }
     if (beats.leveledUp) {
@@ -214,7 +260,7 @@ export const useSceneDirector = (
     return {
       anim: monsterAnim({
         dying,
-        attacking: isTarget && monAttack,
+        attacking: attackSlot === i,
         hurt: isTarget && monHurt,
       }),
       hpFraction: hits / PACK_HITS,
@@ -222,5 +268,5 @@ export const useSceneDirector = (
     };
   });
 
-  return { phase: dir.phase, hero, mobs, floaters, effects };
+  return { phase: dir.phase, hero, mobs, floaters, effects, heroHits };
 };

@@ -8,6 +8,12 @@ export const SCENE_BGS = new Set<SceneTheme>([
   SceneTheme.Dungeon,
   SceneTheme.SkyforgeAether,
   SceneTheme.CircuitCatacombs,
+  SceneTheme.AuroraFlux,
+  SceneTheme.GeometricSanctum,
+  SceneTheme.QuantumRift,
+  SceneTheme.NoirCrimeScene,
+  SceneTheme.OraclesAthenaeum,
+  SceneTheme.ConductorsNexus,
 ]);
 
 export const hasSceneBg = (theme: SceneTheme): boolean => SCENE_BGS.has(theme);

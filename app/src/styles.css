@@ -1574,6 +1574,14 @@ body {
   margin-top: 1px;
   line-height: 1.15;
 }
+/* Locked goals: a dimmed, dashed-border card so they read as "not yet" next to earned deeds. */
+.deed-todo {
+  border-style: dashed;
+  opacity: 0.75;
+}
+.deed-todo .deed-name {
+  color: var(--dim);
+}
 .deed-locked {
   grid-column: 1 / -1;
   color: var(--dim);

@@ -5,14 +5,20 @@ interface IProps {
   effects: IHitEffect[];
 }
 
+const CLASS_FOR: Record<EffectKind, string> = {
+  [EffectKind.Slash]: "hit-effect",
+  [EffectKind.Zap]: "hit-zap",
+  [EffectKind.Arrow]: "hit-arrow",
+  [EffectKind.Glyph]: "hit-glyph",
+};
+
 const HitEffects = (props: IProps) => {
   const { effects } = props;
   return (
     <div className="hit-effects" aria-hidden="true">
-      {effects.map(e => {
-        const cls = e.kind === EffectKind.Zap ? "hit-zap" : "hit-effect";
-        return <span key={e.id} className={cls} style={slotPos(e.slot)} />;
-      })}
+      {effects.map(e => (
+        <span key={e.id} className={CLASS_FOR[e.kind]} style={slotPos(e.slot)} />
+      ))}
     </div>
   );
 };

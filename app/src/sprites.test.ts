@@ -47,27 +47,30 @@ test("Mage forms carry 9 east cast frames", () => {
   );
 });
 
-test("Ranger forms resolve (walk + idle, no cast)", () => {
+test("Ranger forms resolve (walk + idle + attack)", () => {
   expect(heroSpriteSet("ranger", 1)?.idle[Facing.East]).toBe(
     "/sprites/ranger/t1/idle/east.png",
   );
   expect(heroSpriteSet("ranger", 1)?.walk[Facing.South].length).toBe(9);
-  expect(heroSpriteSet("ranger", 1)?.attack).toBeUndefined();
+  expect(heroSpriteSet("ranger", 1)?.attack?.length).toBe(9);
+  expect(heroSpriteSet("ranger", 1)?.attack?.[0]).toBe("/sprites/ranger/t1/attack/0.png");
   expect(heroSpriteSet("ranger", 4, "a")).toBeDefined();
 });
 
-test("Rogue forms resolve (walk + idle, no cast)", () => {
+test("Rogue forms resolve (walk + idle + attack)", () => {
   expect(heroSpriteSet("rogue", 1)?.idle[Facing.East]).toBe(
     "/sprites/rogue/t1/idle/east.png",
   );
   expect(heroSpriteSet("rogue", 1)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("rogue", 1)?.attack?.length).toBe(9);
   expect(heroSpriteSet("rogue", 4, "b")).toBeDefined();
 });
 
-test("Sage forms resolve (walk + idle, no cast)", () => {
+test("Sage forms resolve (walk + idle + attack)", () => {
   expect(heroSpriteSet("sage", 1)?.idle[Facing.East]).toBe(
     "/sprites/sage/t1/idle/east.png",
   );
   expect(heroSpriteSet("sage", 1)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("sage", 1)?.attack?.length).toBe(9);
   expect(heroSpriteSet("sage", 4, "a")).toBeDefined();
 });

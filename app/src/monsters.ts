@@ -21,12 +21,22 @@ export const buildMonsterSet = (
   ),
 });
 
-// Starter mobs (T1-T3, idle 9 + attack 9, west-facing). Add a theme here after importing its art
+// Mob art (idle 9 + attack 9, west-facing) per realm. Add a theme here after importing its art
 // (the importer prints the frame counts). A missing theme returns undefined → emoji placeholder.
 export const MONSTER_SPRITES: Partial<Record<SceneTheme, IMonsterSet>> = {
+  // Starter realms (T1-T3)
   [SceneTheme.Grassland]: buildMonsterSet("grassland", 9, 9),
   [SceneTheme.Forest]: buildMonsterSet("forest", 9, 9),
   [SceneTheme.Dungeon]: buildMonsterSet("dungeon", 9, 9),
+  // T4 realm bosses
+  [SceneTheme.SkyforgeAether]: buildMonsterSet("skyforge_aether", 9, 9),
+  [SceneTheme.CircuitCatacombs]: buildMonsterSet("circuit_catacombs", 9, 9),
+  [SceneTheme.AuroraFlux]: buildMonsterSet("aurora_flux", 9, 9),
+  [SceneTheme.GeometricSanctum]: buildMonsterSet("geometric_sanctum", 9, 9),
+  [SceneTheme.QuantumRift]: buildMonsterSet("quantum_rift", 9, 9),
+  [SceneTheme.NoirCrimeScene]: buildMonsterSet("noir_crime_scene", 9, 9),
+  [SceneTheme.OraclesAthenaeum]: buildMonsterSet("oracles_athenaeum", 9, 9),
+  [SceneTheme.ConductorsNexus]: buildMonsterSet("conductors_nexus", 9, 9),
 };
 
 export const monsterSet = (theme: SceneTheme): IMonsterSet | undefined =>

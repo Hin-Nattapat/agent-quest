@@ -528,7 +528,7 @@ T4 มอน = บอสประจำแดน → **อลังกว่า 
 
 `conductors_nexus` · **The Orchestration Construct**
 
-- idle: `hovering with its many gilded clockwork arms weaving slow conducting motions, the light-batons glowing and golden threads swaying, facing left, keeping its construct form and amber-gold and multicolored-thread colors unchanged`
+- idle: `hovering almost still in place with its many clockwork arms lowered and folded at rest, only a slow gentle bob and the light-batons dimmed to a faint pulse, the golden threads hanging slack and motionless, facing left, keeping its construct form and amber-gold and multicolored-thread colors unchanged`
 - attack: `sweeping every baton-arm forward to the left in a grand conductor's flourish, loosing a radiating burst of golden light and multicolored threads, the body facing left the whole time, keeping its form and amber-gold and multicolored colors unchanged`
 
 ### 7.3 แดนลับสายลับ (secret class — ไม่มี branch, 1 แดน/บอส ต่อสาย)

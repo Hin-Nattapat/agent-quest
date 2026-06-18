@@ -6,6 +6,7 @@ import { useSceneDirector } from "../use-scene-director";
 import Hero from "./hero";
 import Monster from "./monster";
 import HitEffects from "./hit-effect";
+import HeroHits from "./hero-hit";
 import BossEncounter from "./boss-encounter";
 import FloatingText from "./floating-text";
 
@@ -34,6 +35,7 @@ const BattleScene = (props: IProps) => {
           );
         })}
       {!encounter && <HitEffects effects={scene.effects} />}
+      {!encounter && <HeroHits hits={scene.heroHits} />}
       <Hero line={line} tier={tier} branch={branch} anim={scene.hero} />
       <FloatingText floaters={scene.floaters} />
       {encounter && <BossEncounter encounter={encounter} />}

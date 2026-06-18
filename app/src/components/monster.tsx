@@ -41,6 +41,7 @@ const Monster = (props: IProps) => {
   const hpPct = Math.max(0, Math.min(1, hp)) * 100;
   return (
     <div className="monster-unit mob-spawn" style={slotPos(slot)}>
+      <span className="monster-name">{scene.monster}</span>
       <div className="monster-hp">
         <i style={{ width: `${hpPct}%` }} />
       </div>

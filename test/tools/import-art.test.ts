@@ -27,6 +27,9 @@ test("frameIndex strips PixelLab zero-padding", () => {
 test("pickAnimDir matches PixelLab's inconsistent folder names", () => {
   const names = ["walking_forward", "casting_a_spell_swinging_the_staff_up_then_thrusti"];
   expect(pickAnimDir(names, "alking")).toBe("walking_forward");
+  // importHero globs "alk" so it matches both the short "walk" folder and "walking_forward".
+  expect(pickAnimDir(["attack", "walk"], "alk")).toBe("walk");
+  expect(pickAnimDir(names, "alk")).toBe("walking_forward");
   expect(pickAnimDir(names, "asting")).toBe(
     "casting_a_spell_swinging_the_staff_up_then_thrusti",
   );

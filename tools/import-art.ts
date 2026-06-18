@@ -75,7 +75,8 @@ const importHero = (rawDir: string, target: ITarget): void => {
     throw new Error(`hero export missing rotations/ or animations/ in ${rawDir}`);
   }
   const animNames = readdirSync(animDir);
-  const walk = pickAnimDir(animNames, "alking");
+  // "alk" matches both the short "walk" export folder and the older "walking_forward" description.
+  const walk = pickAnimDir(animNames, "alk");
   if (!walk) {
     throw new Error(`hero export has no walking animation in ${animDir}`);
   }
@@ -90,9 +91,17 @@ const importHero = (rawDir: string, target: ITarget): void => {
       throw new Error(`hero export missing rotations/${dir}.png in ${rawDir}`);
     }
     copyFileSync(rotation, join(out, "idle", `${dir}.png`));
-    const srcWalk = join(animDir, walk, dir);
+    let srcWalk = join(animDir, walk, dir);
     if (!existsSync(srcWalk)) {
-      throw new Error(`hero walk animation missing "${dir}/" in ${join(animDir, walk)}`);
+      // Some exports only render the east (battle-facing) walk; reuse it for the other overworld
+      // directions so the manifest's per-direction frames still resolve instead of 404-ing.
+      const eastWalk = join(animDir, walk, "east");
+      if (!existsSync(eastWalk)) {
+        throw new Error(
+          `hero walk animation missing "${dir}/" (no east fallback) in ${join(animDir, walk)}`,
+        );
+      }
+      srcWalk = eastWalk;
     }
     mkdirSync(join(out, "walk", dir), { recursive: true });
     for (const f of pngs(srcWalk)) {

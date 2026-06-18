@@ -38,24 +38,24 @@ export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
   "mage-t3": buildSet("mage/t3", 9, 9),
   "mage-t4a": buildSet("mage/t4a", 9, 9),
   "mage-t4b": buildSet("mage/t4b", 9, 9),
-  // Ranger: walk + idle only for now (no cast art wired — ranger uses the melee dash).
-  "ranger-t1": buildSet("ranger/t1", 9),
-  "ranger-t2": buildSet("ranger/t2", 9),
-  "ranger-t3": buildSet("ranger/t3", 9),
-  "ranger-t4a": buildSet("ranger/t4a", 9),
-  "ranger-t4b": buildSet("ranger/t4b", 9),
-  // Rogue: walk + idle only for now (no cast art wired — rogue uses the melee dash).
-  "rogue-t1": buildSet("rogue/t1", 9),
-  "rogue-t2": buildSet("rogue/t2", 9),
-  "rogue-t3": buildSet("rogue/t3", 9),
-  "rogue-t4a": buildSet("rogue/t4a", 9),
-  "rogue-t4b": buildSet("rogue/t4b", 9),
+  // Ranger: idle + walk + attack (Shoot — stands and looses an arrow).
+  "ranger-t1": buildSet("ranger/t1", 9, 9),
+  "ranger-t2": buildSet("ranger/t2", 9, 9),
+  "ranger-t3": buildSet("ranger/t3", 9, 9),
+  "ranger-t4a": buildSet("ranger/t4a", 9, 9),
+  "ranger-t4b": buildSet("ranger/t4b", 9, 9),
+  // Rogue: idle + walk + attack (Stab — dashes in and slashes).
+  "rogue-t1": buildSet("rogue/t1", 9, 9),
+  "rogue-t2": buildSet("rogue/t2", 9, 9),
+  "rogue-t3": buildSet("rogue/t3", 9, 9),
+  "rogue-t4a": buildSet("rogue/t4a", 9, 9),
+  "rogue-t4b": buildSet("rogue/t4b", 9, 9),
   // Sage: walk + idle only for now (no cast art wired — sage uses the melee dash).
-  "sage-t1": buildSet("sage/t1", 9),
-  "sage-t2": buildSet("sage/t2", 9),
-  "sage-t3": buildSet("sage/t3", 9),
-  "sage-t4a": buildSet("sage/t4a", 9),
-  "sage-t4b": buildSet("sage/t4b", 9),
+  "sage-t1": buildSet("sage/t1", 9, 9),
+  "sage-t2": buildSet("sage/t2", 9, 9),
+  "sage-t3": buildSet("sage/t3", 9, 9),
+  "sage-t4a": buildSet("sage/t4a", 9, 9),
+  "sage-t4b": buildSet("sage/t4b", 9, 9),
 };
 
 // At tier 4 the form branches (a/b) so the key carries it; below tier 4 the branch is ignored.

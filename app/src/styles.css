@@ -1225,12 +1225,22 @@ body {
   color: var(--dim);
   margin: 10px 0 6px;
 }
+/* A section's first head shouldn't add space on top of the panel/section padding — keeps every
+   panel's top edge aligned (the flex gap on hero/usage panels handles between-section spacing). */
+.panel-head:first-child {
+  margin-top: 0;
+}
 .panel-empty {
   color: var(--dim);
   padding: 8px 0;
 }
 
 /* hero panel */
+.hero-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* even rhythm between the id header and the two-column body */
+}
 .hero-id {
   display: flex;
   gap: 10px;
@@ -1382,6 +1392,7 @@ body {
   background: var(--tone-legendary);
 }
 .item-equip {
+  width: 100%;
   margin-top: 1px;
   font-family: "Pixelify Sans", monospace;
   font-size: 10px;
@@ -1681,6 +1692,11 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px 16px;
+}
+.usage-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px; /* even rhythm between the four stat sections (matches the hero panel) */
 }
 .usage-section {
   display: flex;

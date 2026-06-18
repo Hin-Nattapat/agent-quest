@@ -146,23 +146,29 @@ body {
 .scene-circuit_catacombs .sky {
   background: linear-gradient(180deg, #0d1518 0%, #16242a 46%, #16261e 56%, #0c1410 100%);
 }
+/* T4 Aurora Flux: soft teal-aqua aurora over a pale crystal floor — letterbox continues it. */
 .scene-aurora_flux .sky {
-  background: linear-gradient(180deg, #08201f, #0f3a44 50%, #1a5a55);
+  background: linear-gradient(180deg, #0e2b30 0%, #17484a 46%, #1d4a44 56%, #0e2620 100%);
 }
+/* T4 Geometric Sanctum: teal-grey architecture over a pale tile floor. */
 .scene-geometric_sanctum .sky {
-  background: linear-gradient(180deg, #0c2230, #14506b 60%, #2a7a8c);
+  background: linear-gradient(180deg, #11242b 0%, #21424a 46%, #294f52 56%, #14242a 100%);
 }
+/* T4 Quantum Rift: dark glitch void over a grey cracked-stone floor (coral accents in-image). */
 .scene-quantum_rift .sky {
-  background: linear-gradient(180deg, #1f0a18, #3a1430 55%, #5a1a3a);
+  background: linear-gradient(180deg, #160a18 0%, #2a1a2e 46%, #2e2630 56%, #14100f 100%);
 }
+/* T4 Noir Crime Scene: rainy monochrome night over wet dark cobblestone (coral spotlight in-image). */
 .scene-noir_crime_scene .sky {
-  background: linear-gradient(180deg, #0c0c10, #1c1c24 60%, #2a2230);
+  background: linear-gradient(180deg, #0c0d12 0%, #1c1d26 46%, #241c20 56%, #120d0e 100%);
 }
+/* T4 Oracle's Athenaeum: amber library light over warm amber stone. */
 .scene-oracles_athenaeum .sky {
-  background: linear-gradient(180deg, #2a1f0c, #4a3a18 55%, #6b5a2a);
+  background: linear-gradient(180deg, #1c1408 0%, #3a2c12 46%, #3e2e14 56%, #1a1206 100%);
 }
+/* T4 Conductor's Nexus: dark amber dome over a polished gold floor (multicolor threads in-image). */
 .scene-conductors_nexus .sky {
-  background: linear-gradient(180deg, #241a08, #443414 60%, #6b5520);
+  background: linear-gradient(180deg, #1e1408 0%, #3e2c12 46%, #4a3614 56%, #1c1408 100%);
 }
 .scene-grand_concert_vault .sky {
   background: linear-gradient(180deg, #2a200a, #554216 55%, #806020);

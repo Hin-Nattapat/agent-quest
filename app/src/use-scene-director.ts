@@ -243,13 +243,11 @@ export const useSceneDirector = (
     // advance closes over `activity`; re-arm when it changes so transitions read fresh activity.
   }, [activity]);
 
-  const wander = dir.phase === ScenePhase.Wander;
   const hero = heroAnim({
     celebrate: celebrating,
     hurt: heroHurt,
     attack: attacking,
     activity,
-    wander,
   });
   const targetIdx = firstAlive(dir.pack);
   const mobs: IMobView[] = dir.pack.map((hits, i) => {

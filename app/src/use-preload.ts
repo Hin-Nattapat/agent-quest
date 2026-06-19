@@ -35,3 +35,11 @@ export const usePreloadSprites = (set: IMonsterSet | undefined): void => {
     preload([...set.idle, ...set.attack]);
   }, [set]);
 };
+
+// A plain frame list (e.g. an NPC idle loop). Re-decodes when the joined urls change.
+export const usePreloadFrames = (frames: string[]): void => {
+  const key = frames.join("|");
+  useEffect(() => {
+    preload(frames);
+  }, [key]);
+};

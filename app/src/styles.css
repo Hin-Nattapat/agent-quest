@@ -2086,24 +2086,28 @@ body.reduce-motion *::after {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* size container so .guild-stage can pick the largest 400:128 box that fits; the fill = letterbox */
+  container-type: size;
   background: radial-gradient(120% 80% at 50% 0%, #4a3a24 0%, #3a2e1f 45%, #2a2118 100%);
 }
+/* Locked to the map ratio (400x128) like .battle-stage, so the hero's % waypoints map to fixed
+   floor positions on the map regardless of panel shape. Its container-type lets the hero size in cqh. */
+.guild-stage {
+  position: relative;
+  width: min(100cqw, 312.5cqh);
+  aspect-ratio: 400 / 128;
+  overflow: hidden;
+  container-type: size;
+}
+/* Fills the aspect-locked stage exactly (matching ratio → no zoom/crop). */
 .guild-bg {
   position: absolute;
   inset: 0;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background: center / cover no-repeat;
   image-rendering: pixelated;
-}
-/* Real map supplies the room — drop the CSS-placeholder props (hero + 💤 stay on top). */
-.guild-room.has-art .guild-floor,
-.guild-room.has-art .guild-rug,
-.guild-room.has-art .guild-banner,
-.guild-room.has-art .guild-table,
-.guild-room.has-art .guild-npc,
-.guild-room.has-art .guild-chest {
-  display: none;
 }
 .guild-floor {
   position: absolute;
@@ -2172,8 +2176,9 @@ body.reduce-motion *::after {
   position: absolute;
   left: 0;
   top: 0;
-  width: 92px;
-  height: 92px;
+  /* sized against the .guild-stage height (cqh) so the hero scales with the locked map */
+  width: 32cqh;
+  height: 32cqh;
   image-rendering: pixelated;
   background-repeat: no-repeat;
   background-size: contain;
@@ -2184,6 +2189,23 @@ body.reduce-motion *::after {
 .ow-hero:not(.has-art)::after {
   content: "🧙";
   font-size: 34px;
+}
+/* On-map guild NPCs — anchored at their feet, same size as the hero (32cqh); the imported idle loop
+   animates them (useSpriteFrame), with an emoji fallback centered in the box when there's no art. */
+.guild-npc-actor {
+  position: absolute;
+  transform: translate(-50%, -85%);
+  width: 32cqh;
+  height: 32cqh;
+  display: grid;
+  place-items: center;
+  font-size: 24cqh; /* emoji fallback when no sprite */
+  line-height: 1;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.45));
 }
 .guild-zzz {
   position: absolute;

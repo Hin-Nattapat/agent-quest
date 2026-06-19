@@ -368,9 +368,23 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     desc: registry[id]?.desc ?? "",
     points: registry[id]?.points ?? 0,
   }));
+  // Split the not-yet-earned deeds: visible ones become "locked goals" (with criteria), hidden ones
+  // stay an opaque "??? secret" count so the codex shows what to chase without spoiling easter eggs.
+  const earnedSet = new Set(achievements.earned);
+  const unearned = Object.entries(registry).filter(([id]) => !earnedSet.has(id));
+  const locked = unearned
+    .filter(([, def]) => !def.hidden)
+    .map(([id, def]) => ({ id, name: def.name, desc: def.desc, points: def.points }));
+  const secret = unearned.filter(([, def]) => def.hidden).length;
   return {
     ...prelim,
-    achievements: { ...achievements, earned_detail, total: Object.keys(registry).length },
+    achievements: {
+      ...achievements,
+      earned_detail,
+      locked,
+      secret,
+      total: Object.keys(registry).length,
+    },
     cosmetics,
     unlocked_secret_classes: unlocked,
   };

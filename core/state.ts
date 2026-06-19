@@ -21,6 +21,10 @@ export interface IAchievementsState {
   points: number;
   progress: Record<string, number>;
   earned_detail?: IEarnedAchievement[];
+  // Not-earned, non-secret deeds (with their criteria) so the player can see what to work toward.
+  locked?: IEarnedAchievement[];
+  // Count of not-earned hidden deeds — shown as "??? secret", never with criteria.
+  secret?: number;
   total?: number;
 }
 

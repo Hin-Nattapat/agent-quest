@@ -12,7 +12,6 @@ interface IProps {
   anim: HeroAnim;
 }
 
-const WALK_FPS = 10;
 const ATTACK_FPS = 15; // ~9 attack frames over the ranged pulse (CAST_MS 600ms in the director)
 
 const Hero = (props: IProps) => {
@@ -21,12 +20,11 @@ const Hero = (props: IProps) => {
   usePreload(set);
   const attacking = anim === HeroAnim.Attack && Boolean(set?.attack);
   const ranged = isRanged(attackStyleFor(line));
-  const moving = anim === HeroAnim.Wander;
-  const battleFrames = set ? directionalFrames(set, Facing.East, moving) : [];
+  // The battle hero stands facing east (idle frame) and only cycles frames on attack; its bob/sway
+  // is CSS (.hero-farming/.hero-idle). No wander-walk — it used to slide backward while farming.
+  const battleFrames = set ? directionalFrames(set, Facing.East, false) : [];
   const frames = attacking ? (set?.attack ?? []) : battleFrames;
-  const playing = attacking || moving;
-  const fps = attacking ? ATTACK_FPS : WALK_FPS;
-  const frame = useSpriteFrame(frames, fps, playing);
+  const frame = useSpriteFrame(frames, ATTACK_FPS, attacking);
   const style = frame ? { backgroundImage: `url(${assetUrl(frame)})` } : undefined;
   const artClass = frame ? " has-art" : "";
   // Ranged attack stands (the `cast` class drops the .hero-attack dash); a melee attack keeps the

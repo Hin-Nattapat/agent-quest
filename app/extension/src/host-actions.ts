@@ -10,6 +10,7 @@ interface IRawAction {
   id?: string;
   line?: string;
   branch?: string;
+  value?: string;
 }
 
 const LOOT_KIND: Record<string, LootKind> = {
@@ -38,6 +39,17 @@ const applyAdvance = (
 // panel's source) — a title is validated against the inventory + loot table, NOT achievement-earned
 // titles (which `rpg title` also accepts but the panel never surfaces).
 export const applyAction = (home: string, action: IRawAction): string | null => {
+  if (action.name === "setName") {
+    const value = (action.value ?? "").trim().slice(0, 24);
+    if (!value) {
+      return null;
+    }
+    const profile = loadProfile(home);
+    profile.name = value;
+    saveProfile(home, profile);
+    reduceToFile(home);
+    return readStateText(home);
+  }
   if (action.name === "setClass") {
     return applyAdvance(home, profile => {
       const state = reduceToFile(home);

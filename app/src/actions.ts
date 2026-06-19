@@ -23,4 +23,14 @@ export interface ISetBranchAction {
   branch: string;
 }
 
-export type TClientAction = IEquipAction | ISetClassAction | ISetBranchAction;
+export interface ISetNameAction {
+  type: "action";
+  name: "setName";
+  value: string;
+}
+
+export type TClientAction =
+  | IEquipAction
+  | ISetClassAction
+  | ISetBranchAction
+  | ISetNameAction;

@@ -20,7 +20,7 @@ console.log(`copy-webview: ${src} -> ${dest}`);
 
 // Static asset folders Vite emits from public/ (heroes/monsters, scene backdrops, items). Each
 // must be copied into the webview so assetUrl(/<dir>/…) resolves under the VS Code webview base.
-for (const dir of ["sprites", "scenes", "items"]) {
+for (const dir of ["sprites", "scenes", "items", "overworld"]) {
   const dirSrc = join(ext, "..", "dist", dir);
   if (existsSync(dirSrc)) {
     const dirDest = join(destRoot, dir);

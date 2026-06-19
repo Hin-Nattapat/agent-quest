@@ -367,6 +367,56 @@ template (ฝัง composition แล้ว — เติม `<SCENE>`/`<decor>
 a side-view pixel-art battle background of <SCENE>, a wide open flat <ground> clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, <decor> only at the far left and right edges, <background> behind, completely empty with no people, no characters, no creatures, no figures, <palette + mood>, limited palette, clean pixel art, slightly stylized
 ```
 
+### 7.C Overworld guild map (top-down · PixelLab create-map)
+
+Guild = ฉาก **Overworld** (Idle/Rest) ไม่ใช่ battle bg — render โดย `OverworldRoom` ที่ฮีโร่เดิน ambient
+ทับข้างบน · gen ด้วย **create-map (Pixflux)** ไม่ใช่ create-image · import: `--as map:guild` →
+`overworld/guild.png` แล้วเติม `SceneTheme.Guild` ใน `OVERWORLD_BGS` (`overworld-bg.ts`)
+
+**ตั้งค่า:** Camera view = **Top-down** · canvas **กว้าง-เตี้ย** ให้ใกล้ panel (~3:1; เลือกขนาดใหญ่สุดที่ tier
+รับได้ เช่น 400×~128–200) · render `cover`/center → ห้องควรเต็ม ไม่มีขอบสำคัญติดมุม
+
+⚠️ เหมือน §7.B: **บรรยายแต่ห้อง/เฟอร์นิเจอร์ ห้ามเอ่ย hero/adventurer/characters** ไม่งั้น AI วาดคนลงไป
+
+**ตั้งค่าสำคัญ:** Camera view = **Top-down** (ไม่ใช่ Sidescroller)
+
+⚠️ **กันขอบดำ — อย่าใช้ negation เรื่อง space** (`no walls`/`no void`/`no black`/`no border`): โมเดลมัก
+วาดสิ่งที่เอ่ยถึงแม้มี "no" → ยิ่งสั่งยิ่งมีขอบดำ/พื้นลอยกลาง void · แทนที่ด้วย **คำเชิงบวก**: บรรยายเป็น
+**"พื้น/terrain ที่ปูเต็มทั้งภาพ edge to edge"** (ไม่ใช่ "ห้องมีกำแพง" — พอเป็นห้องมันวาดเป็นวัตถุลอยกลางจอ)
+· เก็บ negation ไว้แค่ `no people/characters` ท้ายสุด
+
+```
+a seamless top-down pixel-art floor of a cozy medieval adventurers' guild hall, warm wooden planks completely covering the whole image edge to edge as the ground, thin stone walls flush along the top, left and right edges seen from straight above, a hanging dusk-purple banner, brass wall torches, arched windows and framed pictures, a long row of wooden tables, chairs and treasure chests along the top, a large ornate rug centered on the open wooden floor, warm and inviting, dusk-purple brass-gold and warm-wood palette, no people, no characters, no adventurers, limited palette, clean pixel art, slightly stylized
+```
+
+### 7.C.1 Guild NPCs (top-down characters)
+
+NPC ยืนประดับในกิลด์ (overworld) — gen แบบ **character เดียวกับ hero**: Mode **Humanoid** · **56×56** ·
+Camera **Low Top-Down** · Outline **Black outline** · Detail **Highly detailed** · **remove-bg ON**
+(พื้นโปร่ง) · palette ให้เข้ากิลด์ (dusk-purple + brass-gold + warm-wood) · ใช้แค่ท่า **idle south
+(หันหน้าเข้ากล้อง)** ก็พอ (NPC ยืนเฉย ๆ) — วาง prompt เป็น "character description" ตามนี้:
+
+⚠️ **อย่า clone Mage แล้วแก้ชื่ออย่างเดียว** — ช่อง description จะยังเป็น prompt Mage อยู่ → ได้ Mage ทับ.
+ให้ clone เอา **settings** (56×56 · 8-dir · low top-down) แล้ว **แทนที่ description ทั้งก้อน** ด้วย prompt
+เต็มข้างล่าง. โครงร่วม (`adult character (not a child), slightly stylized proportions about 3 heads
+tall, full body head-to-toe, centered, clean 1px black outline`) = ตัวคุม "มู๊ดชุดเดียวกัน" — เก็บไว้
+ทุกตัว เปลี่ยนแค่คน+ชุด:
+
+- 🧙‍♂️ **guild master** (กลาง): `an elderly guild master around 60, wise calm expression, lean build, weathered fair skin, long grey hair and a long grey beard, kind eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline — dressed in a long dusk-purple hooded robe with brass-gold trim, holding a tall plain wooden staff, limited dusk-purple and brass-gold palette`
+- 🧝 **blacksmith** (ซ้าย): `a sturdy guild blacksmith around 40, gruff focused expression, broad muscular build, tan skin, short dark hair, thick beard, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline — dressed in a brown leather apron over a cream tunic with rolled sleeves and brass-gold buckles, holding a smithing hammer, limited warm-wood brown and brass-gold palette`
+- 🧑‍🌾 **adventurer** (ขวา): `a young guild adventurer around 22, eager confident expression, lean athletic build, light-tan skin, short brown hair, bright eyes, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline — dressed in a teal and brown traveler's cloak with leather boots and brass-gold clasps, a quiver and bow on the back, limited teal brown and brass-gold palette`
+
+**Idle animation — Action Description** (Direction = South / หันเข้ากล้อง · ต้องมีคำ `in place`/`almost
+motionless`/`idle` เพื่อให้ importer จับเป็น idle ถูก):
+
+- 🧙‍♂️ guild master: `standing still in place, almost motionless, leaning slightly on the wooden staff, a calm idle breathing loop`
+- 🧝 blacksmith: `standing still in place, almost motionless, resting the smithing hammer on one shoulder, a steady idle breathing loop`
+- 🧑‍🌾 adventurer: `standing still in place, almost motionless, a relaxed idle breathing loop, glancing around`
+- (ทั่วไป ถ้าใช้ตัวเดียว): `standing still in place, almost motionless, a calm idle breathing loop, facing forward`
+
+> ยังไม่มี importer type `npc` — พอได้ art แล้วบอก เดี๋ยวเพิ่ม `--as npc:<id>` → `overworld/npc/<id>.png`
+> + สลับ `GUILD_NPCS` (overworld-room.tsx) จาก emoji เป็น sprite (เหมือน hero seam)
+
 ### 7.1 ฉากพื้น T1–T3 (ใช้ร่วมทุกสาย) — มอน + ฉาก
 
 ทุก prompt ด้านล่าง **copy ทั้งบรรทัดวางได้เลย** (constants รวมแล้ว) · Generation Mode = **Humanoid** ทุกตัว · idle/attack วาง Action Description จาก §7.A

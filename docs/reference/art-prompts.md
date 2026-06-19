@@ -570,56 +570,80 @@ Humanoid for titans/colossi).
 
 **constants** (in every boss prompt): `a colossal boss creature, far larger and more imposing than a common monster, not human, menacing and powerful, full body, centered, slightly stylized, clean 1px black outline`
 
-**idle action** (shared): `a slow menacing idle loop, looming and breathing heavily in place with a subtle threatening sway, the body facing left toward the hero, keeping its form and colors unchanged`
+Each boss has its own **idle + attack** (Add Animation, **Keep first frame ✓**, ~9 frames, facing
+left), tailored to the creature — same rule as the §7.A/§7.2 anims, ending in "keeping … unchanged".
 
 #### Starter realms (T1–T3)
 
 `boss/grassland` · **Thornback Behemoth** (Mode Quadruped) — grassland palette (green + earth-brown)
 
-- `a colossal mossy grassland behemoth boss, a massive four-legged beast covered in thick bark, moss and blooming thorned vines, great curved horns and heavy stone-like hooves, earthy and overgrown, green and earth-brown palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a colossal mossy grassland behemoth boss, a massive four-legged beast covered in thick bark, moss and blooming thorned vines, great curved horns and heavy stone-like hooves, earthy and overgrown, green and earth-brown palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `standing heavily in place breathing deep, its mossy flanks rising and the thorned vines swaying, head low with horns forward, facing left, keeping its form and colors unchanged`
+- attack: `lowering its horns and charging a short heavy lunge forward to the left then stamping down, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/forest` · **Elder Treant** (Mode Humanoid) — forest palette (deep green, ghostly)
 
-- `a towering ancient treant boss, a giant walking gnarled tree-guardian with two glowing pale-green hollows for eyes, thick root-legs and branch-arms, draped in hanging moss and drifting spirit-wisps, deep forest-green palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a towering ancient treant boss, a giant walking gnarled tree-guardian with two glowing pale-green hollows for eyes, thick root-legs and branch-arms, draped in hanging moss and drifting spirit-wisps, deep forest-green palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `looming in place with a slow creaking sway, branch-arms drifting and the green eye-hollows pulsing, facing left, keeping its form and colors unchanged`
+- attack: `raising a massive branch-arm and sweeping it down forward to the left in a crushing slam, roots cracking the ground, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/dungeon` · **Stone Wyrm** (Mode Quadruped) — dungeon palette (grey stone + ember)
 
-- `a massive armored cave wyrm boss, a huge serpentine dragon of cracked grey stone and bone coiling up from the dungeon floor, jagged teeth, tattered stone wings and glowing ember eyes, grey stone with an ember glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a massive armored cave wyrm boss, a huge serpentine dragon of cracked grey stone and bone coiling up from the dungeon floor, jagged teeth, tattered stone wings and glowing ember eyes, grey stone with an ember glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `coiled and looming, breathing slow with smoke curling from its jaws and the ember eyes glowing, facing left, keeping its form and colors unchanged`
+- attack: `rearing back then lunging its head forward to the left with jaws wide, breathing a gout of ember fire, the body facing left the whole time, keeping its form and colors unchanged`
 
 #### T4 realms (per branch)
 
 `boss/skyforge_aether` · **Tempest Leviathan** (Mode Quadruped) — purple + gold
 
-- `a colossal storm leviathan boss, a vast serpentine dragon woven from thundercloud and crackling golden lightning, broad storm-cloud wings and a blazing violet storm-eye, majestic, purple and gold palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a colossal storm leviathan boss, a vast serpentine dragon woven from thundercloud and crackling golden lightning, broad storm-cloud wings and a blazing violet storm-eye, majestic, purple and gold palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `hovering in place wreathed in swirling storm-cloud, golden lightning crackling along its body and the violet eye blazing, facing left, keeping its form and colors unchanged`
+- attack: `rearing and snapping its head forward to the left, loosing a great fork of golden lightning from its maw, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/circuit_catacombs` · **Circuit Wyrmking** (Mode Quadruped) — deep-purple + toxic-green
 
-- `a giant undead circuit-dragon boss, a massive skeletal wyrm fused with glowing toxic-green circuit-board plating, a pulsing green core in its exposed ribcage, necrotic-tech, deep-purple and toxic-green palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a giant undead circuit-dragon boss, a massive skeletal wyrm fused with glowing toxic-green circuit-board plating, a pulsing green core in its exposed ribcage, necrotic-tech, deep-purple and toxic-green palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `coiled and floating, the toxic-green core pulsing and circuit-plating flickering across its skeletal body, facing left, keeping its form and colors unchanged`
+- attack: `lunging its skull forward to the left and exhaling a surge of toxic-green necrotic energy, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/aurora_flux` · **Aurora Leviathan** (Mode Quadruped) — teal + rainbow
 
-- `a vast celestial light-whale boss, a colossal translucent leviathan of flowing teal and rainbow aurora drifting weightlessly, trailing motion-blur light-motes, ethereal, teal and rainbow palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a vast celestial light-whale boss, a colossal translucent leviathan of flowing teal and rainbow aurora drifting weightlessly, trailing motion-blur light-motes, ethereal, teal and rainbow palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `drifting weightlessly in place, rainbow aurora rippling along its translucent body with trailing light-motes, facing left, keeping its form and colors unchanged`
+- attack: `gliding back then surging forward to the left, loosing a sweeping beam of refracted rainbow light, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/geometric_sanctum` · **Prism Colossus** (Mode Humanoid) — teal + blueprint-blue + white
 
-- `a towering crystalline colossus boss, a giant angular titan of clear blueprint-blue crystal and glowing grid-lines, sharp geometric plating and a luminous core, orderly and immense, teal, blueprint-blue and white palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a towering crystalline colossus boss, a giant angular titan of clear blueprint-blue crystal and glowing grid-lines, sharp geometric plating and a luminous core, orderly and immense, teal, blueprint-blue and white palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `standing immense and immovable, its crystal facets slowly rotating and the core glowing in a steady pulse, facing left, keeping its form and colors unchanged`
+- attack: `drawing back a huge crystalline fist and driving it forward to the left in a heavy slam, grid-lines flaring on impact, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/quantum_rift` · **Rift Devourer** (Mode Quadruped) — coral + glitch-magenta
 
-- `a colossal phasing void-beast boss, a huge double-exposed glitch-leviathan flickering and tearing between states, a fragmented coral-magenta maw and unstable shifting limbs, unsettling, coral and glitch-magenta palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a colossal phasing void-beast boss, a huge double-exposed glitch-leviathan flickering and tearing between states, a fragmented coral-magenta maw and unstable shifting limbs, unsettling, coral and glitch-magenta palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `flickering and phasing in place, its double-exposed body tearing and re-merging with shifting limbs, facing left, keeping its form and colors unchanged`
+- attack: `glitching forward to the left in a stuttering lunge, its fragmented maw splitting wide to bite, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/noir_crime_scene` · **Shadow Behemoth** (Mode Quadruped) — black-grey + coral
 
-- `a towering noir shadow-beast boss, a massive hulking hound made of living darkness prowling in the rain, many glowing coral eyes and dripping shadow-smoke, mysterious, monochrome black-grey with a coral glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a towering noir shadow-beast boss, a massive hulking hound made of living darkness prowling in the rain, many glowing coral eyes and dripping shadow-smoke, mysterious, monochrome black-grey with a coral glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `prowling low in place, shadow-smoke dripping from its hide and the coral eyes glowing, head lowered, facing left, keeping its form and colors unchanged`
+- attack: `crouching then pouncing a short lunge forward to the left, jaws snapping and the coral eyes flaring, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/oracles_athenaeum` · **Rune Colossus** (Mode Humanoid) — amber-gold + parchment
 
-- `a colossal amber-stone guardian boss, a giant winged statue-titan carved from glowing amber sandstone, its body blazing with golden runes, vast feathered stone wings, regal and ancient, amber-gold and parchment palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a colossal amber-stone guardian boss, a giant winged statue-titan carved from glowing amber sandstone, its body blazing with golden runes, vast feathered stone wings, regal and ancient, amber-gold and parchment palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `standing vast and still, the golden runes across its body glowing and dimming in a slow pulse, stone wings shifting, facing left, keeping its form and colors unchanged`
+- attack: `raising both arms and bringing them down forward to the left in a thunderous rune-blazing smash, the body facing left the whole time, keeping its form and colors unchanged`
 
 `boss/conductors_nexus` · **Clockwork Colossus** (Mode Humanoid) — amber + gold + multicolor
 
-- `a towering gilded clockwork colossus boss, a massive multi-armed brass automaton of turning gears and glowing golden threads, a radiant core in its chest, commanding, amber and gold with multicolored thread accents, not human, full body, centered, slightly stylized, clean 1px black outline`
+- art: `a towering gilded clockwork colossus boss, a massive multi-armed brass automaton of turning gears and glowing golden threads, a radiant core in its chest, commanding, amber and gold with multicolored thread accents, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `looming in place, its many brass arms turning slowly and the golden threads swaying, the chest core pulsing, facing left, keeping its form and colors unchanged`
+- attack: `sweeping several of its baton-arms forward to the left at once, loosing a radiating burst of golden light, the body facing left the whole time, keeping its form and colors unchanged`
 
 > import (when gen'd): `--as boss:<theme>` (importer's boss type is `notImplemented` today — wire it
-> like monster, output `sprites/boss/<theme>/idle/`) → select by `sceneInfo.theme` in BossEncounter;
-> until then the 🐉 emoji stays. idle is the minimum (the defeat/flee motion is CSS on `.boss`).
+> like monster, output `sprites/boss/<theme>/{idle,attack}/`) → select by `sceneInfo.theme` in
+> BossEncounter; until then the 🐉 emoji stays. idle is the minimum; attack plays before the
+> CSS-driven defeat/flee on `.boss`.

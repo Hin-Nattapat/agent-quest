@@ -1,28 +1,7 @@
-import { useState } from "react";
-
-const MOTION_KEY = "cq.reduceMotion";
-
-const readReduceMotion = (): boolean => {
-  try {
-    return localStorage.getItem(MOTION_KEY) === "1";
-  } catch {
-    return false; // webview without storage: just don't persist
-  }
-};
+import { useReduceMotion } from "../use-reduce-motion";
 
 const SettingsPanel = () => {
-  const [reduceMotion, setReduceMotion] = useState(readReduceMotion);
-
-  const toggleMotion = () => {
-    const next = !reduceMotion;
-    setReduceMotion(next);
-    try {
-      localStorage.setItem(MOTION_KEY, next ? "1" : "0");
-    } catch {
-      // ignore: persistence is best-effort
-    }
-    document.body.classList.toggle("reduce-motion", next);
-  };
+  const [reduceMotion, toggleMotion] = useReduceMotion();
 
   return (
     <div className="panel-body settings-panel">

@@ -1,5 +1,5 @@
 import type { IState } from "../../../core/state";
-import { EquipKind, type TClientAction } from "../actions";
+import { ActionType, ClientActionName, EquipKind, type TClientAction } from "../actions";
 
 interface IProps {
   state: IState;
@@ -54,7 +54,12 @@ const ItemsPanel = (props: IProps) => {
                     type="button"
                     className={`item-equip${item.equipped ? " is-equipped" : ""}`}
                     onClick={() =>
-                      dispatch({ type: "action", name: "equip", kind: ek, id: item.id })
+                      dispatch({
+                        type: ActionType.Action,
+                        name: ClientActionName.Equip,
+                        kind: ek,
+                        id: item.id,
+                      })
                     }
                   >
                     {item.equipped ? "Equipped" : "Equip"}

@@ -1,8 +1,6 @@
 import type { IState } from "../../../core/state";
-import { displayName } from "../view";
-import { heroSpriteSet } from "../sprites";
-import { Facing } from "../facing";
-import { assetUrl } from "../assets-base";
+import { displayName, spriteStyle } from "../view";
+import { heroPortrait } from "../sprites";
 
 interface IProps {
   state: IState;
@@ -17,20 +15,14 @@ const HeroPanel = (props: IProps) => {
   const stats = state.stats;
   const totalActions = Object.values(stats.actions).reduce((a, b) => a + b, 0);
   // Real class sprite instead of a fixed mage emoji; south (front-facing) reads best as a portrait.
-  const set = klass?.line
-    ? heroSpriteSet(klass.line, klass.tier, klass.branch)
-    : undefined;
-  const portrait = set?.idle[Facing.South];
-  const portraitStyle = portrait
-    ? { backgroundImage: `url(${assetUrl(portrait)})` }
-    : undefined;
+  const portrait = heroPortrait(klass);
 
   return (
     <div className="panel-body hero-panel">
       <div className="hero-id">
         <span
           className={`sprite panel-portrait${portrait ? " has-art" : ""}`}
-          style={portraitStyle}
+          style={spriteStyle(portrait)}
           aria-hidden="true"
         />
         <div>

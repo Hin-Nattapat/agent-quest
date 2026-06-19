@@ -67,6 +67,17 @@ const CARDINALS = ["south", "north", "east", "west"];
 
 const pngs = (dir: string): string[] => readdirSync(dir).filter(f => f.endsWith(".png"));
 
+// Copy every PixelLab frame from srcDir into destDir (created if needed), renamed to a bare index.
+// Returns the number of frames copied.
+const copyFrames = (srcDir: string, destDir: string): number => {
+  mkdirSync(destDir, { recursive: true });
+  const files = pngs(srcDir);
+  for (const f of files) {
+    copyFileSync(join(srcDir, f), join(destDir, `${frameIndex(f)}.png`));
+  }
+  return files.length;
+};
+
 // PixelLab character export -> sprites/<line>/<tier>/{idle/<dir>, walk/<dir>/N, cast/N (east)}.
 const importHero = (rawDir: string, target: ITarget): void => {
   const out = join(PUBLIC, "sprites", target.line ?? "", target.tier ?? "");
@@ -103,17 +114,10 @@ const importHero = (rawDir: string, target: ITarget): void => {
       }
       srcWalk = eastWalk;
     }
-    mkdirSync(join(out, "walk", dir), { recursive: true });
-    for (const f of pngs(srcWalk)) {
-      copyFileSync(join(srcWalk, f), join(out, "walk", dir, `${frameIndex(f)}.png`));
-    }
+    copyFrames(srcWalk, join(out, "walk", dir));
   }
   if (attack) {
-    const srcAttack = join(animDir, attack, "east");
-    mkdirSync(join(out, "attack"), { recursive: true });
-    for (const f of pngs(srcAttack)) {
-      copyFileSync(join(srcAttack, f), join(out, "attack", `${frameIndex(f)}.png`));
-    }
+    copyFrames(join(animDir, attack, "east"), join(out, "attack"));
   } else {
     console.warn("  (no attack/casting animation found — skipping attack/)");
   }
@@ -180,15 +184,8 @@ const importCreature = (rawDir: string, theme: string, kind: string): void => {
     pickAnimDir(animNames, "ttack") ?? animNames.find(n => n !== idle) ?? null;
 
   rmSync(out, { recursive: true, force: true });
-  const copyAnim = (animName: string, sub: string): number => {
-    const src = animFrameDir(join(animDir, animName));
-    mkdirSync(join(out, sub), { recursive: true });
-    const files = pngs(src);
-    for (const f of files) {
-      copyFileSync(join(src, f), join(out, sub, `${frameIndex(f)}.png`));
-    }
-    return files.length;
-  };
+  const copyAnim = (animName: string, sub: string): number =>
+    copyFrames(animFrameDir(join(animDir, animName)), join(out, sub));
 
   const idleN = copyAnim(idle, "idle");
   let attackN = 0;

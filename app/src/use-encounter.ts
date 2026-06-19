@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { IState } from "../../core/state";
 import { diffStates, type IGameEvent } from "./game-events";
 
-const ENCOUNTER_MS = 4500; // min on-screen battle so a real drop never flashes
+const ENCOUNTER_MS = 18200; // covers the scripted boss fight (10 turn-based rounds + the die/flee exit)
 
 // Diffs each new state into encounter events and plays them one at a time.
 export const useEncounter = (state: IState | null): IGameEvent | null => {

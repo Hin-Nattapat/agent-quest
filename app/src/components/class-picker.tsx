@@ -1,14 +1,10 @@
+import { titleCase } from "../view";
+
 interface IProps {
   options: string[];
   onPick: (line: string) => void;
   onCancel?: () => void;
 }
-
-const titleCase = (id: string): string =>
-  id
-    .split("_")
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
 
 // The class-choice buttons, shared by the initial class pick and the respec flow.
 const ClassPicker = (props: IProps) => {

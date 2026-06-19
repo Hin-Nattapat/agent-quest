@@ -1,6 +1,28 @@
+import type { CSSProperties } from "react";
 import type { IState } from "../../core/state";
 import { TimelineKind } from "../../core/events";
 import type { ITimelineEntry } from "../../core/timeline";
+import { assetUrl } from "./assets-base";
+
+// A background-image style for a sprite frame (resolved under the webview asset base), or undefined
+// when there's no frame yet so the element keeps its emoji/gradient fallback.
+export const spriteStyle = (frame: string | undefined): CSSProperties | undefined => {
+  if (!frame) {
+    return undefined;
+  }
+  return { backgroundImage: `url(${assetUrl(frame)})` };
+};
+
+// A 0..1 fraction clamped to a 0..100 percentage for a CSS bar width.
+export const hpPercent = (fraction: number): number =>
+  Math.max(0, Math.min(1, fraction)) * 100;
+
+// Title Case a snake_case id ("stone_wyrm" → "Stone Wyrm").
+export const titleCase = (id: string): string =>
+  id
+    .split("_")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
 export const xpPercent = (state: IState): number => {
   if (state.xp_to_next <= 0) {
@@ -69,16 +91,7 @@ const CMD_LABELS: Record<string, string> = {
 };
 
 // Readable label for a CmdTag value; unknown tags fall back to Title Case of the snake_case key.
-export const cmdLabel = (tag: string): string => {
-  const known = CMD_LABELS[tag];
-  if (known) {
-    return known;
-  }
-  return tag
-    .split("_")
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-};
+export const cmdLabel = (tag: string): string => CMD_LABELS[tag] ?? titleCase(tag);
 
 // Entries of a count record sorted by value descending (Array.sort is stable, so ties keep order).
 export const byCountDesc = (rec: Record<string, number>): [string, number][] => {

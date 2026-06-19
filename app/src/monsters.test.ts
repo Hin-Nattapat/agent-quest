@@ -1,10 +1,10 @@
 import { test, expect } from "bun:test";
 import { SceneTheme } from "./scene";
 import { MonsterAnim } from "./combat";
-import { buildMonsterSet, monsterSet, monsterFrames } from "./monsters";
+import { CreatureKind, buildCreatureSet, monsterSet, monsterFrames } from "./monsters";
 
-test("buildMonsterSet lays out idle + attack frame paths", () => {
-  const set = buildMonsterSet("grassland", 3, 2);
+test("buildCreatureSet lays out idle + attack frame paths", () => {
+  const set = buildCreatureSet(CreatureKind.Monster, "grassland", 3, 2);
   expect(set.idle).toEqual([
     "/sprites/monsters/grassland/idle/0.png",
     "/sprites/monsters/grassland/idle/1.png",
@@ -16,8 +16,14 @@ test("buildMonsterSet lays out idle + attack frame paths", () => {
   ]);
 });
 
+test("buildCreatureSet keys the folder off the kind", () => {
+  const boss = buildCreatureSet(CreatureKind.Boss, "grassland", 1, 1);
+  expect(boss.idle[0]).toBe("/sprites/boss/grassland/idle/0.png");
+  expect(boss.attack[0]).toBe("/sprites/boss/grassland/attack/0.png");
+});
+
 test("monsterFrames picks attack on attack anim, else idle", () => {
-  const set = buildMonsterSet("forest", 2, 2);
+  const set = buildCreatureSet(CreatureKind.Monster, "forest", 2, 2);
   expect(monsterFrames(set, MonsterAnim.Attack)).toBe(set.attack);
   expect(monsterFrames(set, MonsterAnim.Idle)).toBe(set.idle);
   expect(monsterFrames(set, MonsterAnim.Hurt)).toBe(set.idle);

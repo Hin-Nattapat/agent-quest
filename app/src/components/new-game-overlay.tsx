@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { IState } from "../../../core/state";
-import type { TClientAction } from "../actions";
+import { ActionType, ClientActionName, type TClientAction } from "../actions";
 import { assetUrl } from "../assets-base";
 
 // CSS url() can't resolve under the VS Code webview base, so the BG image goes through assetUrl on an
@@ -33,7 +33,11 @@ const NewGameOverlay = (props: IProps) => {
     if (!name) {
       return;
     }
-    dispatch({ type: "action", name: "setName", value: name });
+    dispatch({
+      type: ActionType.Action,
+      name: ClientActionName.SetName,
+      value: name,
+    });
     onStart();
   };
 

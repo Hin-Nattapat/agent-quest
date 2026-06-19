@@ -1,10 +1,10 @@
-import { useEffect } from "react";
 import { GameEventType, type IGameEvent } from "../game-events";
 import type { SceneTheme } from "../scene";
 import { MonsterAnim } from "../combat";
 import { bossSet, bossName } from "../boss";
 import { useSpriteFrame } from "../use-sprite-frame";
-import { assetUrl } from "../assets-base";
+import { usePreloadSprites } from "../use-preload";
+import { spriteStyle, hpPercent } from "../view";
 import type { IBossFightView } from "../use-boss-fight";
 import LootToast from "./loot-toast";
 
@@ -21,6 +21,7 @@ const BossEncounter = (props: IProps) => {
   const { encounter, theme, fight } = props;
   const set = bossSet(theme);
   const name = bossName(theme);
+  usePreloadSprites(set);
   // Attack cycles the attack frames; every other state holds the idle cycle (hurt is a CSS flash,
   // die/flee is a CSS transform on the sprite, both over the idle art).
   const attacking = fight.bossAnim === MonsterAnim.Attack && Boolean(set?.attack.length);
@@ -28,26 +29,13 @@ const BossEncounter = (props: IProps) => {
   const fps = attacking ? BOSS_ATTACK_FPS : BOSS_IDLE_FPS;
   const frame = useSpriteFrame(frames, fps, frames.length > 1);
 
-  // Decode idle + attack frames so the first swap doesn't flash.
-  useEffect(() => {
-    if (!set) {
-      return;
-    }
-    for (const url of [...set.idle, ...set.attack]) {
-      const img = new Image();
-      img.src = assetUrl(url);
-    }
-  }, [set]);
-
   const outcome = encounter.type === GameEventType.BossFled ? "fled" : "defeated";
   // The exit (die/flee) only plays once the trades are over, so the boss fights in place first.
   const outcomeClass = fight.leaving ? ` boss-${outcome}` : "";
-  const bg = frame ? { backgroundImage: `url(${assetUrl(frame)})` } : undefined;
   const artClass = frame ? " has-art" : "";
   // boss-hurt is a knockback + flash scaled for the big sprite (the mob's m-hurt is a 7px nudge,
   // invisible at this size).
   const hurtClass = !attacking && fight.bossAnim === MonsterAnim.Hurt ? " boss-hurt" : "";
-  const hpPct = Math.max(0, Math.min(1, fight.bossHp)) * 100;
   const showLoot = encounter.type === GameEventType.BossDefeated && fight.leaving;
 
   return (
@@ -56,12 +44,12 @@ const BossEncounter = (props: IProps) => {
         <div className="boss-plate">
           <span className="boss-name">{name}</span>
           <div className="boss-hp">
-            <i style={{ width: `${hpPct}%` }} />
+            <i style={{ width: `${hpPercent(fight.bossHp)}%` }} />
           </div>
         </div>
         <div
           className={`sprite boss${hurtClass}${artClass}`}
-          style={bg}
+          style={spriteStyle(frame)}
           aria-label={name}
         />
         {fight.bossHits.map(id => (

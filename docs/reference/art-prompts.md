@@ -557,33 +557,69 @@ The Jester Mirage:      a mischievous illusion jester splitting into mirror-imag
 - gen ตามลำดับ: base mob (slime/wraith/brute) → บอสสายที่เล่นอยู่ (Mage ก่อน) → ที่เหลือทยอย
 - **3.8b** ฉาก **กิล/เมือง** (home base, โทนอุ่น) + world-transition (fade + ป้าย "Now Entering") — โค้ดใช้ `.scene-guild` + `sceneNow` (Rest/fresh session_start = กิล); ตอนนี้ gradient placeholder, art เสียบหลัง CSS seam
 
-### 7.5 Boss per tier (boss-encounter event) — copy-paste
+### 7.5 Boss per realm (boss-encounter event) — copy-paste
 
-The random boss-encounter (`.boss`, renders **96px**, currently the 🐉 emoji) is class-agnostic; the
-art escalates with the player's **tier** instead. Four bosses, T1→T4, growing more menacing — a
-coding-fantasy nemesis line. **Character Creator · Mode Humanoid · 64×64** (bigger than the 56×56
-mobs, for a boss-grade silhouette) · **facing left** (west, toward the hero) · idle + keep-first-frame.
+The random boss-encounter (`.boss`, renders **96px**, currently the 🐉 emoji) is keyed by **realm
+theme** (same key as the mob/scene), so each area's boss matches its theme and T4a/b get their own.
+Each boss is a **distinct, larger creature** of that realm — NOT the mob upgraded, a different beast
+that just shares the realm's palette and mood, clearly bigger and more imposing than the regular mob.
 
-**constants** (in every boss prompt): `a massive imposing boss creature, not human, menacing and powerful, full body, centered, slightly stylized, clean 1px black outline`
+**settings:** Character Creator · **64×64** (bigger canvas than the 56×56 mobs) · **facing left** (west,
+toward the hero) · idle + keep-first-frame · Mode noted per boss (Quadruped for beasts/dragons,
+Humanoid for titans/colossi).
+
+**constants** (in every boss prompt): `a colossal boss creature, far larger and more imposing than a common monster, not human, menacing and powerful, full body, centered, slightly stylized, clean 1px black outline`
 
 **idle action** (shared): `a slow menacing idle loop, looming and breathing heavily in place with a subtle threatening sway, the body facing left toward the hero, keeping its form and colors unchanged`
 
-`boss/t1` · **The Null Imp** (T1)
+#### Starter realms (T1–T3)
 
-- `a gangly void-imp boss born of a null reference, a tall thin shadow-skinned humanoid with a gaping ragged hole through its chest leaking grey static, long claws, glowing red error-eyes, hunched and twitchy, grey-black body with a red error glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+`boss/grassland` · **Thornback Behemoth** (Mode Quadruped) — grassland palette (green + earth-brown)
 
-`boss/t2` · **The Stack Overflow** (T2)
+- `a colossal mossy grassland behemoth boss, a massive four-legged beast covered in thick bark, moss and blooming thorned vines, great curved horns and heavy stone-like hooves, earthy and overgrown, green and earth-brown palette, not human, full body, centered, slightly stylized, clean 1px black outline`
 
-- `a towering boss built from an unstable teetering stack of glowing glitch-blocks piled into a crude giant, each block flickering with scrolling code, cracking and spilling over at the top, stubby arms, a single angry eye, teal and amber glitch palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+`boss/forest` · **Elder Treant** (Mode Humanoid) — forest palette (deep green, ghostly)
 
-`boss/t3` · **The Deadlock Warden** (T3)
+- `a towering ancient treant boss, a giant walking gnarled tree-guardian with two glowing pale-green hollows for eyes, thick root-legs and branch-arms, draped in hanging moss and drifting spirit-wisps, deep forest-green palette, not human, full body, centered, slightly stylized, clean 1px black outline`
 
-- `a colossal two-headed iron golem boss, its two armored halves chained and bolted against each other and straining in opposite directions, heavy rusted riveted plating, glowing orange lock-runes along the chains, immovable and furious, iron-grey body with an orange lock-glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+`boss/dungeon` · **Stone Wyrm** (Mode Quadruped) — dungeon palette (grey stone + ember)
 
-`boss/t4` · **The Kernel Panic** (T4)
+- `a massive armored cave wyrm boss, a huge serpentine dragon of cracked grey stone and bone coiling up from the dungeon floor, jagged teeth, tattered stone wings and glowing ember eyes, grey stone with an ember glow, not human, full body, centered, slightly stylized, clean 1px black outline`
 
-- `a gigantic apocalyptic boss titan of corrupted molten code, a screaming many-eyed core wreathed in crashing red glitch-flames with broken terminal windows orbiting its body, jagged shards erupting from its back, overwhelming and final, deep-red and black body with white crash-flash highlights, not human, full body, centered, slightly stylized, clean 1px black outline`
+#### T4 realms (per branch)
 
-> import (when gen'd): `--as boss:t<N>` (importer's boss type is `notImplemented` today — wire it like
-> monster, output `sprites/boss/t<N>/idle/`) → select by `state.class.tier` in BossEncounter; until
-> then the 🐉 emoji stays. idle is the minimum (the defeat/flee motion is CSS on `.boss`).
+`boss/skyforge_aether` · **Tempest Leviathan** (Mode Quadruped) — purple + gold
+
+- `a colossal storm leviathan boss, a vast serpentine dragon woven from thundercloud and crackling golden lightning, broad storm-cloud wings and a blazing violet storm-eye, majestic, purple and gold palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/circuit_catacombs` · **Circuit Wyrmking** (Mode Quadruped) — deep-purple + toxic-green
+
+- `a giant undead circuit-dragon boss, a massive skeletal wyrm fused with glowing toxic-green circuit-board plating, a pulsing green core in its exposed ribcage, necrotic-tech, deep-purple and toxic-green palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/aurora_flux` · **Aurora Leviathan** (Mode Quadruped) — teal + rainbow
+
+- `a vast celestial light-whale boss, a colossal translucent leviathan of flowing teal and rainbow aurora drifting weightlessly, trailing motion-blur light-motes, ethereal, teal and rainbow palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/geometric_sanctum` · **Prism Colossus** (Mode Humanoid) — teal + blueprint-blue + white
+
+- `a towering crystalline colossus boss, a giant angular titan of clear blueprint-blue crystal and glowing grid-lines, sharp geometric plating and a luminous core, orderly and immense, teal, blueprint-blue and white palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/quantum_rift` · **Rift Devourer** (Mode Quadruped) — coral + glitch-magenta
+
+- `a colossal phasing void-beast boss, a huge double-exposed glitch-leviathan flickering and tearing between states, a fragmented coral-magenta maw and unstable shifting limbs, unsettling, coral and glitch-magenta palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/noir_crime_scene` · **Shadow Behemoth** (Mode Quadruped) — black-grey + coral
+
+- `a towering noir shadow-beast boss, a massive hulking hound made of living darkness prowling in the rain, many glowing coral eyes and dripping shadow-smoke, mysterious, monochrome black-grey with a coral glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/oracles_athenaeum` · **Rune Colossus** (Mode Humanoid) — amber-gold + parchment
+
+- `a colossal amber-stone guardian boss, a giant winged statue-titan carved from glowing amber sandstone, its body blazing with golden runes, vast feathered stone wings, regal and ancient, amber-gold and parchment palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/conductors_nexus` · **Clockwork Colossus** (Mode Humanoid) — amber + gold + multicolor
+
+- `a towering gilded clockwork colossus boss, a massive multi-armed brass automaton of turning gears and glowing golden threads, a radiant core in its chest, commanding, amber and gold with multicolored thread accents, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+> import (when gen'd): `--as boss:<theme>` (importer's boss type is `notImplemented` today — wire it
+> like monster, output `sprites/boss/<theme>/idle/`) → select by `sceneInfo.theme` in BossEncounter;
+> until then the 🐉 emoji stays. idle is the minimum (the defeat/flee motion is CSS on `.boss`).

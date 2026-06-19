@@ -1,5 +1,8 @@
 import type { IState } from "../../../core/state";
 import { displayName, passiveMultiplier, xpPercent } from "../view";
+import { heroSpriteSet } from "../sprites";
+import { Facing } from "../facing";
+import { assetUrl } from "../assets-base";
 
 interface IProps {
   state: IState;
@@ -7,17 +10,28 @@ interface IProps {
 
 const PortraitFrame = (props: IProps) => {
   const { state } = props;
-  const tier = state.class?.tier ?? 0;
-  const form = state.class?.form ?? "Novice";
+  const klass = state.class;
+  const tier = klass?.tier ?? 0;
+  const form = klass?.form ?? "Novice";
   const title = state.cosmetics?.title ?? null;
   const days = state.streak?.current_days ?? 0;
   const items = (state.inventory ?? []).length; // distinct loot owned
   const total = state.xp_in_level + state.xp_to_next;
+  // Real class sprite (south/front-facing) instead of the mage emoji, matching the Hero panel.
+  const set = klass?.line
+    ? heroSpriteSet(klass.line, klass.tier, klass.branch)
+    : undefined;
+  const face = set?.idle[Facing.South];
+  const faceStyle = face ? { backgroundImage: `url(${assetUrl(face)})` } : undefined;
 
   return (
     <div className="portrait-frame">
       <div className="portrait">
-        <span className="sprite portrait-face" aria-hidden="true" />
+        <span
+          className={`sprite portrait-face${face ? " has-art" : ""}`}
+          style={faceStyle}
+          aria-hidden="true"
+        />
       </div>
       <div className="portrait-body">
         <div className="pf-top">

@@ -480,7 +480,18 @@ body {
   box-shadow: inset 0 0 0 1px #ffffff14;
   font-size: 32px;
 }
-/* swap: set background-image (56×56 south-facing) and remove this content. */
+/* Override the battle-sprite defaults (absolute 64px, ground-anchored): fill the 56px frame and
+   centre the bust so the south-facing sprite sits squarely, not bottom-cropped or overflowing. */
+.portrait-face {
+  position: static;
+  width: 100%;
+  height: 100%;
+  font-size: 32px;
+  /* Zoom past `contain` so the character reads as a bust (head + torso) rather than a tiny full body;
+     anchor high so the head stays in frame while the legs crop out. */
+  background-size: 165%;
+  background-position: center 18%;
+}
 .portrait-face::after {
   content: "🧙";
 }
@@ -1367,7 +1378,11 @@ body {
   width: 52px;
   height: 52px;
   font-size: 32px;
-  background: var(--panel-2);
+  /* background-color (not the `background` shorthand) so the inline sprite image stays put */
+  background-color: var(--panel-2);
+  /* Zoom into a bust (head + torso) and anchor high, matching the HUD portrait. */
+  background-size: 165%;
+  background-position: center 18%;
   border: 2px solid var(--ink);
 }
 .panel-portrait::after {

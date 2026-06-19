@@ -55,6 +55,140 @@ body {
   color: var(--dim);
 }
 
+/* Title screen full-panel layer. The gradient is the fallback that shows behind .ng-bg (the real
+   splash.png, loaded via assetUrl so it resolves under the webview base) before/if the art fails. */
+.new-game {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a1330 0%, #2a1f48 55%, #3a2a14 100%);
+  image-rendering: pixelated;
+}
+/* The splash art (logo baked in). `center top` so the logo at the image top is never the cropped
+   edge when the panel ratio differs from the image's. */
+.ng-bg {
+  position: absolute;
+  inset: 0;
+  background: center top / cover no-repeat;
+  image-rendering: pixelated;
+}
+/* Splash: the baked logo is the title, so just sit the Start button low-centre over the valley, with
+   a soft bottom vignette so it stays legible against the bright sunset. */
+.ng-splash {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 9%;
+}
+.ng-splash::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 55%;
+  background: linear-gradient(180deg, transparent, #0a0810cc 88%);
+  pointer-events: none;
+}
+/* Name step needs readable UI over the art, so keep the centred column + full scrim here. */
+.ng-named {
+  display: grid;
+  place-items: center;
+}
+.ng-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #0a0810cc 0%, #0a0810f2 100%);
+}
+.ng-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+}
+.ng-title {
+  margin: 0;
+  font-family: var(--font-display);
+  /* vw instead of cqw: .new-game has no container-type ancestor, so cqw would resolve to 0 */
+  font-size: clamp(28px, 6vw, 52px);
+  color: var(--gold-soft);
+  text-shadow: 0 2px 0 #000;
+  letter-spacing: 1px;
+}
+/* The Start button sits above the splash vignette (the ::after), hence position + z-index. */
+/* Title-screen actions read as glowing gold text (a "press start" prompt), not a solid UI pill —
+   the pill clashed with the pixel-art splash. Hard shadow + glow keep them legible over the art. */
+.ng-action {
+  padding: 4px 10px;
+  font-family: "Pixelify Sans", monospace;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: var(--gold-soft);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 10px #0009;
+  transition:
+    color 120ms ease-out,
+    text-shadow 120ms ease-out,
+    transform 120ms ease-out;
+}
+.ng-action:hover {
+  color: #fff7e0;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 14px var(--gold-soft);
+}
+.ng-action:active {
+  transform: translateY(1px);
+}
+.ng-action:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.ng-action:disabled {
+  color: var(--dim);
+  cursor: default;
+  text-shadow: 0 1px 2px #000;
+}
+/* The splash Start is the hero CTA: larger and slowly pulsing like a classic title screen. */
+.ng-start {
+  position: relative;
+  z-index: 1;
+  font-size: 22px;
+  animation: ng-pulse 1.9s ease-in-out infinite;
+}
+@keyframes ng-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+.ng-input {
+  font-family: "Pixelify Sans", monospace;
+  font-size: 15px;
+  text-align: center;
+  padding: 7px 12px;
+  /* vw instead of cqw: no container-type ancestor; vw matches overlay width in the webview */
+  width: min(260px, 70vw);
+  color: var(--text);
+  background: var(--panel-dark);
+  border: 2px solid var(--gold);
+  border-radius: 3px;
+}
+.ng-input:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 2px;
+}
+
 /* ── two-column companion ── */
 .companion {
   display: flex;
@@ -1814,7 +1948,8 @@ body.reduce-motion *::after {
   .activity-farming .activity-dot,
   .boss-defeated .boss,
   .boss-fled .boss,
-  .loot-toast {
+  .loot-toast,
+  .ng-start {
     animation: none;
   }
   .hero-attack,

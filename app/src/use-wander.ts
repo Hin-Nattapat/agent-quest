@@ -45,15 +45,44 @@ export const stepWander = (
   };
 };
 
-// Waypoints + rest spot in panel-relative percentages (so the room scales with the panel).
-const WAYPOINTS = [
-  { x: 25, y: 35 },
-  { x: 70, y: 30 },
-  { x: 72, y: 68 },
-  { x: 35, y: 75 },
-  { x: 22, y: 55 },
+interface IPoint {
+  x: number;
+  y: number;
+}
+
+// Several patrol routes across the open wooden floor, in percentages of the locked .guild-stage.
+// The hero walks one route end-to-end, then switches to a different one, so the path varies instead
+// of looping a single fixed loop. All points stay in x ~[24,78], y ~[56,86] — off the back wall +
+// tables (top ~half) and the side walls (far edges).
+const ROUTES: IPoint[][] = [
+  // left → right across the upper floor
+  [
+    { x: 26, y: 60 },
+    { x: 50, y: 58 },
+    { x: 74, y: 62 },
+  ],
+  // right → left across the lower floor
+  [
+    { x: 74, y: 84 },
+    { x: 50, y: 82 },
+    { x: 30, y: 84 },
+  ],
+  // zigzag between the two
+  [
+    { x: 30, y: 62 },
+    { x: 44, y: 84 },
+    { x: 60, y: 60 },
+    { x: 72, y: 82 },
+  ],
+  // a lap around the central rug
+  [
+    { x: 50, y: 60 },
+    { x: 72, y: 72 },
+    { x: 50, y: 84 },
+    { x: 30, y: 72 },
+  ],
 ];
-const REST_SPOT = { x: 50, y: 62 };
+const REST_SPOT = { x: 50, y: 74 };
 const SPEED_PCT_PER_SEC = 9;
 const PAUSE_MIN_MS = 900;
 const PAUSE_MAX_MS = 2200;
@@ -65,8 +94,19 @@ const prefersReducedMotion = (): boolean => {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 };
 
-// roaming=false (Rest) pins the hero to the rest spot facing south. reduced-motion holds the
-// first waypoint. Otherwise the hero walks waypoint→waypoint with a varied pause between legs.
+// Pick a route index different from the current one (rand ∈ [0,1)). Maps rand onto the count-1
+// other routes, so the hero never replays the route it just finished. Pure for unit testing.
+export const pickNextRoute = (current: number, count: number, rand: number): number => {
+  if (count <= 1) {
+    return 0;
+  }
+  const i = Math.floor(rand * (count - 1));
+  return i >= current ? i + 1 : i;
+};
+
+// roaming=false (Rest) pins the hero to the rest spot facing south. reduced-motion holds the first
+// point. Otherwise the hero walks the current route point→point, then switches to a different route
+// (via pickNextRoute) so the path varies, with a varied pause between legs.
 export const useWander = (roaming: boolean): IWanderPose => {
   const restPose: IWanderPose = {
     xPct: REST_SPOT.x,
@@ -74,7 +114,7 @@ export const useWander = (roaming: boolean): IWanderPose => {
     facing: Facing.South,
     moving: false,
   };
-  const first = WAYPOINTS[0];
+  const first = ROUTES[0][0];
   const idlePose: IWanderPose = {
     xPct: first.x,
     yPct: first.y,
@@ -82,6 +122,7 @@ export const useWander = (roaming: boolean): IWanderPose => {
     moving: false,
   };
   const [pose, setPose] = useState<IWanderPose>(roaming ? idlePose : restPose);
+  const routeRef = useRef(0);
   const wpRef = useRef(0);
   const pauseRef = useRef(0);
   const posRef = useRef({ x: first.x, y: first.y });
@@ -105,7 +146,8 @@ export const useWander = (roaming: boolean): IWanderPose => {
       if (pauseRef.current > 0) {
         pauseRef.current -= dtMs;
       } else {
-        const target = WAYPOINTS[wpRef.current];
+        const route = ROUTES[routeRef.current];
+        const target = route[wpRef.current];
         const r = stepWander({
           xPct: posRef.current.x,
           yPct: posRef.current.y,
@@ -117,17 +159,26 @@ export const useWander = (roaming: boolean): IWanderPose => {
         posRef.current = { x: r.pose.xPct, y: r.pose.yPct };
         setPose(r.pose);
         if (r.reached) {
+          const lastLeg = wpRef.current >= route.length - 1;
           pauseRef.current =
-            PAUSE_MIN_MS +
-            (wpRef.current / WAYPOINTS.length) * (PAUSE_MAX_MS - PAUSE_MIN_MS);
-          wpRef.current = (wpRef.current + 1) % WAYPOINTS.length;
+            PAUSE_MIN_MS + (wpRef.current / route.length) * (PAUSE_MAX_MS - PAUSE_MIN_MS);
+          if (lastLeg) {
+            routeRef.current = pickNextRoute(
+              routeRef.current,
+              ROUTES.length,
+              Math.random(),
+            );
+            wpRef.current = 0;
+          } else {
+            wpRef.current += 1;
+          }
         }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-    // re-arm when active OR roaming flips (covers reduced-motion Rest↔Idle); WAYPOINTS/speed are constants.
+    // re-arm when active OR roaming flips (covers reduced-motion Rest↔Idle); ROUTES/speed are constants.
   }, [active, roaming]);
 
   return pose;

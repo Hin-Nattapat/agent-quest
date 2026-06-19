@@ -23,6 +23,7 @@
   &nbsp;•&nbsp; 📦 <a href="#-install">Install</a>
   &nbsp;•&nbsp; 🧙 <a href="#-how-it-works">How it works</a>
   &nbsp;•&nbsp; 🐛 <a href="https://github.com/Hin-Nattapat/commit-quest/issues">Issues</a>
+  &nbsp;•&nbsp; ☕ <a href="#-support">Support</a>
   &nbsp;•&nbsp; 📜 <a href="LICENSE">License</a>
 </p>
 
@@ -148,6 +149,15 @@ the list. We checked twice.
   has written one yet).
 - `--continue` / `--resume` replay recorded hook output and don't re-run hooks, so resumed spans can be
   sparse. We know. It's on the list.
+
+## ☕ Support
+
+Commit Quest is free and built in spare cycles. If it made your grind a little more fun, you can buy
+me a coffee — it directly funds more sprites, more realms, and more tokens to grind into this thing.
+
+<p align="center">
+  <a href="https://buymeacoffee.com/natta_p"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
+</p>
 
 ## 🤝 Contributing
 

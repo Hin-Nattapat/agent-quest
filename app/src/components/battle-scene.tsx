@@ -38,7 +38,7 @@ const BattleScene = (props: IProps) => {
       {!encounter && <HeroHits hits={scene.heroHits} />}
       <Hero line={line} tier={tier} branch={branch} anim={scene.hero} />
       <FloatingText floaters={scene.floaters} />
-      {encounter && <BossEncounter encounter={encounter} />}
+      {encounter && <BossEncounter encounter={encounter} theme={sceneInfo.theme} />}
     </>
   );
 };

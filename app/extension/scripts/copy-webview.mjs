@@ -28,3 +28,13 @@ for (const dir of ["sprites", "scenes", "items"]) {
     console.log(`copy-webview: ${dirSrc} -> ${dirDest}`);
   }
 }
+
+// Root-level public files Vite emits straight into dist/ (e.g. the splash title image) — copy each
+// so assetUrl("/<file>") resolves under the webview base, like the asset folders above.
+for (const file of ["splash.png"]) {
+  const fileSrc = join(ext, "..", "dist", file);
+  if (existsSync(fileSrc)) {
+    cpSync(fileSrc, join(destRoot, file));
+    console.log(`copy-webview: ${fileSrc} -> ${join(destRoot, file)}`);
+  }
+}

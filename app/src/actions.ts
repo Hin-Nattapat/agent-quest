@@ -1,3 +1,16 @@
+// Client → extension-host action messages. The enum string values ARE the wire contract read by the
+// host (app/extension/src/host-actions.ts), so keep them in sync.
+export enum ActionType {
+  Action = "action",
+}
+
+export enum ClientActionName {
+  Equip = "equip",
+  SetClass = "setClass",
+  SetBranch = "setBranch",
+  SetName = "setName",
+}
+
 export enum EquipKind {
   Title = "title",
   Theme = "theme",
@@ -5,27 +18,27 @@ export enum EquipKind {
 }
 
 export interface IEquipAction {
-  type: "action";
-  name: "equip";
+  type: ActionType.Action;
+  name: ClientActionName.Equip;
   kind: EquipKind;
   id: string;
 }
 
 export interface ISetClassAction {
-  type: "action";
-  name: "setClass";
+  type: ActionType.Action;
+  name: ClientActionName.SetClass;
   line: string;
 }
 
 export interface ISetBranchAction {
-  type: "action";
-  name: "setBranch";
+  type: ActionType.Action;
+  name: ClientActionName.SetBranch;
   branch: string;
 }
 
 export interface ISetNameAction {
-  type: "action";
-  name: "setName";
+  type: ActionType.Action;
+  name: ClientActionName.SetName;
   value: string;
 }
 

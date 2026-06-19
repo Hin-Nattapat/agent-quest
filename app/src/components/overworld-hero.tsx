@@ -1,8 +1,8 @@
 import type { Facing } from "../facing";
-import { assetUrl } from "../assets-base";
 import { heroSpriteSet, directionalFrames } from "../sprites";
 import { useSpriteFrame } from "../use-sprite-frame";
 import { usePreload } from "../use-preload";
+import { spriteStyle } from "../view";
 
 interface IProps {
   line: string;
@@ -25,7 +25,7 @@ const OverworldHero = (props: IProps) => {
   const artClass = frame ? " has-art" : "";
   const style = {
     transform: `translate3d(${xPx}px, ${yPx}px, 0) translate(-50%, -85%)`,
-    backgroundImage: frame ? `url(${assetUrl(frame)})` : undefined,
+    ...spriteStyle(frame),
   };
   return (
     <div

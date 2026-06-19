@@ -1,6 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { HeroAnim, MonsterAnim, attackStyleFor, isRanged } from "./combat";
+import { useEffect, useState } from "react";
+import { HeroAnim, MonsterAnim } from "./combat";
+import { heroAttackMs } from "./combat-timing";
 import { GameEventType, type IGameEvent } from "./game-events";
+import { useTimerPool } from "./timer-pool";
+import { useFlashIds } from "./use-flash-list";
 
 // A scripted boss battle reusing the mob combat visuals. The reducer already decided the outcome
 // (defeat/flee) and there is no live HP, so this is pure cosmetic choreography off the one encounter
@@ -16,76 +19,31 @@ export interface IBossFightView {
 }
 
 const ROUNDS = 10; // hero + boss exchanges; the last one is the hero's finisher (no boss counter)
-
-// Attack lengths must let the full frame cycle play, or the sprite barely animates before reverting.
-// These mirror the scene director: a ranged/cast hero needs its whole 9-frame cycle (≈600ms at the
-// hero's 15fps), a melee dash is a quick 280ms. The boss gets a punchy strike window.
-const HERO_RANGED_MS = 600;
-const HERO_MELEE_MS = 280;
-const BOSS_ATTACK_MS = 760;
+const BOSS_ATTACK_MS = 760; // a punchy strike window for the boss's ~9 attack frames
 const HERO_HURT_MS = 460;
 const BOSS_HURT_MS = 360;
 const FX_MS = 360; // clears a hit flash / impact burst; matches the CSS keyframes
 const RECOVER_MS = 220; // a breath between turns so the trade reads as turns, not a scramble
 
-const heroAttackMs = (line: string): number =>
-  isRanged(attackStyleFor(line)) ? HERO_RANGED_MS : HERO_MELEE_MS;
-
-const IDLE: IBossFightView = {
-  bossAnim: MonsterAnim.Idle,
-  bossHp: 1,
-  heroAnim: null,
-  heroHits: [],
-  bossHits: [],
-  leaving: false,
-};
-
 export const useBossFight = (
   encounter: IGameEvent | null,
   line: string,
 ): IBossFightView => {
-  const timers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
-  const seqRef = useRef(0);
-  const [bossAnim, setBossAnim] = useState<MonsterAnim>(IDLE.bossAnim);
-  const [bossHp, setBossHp] = useState(IDLE.bossHp);
-  const [heroAnim, setHeroAnim] = useState<HeroAnim | null>(IDLE.heroAnim);
-  const [heroHits, setHeroHits] = useState<number[]>([]);
-  const [bossHits, setBossHits] = useState<number[]>([]);
+  const pool = useTimerPool();
+  const [bossAnim, setBossAnim] = useState<MonsterAnim>(MonsterAnim.Idle);
+  const [bossHp, setBossHp] = useState(1);
+  const [heroAnim, setHeroAnim] = useState<HeroAnim | null>(null);
+  const [heroHits, flashHeroHit, clearHeroHits] = useFlashIds(pool, FX_MS);
+  const [bossHits, flashBossHit, clearBossHits] = useFlashIds(pool, FX_MS);
   const [leaving, setLeaving] = useState(false);
 
-  const clearTimers = () => {
-    for (const t of timers.current) {
-      clearTimeout(t);
-    }
-    timers.current.clear();
-  };
   useEffect(() => {
-    return () => {
-      clearTimers();
-    };
-  }, []);
-
-  const later = (fn: () => void, ms: number) => {
-    const t = setTimeout(() => {
-      timers.current.delete(t);
-      fn();
-    }, ms);
-    timers.current.add(t);
-  };
-  const flash = (set: (fn: (ids: number[]) => number[]) => void, ms: number) => {
-    const id = seqRef.current;
-    seqRef.current += 1;
-    set(ids => [...ids, id]);
-    later(() => set(ids => ids.filter(x => x !== id)), ms);
-  };
-
-  useEffect(() => {
-    clearTimers();
-    setBossAnim(IDLE.bossAnim);
-    setBossHp(IDLE.bossHp);
-    setHeroAnim(IDLE.heroAnim);
-    setHeroHits([]);
-    setBossHits([]);
+    pool.clearAll();
+    setBossAnim(MonsterAnim.Idle);
+    setBossHp(1);
+    setHeroAnim(null);
+    clearHeroHits();
+    clearBossHits();
     setLeaving(false);
     if (!encounter) {
       return;
@@ -106,14 +64,17 @@ export const useBossFight = (
 
       // — hero's turn: strike → boss flinches, takes a chunk of HP, shows an impact burst —
       const heroStart = t;
-      later(() => setHeroAnim(HeroAnim.Attack), heroStart);
-      later(() => setHeroAnim(null), heroStart + heroMs);
-      later(() => {
+      pool.later(() => setHeroAnim(HeroAnim.Attack), heroStart);
+      pool.later(() => setHeroAnim(null), heroStart + heroMs);
+      pool.later(() => {
         setBossAnim(MonsterAnim.Hurt);
         setBossHp(hp => Math.max(0, hp - 1 / ROUNDS));
-        flash(setBossHits, FX_MS);
+        flashBossHit();
       }, heroStart + heroContact);
-      later(() => setBossAnim(MonsterAnim.Idle), heroStart + heroContact + BOSS_HURT_MS);
+      pool.later(
+        () => setBossAnim(MonsterAnim.Idle),
+        heroStart + heroContact + BOSS_HURT_MS,
+      );
 
       if (finisher) {
         // Collapse a beat after the killing blow connects — no empty round, no boss counter.
@@ -124,23 +85,23 @@ export const useBossFight = (
 
       // — boss's turn: strike back → hero flinches —
       const bossStart = t;
-      later(() => setBossAnim(MonsterAnim.Attack), bossStart);
-      later(() => setBossAnim(MonsterAnim.Idle), bossStart + BOSS_ATTACK_MS);
-      later(() => {
+      pool.later(() => setBossAnim(MonsterAnim.Attack), bossStart);
+      pool.later(() => setBossAnim(MonsterAnim.Idle), bossStart + BOSS_ATTACK_MS);
+      pool.later(() => {
         setHeroAnim(HeroAnim.Hurt);
-        flash(setHeroHits, FX_MS);
+        flashHeroHit();
       }, bossStart + bossContact);
-      later(() => setHeroAnim(null), bossStart + bossContact + HERO_HURT_MS);
+      pool.later(() => setHeroAnim(null), bossStart + bossContact + HERO_HURT_MS);
       t = bossStart + BOSS_ATTACK_MS + RECOVER_MS;
     }
 
     if (fled) {
-      later(() => {
+      pool.later(() => {
         setBossAnim(MonsterAnim.Idle);
         setLeaving(true);
       }, t);
     } else {
-      later(() => {
+      pool.later(() => {
         setBossHp(0);
         setBossAnim(MonsterAnim.Die);
         setLeaving(true);

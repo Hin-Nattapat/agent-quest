@@ -10,7 +10,7 @@ const LootToast = (props: IProps) => {
   return (
     <div className="loot-toast">
       {items.map((id, i) => (
-        <span key={i} className="loot-item">
+        <span key={`${id}-${i}`} className="loot-item">
           🎁 {id}
         </span>
       ))}

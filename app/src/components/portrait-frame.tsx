@@ -1,8 +1,6 @@
 import type { IState } from "../../../core/state";
-import { displayName, passiveMultiplier, xpPercent } from "../view";
-import { heroSpriteSet } from "../sprites";
-import { Facing } from "../facing";
-import { assetUrl } from "../assets-base";
+import { displayName, passiveMultiplier, xpPercent, spriteStyle } from "../view";
+import { heroPortrait } from "../sprites";
 
 interface IProps {
   state: IState;
@@ -18,18 +16,14 @@ const PortraitFrame = (props: IProps) => {
   const items = (state.inventory ?? []).length; // distinct loot owned
   const total = state.xp_in_level + state.xp_to_next;
   // Real class sprite (south/front-facing) instead of the mage emoji, matching the Hero panel.
-  const set = klass?.line
-    ? heroSpriteSet(klass.line, klass.tier, klass.branch)
-    : undefined;
-  const face = set?.idle[Facing.South];
-  const faceStyle = face ? { backgroundImage: `url(${assetUrl(face)})` } : undefined;
+  const face = heroPortrait(klass);
 
   return (
     <div className="portrait-frame">
       <div className="portrait">
         <span
           className={`sprite portrait-face${face ? " has-art" : ""}`}
-          style={faceStyle}
+          style={spriteStyle(face)}
           aria-hidden="true"
         />
       </div>

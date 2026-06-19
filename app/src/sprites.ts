@@ -74,6 +74,23 @@ export const heroSpriteSet = (
   return HERO_SPRITES[heroKey(line, tier, branch)];
 };
 
+// The front-facing (south) idle frame for a class — used as the portrait face in the HUD and Hero
+// panel. Returns undefined for an unwired class so the caller keeps its emoji fallback.
+interface IHeroPortraitClass {
+  line?: string | null;
+  tier?: number;
+  branch?: string | null;
+}
+export const heroPortrait = (
+  klass: IHeroPortraitClass | null | undefined,
+): string | undefined => {
+  if (!klass?.line) {
+    return undefined;
+  }
+  const set = heroSpriteSet(klass.line, klass.tier ?? 0, klass.branch ?? null);
+  return set?.idle[Facing.South];
+};
+
 export const directionalFrames = (
   set: ISpriteSet,
   facing: Facing,

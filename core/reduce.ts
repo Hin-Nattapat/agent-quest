@@ -17,6 +17,7 @@ import {
   classTree,
   SecretLine,
   type IClassState,
+  type TLine,
 } from "./classes";
 import {
   rollInventory,
@@ -27,6 +28,8 @@ import {
   DEFAULT_BOSS_RATE,
   DEFAULT_BOSS_FLEE_RATE,
   type ITrigger,
+  type ILootItem,
+  type TDropTable,
 } from "./loot";
 import { TimelineKind, pushTimeline, type ITimelineEntry } from "./timeline";
 import { seededRng } from "./rng";
@@ -71,6 +74,94 @@ const tsOrder = (ts: string): number => {
 
 const ASCETIC_LEVEL = 25;
 const ASCETIC_MAX_RUN_RATIO = 0.2;
+
+// The agent earns the ascetic seal once it reaches level 25 having leaned on `run` for under a fifth
+// of its actions (a "thinker, not a runner" badge).
+interface IAsceticArgs {
+  level: number;
+  runningRuns: number;
+  runningActions: number;
+}
+const qualifiesAsAscetic = (props: IAsceticArgs): boolean => {
+  const { level, runningRuns, runningActions } = props;
+  if (runningActions === 0) {
+    return false;
+  }
+  return level >= ASCETIC_LEVEL && runningRuns / runningActions < ASCETIC_MAX_RUN_RATIO;
+};
+
+// Timeline entries for thresholds crossed on one event: one LevelUp per level gained, plus an
+// Advance when the class tier steps up.
+interface ILevelMilestonesArgs {
+  prevLevel: number;
+  newLevel: number;
+  prevTier: number;
+  newTier: number;
+  line: TLine | null;
+  branch: "a" | "b" | null;
+  ts: string;
+}
+const levelMilestones = (props: ILevelMilestonesArgs): ITimelineEntry[] => {
+  const { prevLevel, newLevel, prevTier, newTier, line, branch, ts } = props;
+  const entries: ITimelineEntry[] = [];
+  for (let lv = prevLevel + 1; lv <= newLevel; lv++) {
+    entries.push({ kind: TimelineKind.LevelUp, detail: String(lv), ts });
+  }
+  if (newTier > prevTier) {
+    entries.push({
+      kind: TimelineKind.Advance,
+      detail: formFor({ line, tier: newTier, branch }),
+      ts,
+    });
+  }
+  return entries;
+};
+
+interface IBossRollArgs {
+  ordinal: number;
+  bossRate: number;
+  bossFleeRate: number;
+  lootTable: Record<string, ILootItem>;
+  dropTables: Record<string, TDropTable>;
+  ts: string;
+}
+interface IBossRoll {
+  defeated: number; // 0 or 1
+  fled: number; // 0 or 1
+  trigger?: ITrigger; // inventory trigger for a defeat's loot drop
+  timeline: ITimelineEntry[];
+}
+// One seeded boss roll for an Action event: a `bossRate` chance to appear, then a `bossFleeRate`
+// chance to flee vs. be defeated (defeat rolls a loot drop). Seeds are derived from the ordinal so
+// the whole sequence is reproducible from the journal; the loot seed is shared with rollInventory so
+// the logged drop name matches what's actually granted.
+const rollBossForEvent = (props: IBossRollArgs): IBossRoll => {
+  const { ordinal, bossRate, bossFleeRate, lootTable, dropTables, ts } = props;
+  if (seededRng(`boss:${ordinal}`)() >= bossRate) {
+    return { defeated: 0, fled: 0, timeline: [] };
+  }
+  if (seededRng(`bossflee:${ordinal}`)() < bossFleeRate) {
+    return {
+      defeated: 0,
+      fled: 1,
+      timeline: [{ kind: TimelineKind.BossFled, detail: "", ts }],
+    };
+  }
+  const seed = `bossloot:${ordinal}`;
+  const timeline: ITimelineEntry[] = [
+    { kind: TimelineKind.BossDefeated, detail: "", ts },
+  ];
+  const dropId = rollDrop({ trigger: { table: "boss", seed }, lootTable, dropTables });
+  if (dropId && lootTable[dropId]) {
+    timeline.push({
+      kind: TimelineKind.Loot,
+      detail: lootTable[dropId].name,
+      rarity: lootTable[dropId].rarity,
+      ts,
+    });
+  }
+  return { defeated: 1, fled: 0, trigger: { table: "boss", seed }, timeline };
+};
 
 interface ICollectUnlocksArgs {
   earned: string[];
@@ -136,34 +227,30 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   for (const e of sorted) {
     const base = xpFor(e, config.weights);
     const level = levelFor(running, config.difficulty); // from XP accrued so far (causal)
-    const tier = line != null && level >= 5 ? tierForLevel(level) : 0;
+    // tierForLevel already floors to 0 below level 5, so no explicit level guard is needed.
+    const tier = line != null ? tierForLevel(level) : 0;
     const isSignal = line != null && isPassiveSignal(line, e);
     const mult = isSignal && tier >= 1 ? 1 + basePct(tier, config.passive) : 1;
     const gained = base * mult;
     running += gained;
 
-    // `level` above is pre-gain (causal for this event's passive mult); newLevel is
-    // post-gain, which is what a level-up milestone reflects.
+    // `level`/`tier` above are pre-gain (causal for this event's passive mult); the milestones below
+    // reflect the post-gain level/tier this event pushed us to.
     const newLevel = levelFor(running, config.difficulty);
-    if (newLevel > prevLevel) {
-      for (let lv = prevLevel + 1; lv <= newLevel; lv++) {
-        recent = pushTimeline(recent, {
-          kind: TimelineKind.LevelUp,
-          detail: String(lv),
-          ts: e.ts,
-        });
-      }
-      prevLevel = newLevel;
+    const newTier = line != null ? tierForLevel(newLevel) : 0;
+    for (const entry of levelMilestones({
+      prevLevel,
+      newLevel,
+      prevTier,
+      newTier,
+      line,
+      branch,
+      ts: e.ts,
+    })) {
+      recent = pushTimeline(recent, entry);
     }
-    const newTier = line != null && newLevel >= 5 ? tierForLevel(newLevel) : 0;
-    if (newTier > prevTier) {
-      recent = pushTimeline(recent, {
-        kind: TimelineKind.Advance,
-        detail: formFor({ line, tier: newTier, branch }),
-        ts: e.ts,
-      });
-      prevTier = newTier;
-    }
+    prevLevel = newLevel;
+    prevTier = newTier;
 
     sessions.add(e.session_id);
     dates.add(eventLocalDate(e.ts));
@@ -207,49 +294,29 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     }
     if (e.type === EventType.Action) {
       bossOrdinal++;
-      if (seededRng(`boss:${bossOrdinal}`)() < bossRate) {
-        if (seededRng(`bossflee:${bossOrdinal}`)() < bossFleeRate) {
-          bossFled++;
-          recent = pushTimeline(recent, {
-            kind: TimelineKind.BossFled,
-            detail: "",
-            ts: e.ts,
-          });
-        } else {
-          bossDefeated++;
-          // One seed shared by the inventory roll and the timeline peek so the logged
-          // loot name always matches the item rollInventory actually grants.
-          const bossSeed = `bossloot:${bossOrdinal}`;
-          bossTriggers.push({ table: "boss", seed: bossSeed });
-          recent = pushTimeline(recent, {
-            kind: TimelineKind.BossDefeated,
-            detail: "",
-            ts: e.ts,
-          });
-          const dropId = rollDrop({
-            trigger: { table: "boss", seed: bossSeed },
-            lootTable,
-            dropTables,
-          });
-          if (dropId && lootTable[dropId]) {
-            recent = pushTimeline(recent, {
-              kind: TimelineKind.Loot,
-              detail: lootTable[dropId].name,
-              rarity: lootTable[dropId].rarity,
-              ts: e.ts,
-            });
-          }
-        }
+      const boss = rollBossForEvent({
+        ordinal: bossOrdinal,
+        bossRate,
+        bossFleeRate,
+        lootTable,
+        dropTables,
+        ts: e.ts,
+      });
+      bossDefeated += boss.defeated;
+      bossFled += boss.fled;
+      if (boss.trigger) {
+        bossTriggers.push(boss.trigger);
+      }
+      for (const entry of boss.timeline) {
+        recent = pushTimeline(recent, entry);
       }
     }
-    if (asceticSeal === 0 && runningActions > 0) {
-      const lvlNow = levelFor(running, config.difficulty);
-      if (
-        lvlNow >= ASCETIC_LEVEL &&
-        runningRuns / runningActions < ASCETIC_MAX_RUN_RATIO
-      ) {
-        asceticSeal = 1;
-      }
+    // newLevel is this event's post-gain level (computed above) — reuse it instead of recomputing.
+    if (
+      asceticSeal === 0 &&
+      qualifiesAsAscetic({ level: newLevel, runningRuns, runningActions })
+    ) {
+      asceticSeal = 1;
     }
     tally({ groups: bySource, key: e.source, xp: gained, sessionId: e.session_id });
     if (e.repo) {

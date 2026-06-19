@@ -6,7 +6,7 @@ import {
   selectTransport,
   type IMessageTarget,
 } from "./transport";
-import { EquipKind } from "./actions";
+import { ActionType, ClientActionName, EquipKind } from "./actions";
 
 const sample = {
   version: 1,
@@ -101,13 +101,24 @@ test("postMessageTransport.send posts the action; sseTransport.send is a no-op",
   const api = { postMessage: (m: unknown) => posted.push(m) };
   const fake = new FakeTarget();
   const t = postMessageTransport(api, fake as unknown as IMessageTarget);
-  t.send({ type: "action", name: "equip", kind: EquipKind.Title, id: "rookie" });
+  t.send({
+    type: ActionType.Action,
+    name: ClientActionName.Equip,
+    kind: EquipKind.Title,
+    id: "rookie",
+  });
+  // The posted message carries the raw wire strings (the enum values).
   expect(posted).toEqual([
     { type: "action", name: "equip", kind: "title", id: "rookie" },
   ]);
 
   const sse = sseTransport("/events", () => new FakeSource() as unknown as EventSource);
   expect(() =>
-    sse.send({ type: "action", name: "equip", kind: EquipKind.Theme, id: "x" }),
+    sse.send({
+      type: ActionType.Action,
+      name: ClientActionName.Equip,
+      kind: EquipKind.Theme,
+      id: "x",
+    }),
   ).not.toThrow();
 });

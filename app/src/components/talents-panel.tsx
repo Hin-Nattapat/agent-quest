@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { IState } from "../../../core/state";
-import type { TClientAction } from "../actions";
+import { ActionType, ClientActionName, type TClientAction } from "../actions";
 import { AdvanceKind } from "../advance";
 import ClassPicker from "./class-picker";
 import TalentTree from "./talent-tree";
@@ -19,7 +19,7 @@ const TalentsPanel = (props: IProps) => {
   const [confirmBranch, setConfirmBranch] = useState<"a" | "b" | null>(null);
 
   const pickClass = (line: string) => {
-    dispatch({ type: "action", name: "setClass", line });
+    dispatch({ type: ActionType.Action, name: ClientActionName.SetClass, line });
     setRespecOpen(false);
   };
 
@@ -75,7 +75,11 @@ const TalentsPanel = (props: IProps) => {
         <BranchConfirm
           formName={tree.branches?.[confirmBranch] ?? confirmBranch}
           onConfirm={() => {
-            dispatch({ type: "action", name: "setBranch", branch: confirmBranch });
+            dispatch({
+              type: ActionType.Action,
+              name: ClientActionName.SetBranch,
+              branch: confirmBranch,
+            });
             setConfirmBranch(null);
           }}
           onCancel={() => setConfirmBranch(null)}

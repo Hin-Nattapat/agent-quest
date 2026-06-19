@@ -8,14 +8,15 @@ import {
   PACK_HITS,
   AttackStyle,
   attackStyleFor,
-  isRanged,
   firstAlive,
   heroAnim,
   monsterAnim,
   randAlive,
   packCleared,
 } from "./combat";
+import { attackMsForStyle } from "./combat-timing";
 import { heroSpriteSet } from "./sprites";
+import { useTimerPool } from "./timer-pool";
 import {
   ScenePhase,
   initDirector,
@@ -76,10 +77,10 @@ interface ISceneView {
 }
 
 // These clear each transient anim class after it plays; they MUST match the matching CSS keyframe
-// durations in styles.css (.hero-attack/.m-die/.floater/etc.) or the sprite snaps or leaks.
-const HERO_MS = { attack: 280, hurt: 500, celebrate: 1200 };
+// durations in styles.css (.hero-attack/.m-die/.floater/etc.) or the sprite snaps or leaks. The hero
+// attack length lives in combat-timing (shared with the boss fight).
+const HERO_MS = { hurt: 500, celebrate: 1200 };
 const MON_MS = { hurt: 360, attack: 500, die: 600 };
-const CAST_MS = 600; // mage cast pulse — long enough to play the 9 cast frames at CAST_FPS
 const FLOATER_MS = 900;
 const EFFECT_MS = 320;
 const TICK_MS = 250; // advances time-driven transitions (engage start, rest-gap expiry)
@@ -95,7 +96,7 @@ export const useSceneDirector = (
   const prevRef = useRef<IState | null>(null);
   const dirRef = useRef<IDirectorState>(initDirector);
   const seqRef = useRef(0);
-  const timers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const pool = useTimerPool();
 
   const [dir, setDir] = useState<IDirectorState>(initDirector);
   const [attacking, setAttacking] = useState(false);
@@ -115,26 +116,12 @@ export const useSceneDirector = (
   // No attack frames yet → behave as Melee (dash + slash), so unwired lines don't regress.
   styleRef.current = heroSet?.attack ? attackStyleFor(clsLine ?? "") : AttackStyle.Melee;
 
-  useEffect(() => {
-    const set = timers.current;
-    return () => {
-      for (const t of set) {
-        clearTimeout(t);
-      }
-    };
-  }, []);
-
-  const later = (fn: () => void, ms: number) => {
-    const t = setTimeout(() => {
-      timers.current.delete(t);
-      fn();
-    }, ms);
-    timers.current.add(t);
-  };
   const pulse = (set: (v: boolean) => void, ms: number) => {
     set(true);
-    later(() => set(false), ms);
+    pool.later(() => set(false), ms);
   };
+  // seqRef double-duties: a unique id for each transient VFX AND the varying seed randAlive uses to
+  // pick which mob counter-attacks — so the flash lists stay inline here rather than useFlashIds.
   const nextId = () => {
     const id = seqRef.current;
     seqRef.current += 1;
@@ -143,17 +130,17 @@ export const useSceneDirector = (
   const addFloater = (kind: FloaterKind, text: string) => {
     const id = nextId();
     setFloaters(f => [...f, { id, kind, text }]);
-    later(() => setFloaters(f => f.filter(x => x.id !== id)), FLOATER_MS);
+    pool.later(() => setFloaters(f => f.filter(x => x.id !== id)), FLOATER_MS);
   };
   const addEffect = (slot: number, kind: EffectKind) => {
     const id = nextId();
     setEffects(e => [...e, { id, slot, kind }]);
-    later(() => setEffects(e => e.filter(x => x.id !== id)), EFFECT_MS);
+    pool.later(() => setEffects(e => e.filter(x => x.id !== id)), EFFECT_MS);
   };
   const addHeroHit = () => {
     const id = nextId();
     setHeroHits(h => [...h, id]);
-    later(() => setHeroHits(h => h.filter(x => x !== id)), HERO_HIT_MS);
+    pool.later(() => setHeroHits(h => h.filter(x => x !== id)), HERO_HIT_MS);
   };
   // A mob plays its attack frames; CONTACT_MS later its blow connects → hero-hit VFX + flinch.
   const counterAttack = () => {
@@ -162,8 +149,8 @@ export const useSceneDirector = (
       return;
     }
     setAttackSlot(idx);
-    later(() => setAttackSlot(null), MON_MS.attack);
-    later(() => {
+    pool.later(() => setAttackSlot(null), MON_MS.attack);
+    pool.later(() => {
       addHeroHit();
       pulse(setHeroHurt, HERO_MS.hurt);
     }, CONTACT_MS);
@@ -182,25 +169,24 @@ export const useSceneDirector = (
       const idx = firstAlive(before.pack);
       if (idx >= 0 && next.pack[idx] !== before.pack[idx]) {
         const style = styleRef.current;
-        const ranged = isRanged(style);
         const killed = next.pack[idx] <= 0;
-        pulse(setAttacking, ranged ? CAST_MS : HERO_MS.attack);
+        pulse(setAttacking, attackMsForStyle(style));
         // A killing blow drops the mob's hits to 0 synchronously (setDir above), so mark it dying in
         // the SAME render — otherwise the `gone` gate (hits<=0 && !dying) hides the mob during the
         // contact window and it vanishes before its die animation (and final strike) ever play.
         if (killed) {
           setDyingSlot(idx);
-          later(() => setDyingSlot(null), MON_MS.die);
+          pool.later(() => setDyingSlot(null), MON_MS.die);
         }
         // The blow lands on the hero's contact frame, not the windup, so the trade reads smoothly.
-        later(() => {
+        pool.later(() => {
           addEffect(idx, effectKindFor(style));
           if (!killed) {
             pulse(setMonHurt, MON_MS.hurt);
           }
         }, CONTACT_MS);
         if (!packCleared(next.pack)) {
-          later(counterAttack, COUNTER_DELAY_MS);
+          pool.later(counterAttack, COUNTER_DELAY_MS);
         }
       }
     }
@@ -222,9 +208,9 @@ export const useSceneDirector = (
       const idx = firstAlive(dirRef.current.pack);
       if (idx >= 0) {
         setAttackSlot(idx);
-        later(() => setAttackSlot(null), MON_MS.attack);
+        pool.later(() => setAttackSlot(null), MON_MS.attack);
       }
-      later(() => {
+      pool.later(() => {
         addHeroHit();
         pulse(setHeroHurt, HERO_MS.hurt);
       }, CONTACT_MS);

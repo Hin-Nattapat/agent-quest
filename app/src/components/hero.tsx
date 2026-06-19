@@ -1,9 +1,9 @@
 import { HeroAnim, attackStyleFor, isRanged } from "../combat";
 import { Facing } from "../facing";
-import { assetUrl } from "../assets-base";
 import { heroSpriteSet, directionalFrames } from "../sprites";
 import { useSpriteFrame } from "../use-sprite-frame";
 import { usePreload } from "../use-preload";
+import { spriteStyle } from "../view";
 
 interface IProps {
   line: string;
@@ -25,7 +25,6 @@ const Hero = (props: IProps) => {
   const battleFrames = set ? directionalFrames(set, Facing.East, false) : [];
   const frames = attacking ? (set?.attack ?? []) : battleFrames;
   const frame = useSpriteFrame(frames, ATTACK_FPS, attacking);
-  const style = frame ? { backgroundImage: `url(${assetUrl(frame)})` } : undefined;
   const artClass = frame ? " has-art" : "";
   // Ranged attack stands (the `cast` class drops the .hero-attack dash); a melee attack keeps the
   // dash class AND cycles the stab frames (transform + background-image are independent).
@@ -33,7 +32,7 @@ const Hero = (props: IProps) => {
   return (
     <div
       className={`sprite hero hero-${line} hero-${animClass}${artClass}`}
-      style={style}
+      style={spriteStyle(frame)}
       aria-label="hero"
     />
   );

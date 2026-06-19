@@ -50,7 +50,7 @@ export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
   "rogue-t3": buildSet("rogue/t3", 9, 9),
   "rogue-t4a": buildSet("rogue/t4a", 9, 9),
   "rogue-t4b": buildSet("rogue/t4b", 9, 9),
-  // Sage: walk + idle only for now (no cast art wired — sage uses the melee dash).
+  // Sage: idle + walk + attack (Invoke — stands and calls down a glyph).
   "sage-t1": buildSet("sage/t1", 9, 9),
   "sage-t2": buildSet("sage/t2", 9, 9),
   "sage-t3": buildSet("sage/t3", 9, 9),

@@ -14,6 +14,8 @@ export enum AssetType {
   Item = "item",
   Monster = "monster",
   Boss = "boss",
+  Map = "map",
+  Npc = "npc",
 }
 
 export interface ITarget {
@@ -151,6 +153,32 @@ const importBg = (raw: string, target: ITarget): void =>
   importSingle(raw, target, "scenes");
 const importItem = (raw: string, target: ITarget): void =>
   importSingle(raw, target, "items");
+// Top-down overworld map (PixelLab create-map, one flattened image), e.g. the guild interior.
+const importMap = (raw: string, target: ITarget): void =>
+  importSingle(raw, target, "overworld");
+
+// PixelLab character export -> overworld/npc/<id>/<N>.png (the south-facing idle loop). NPCs stand
+// in place facing the camera, so only the idle animation's south frames are needed.
+const importNpc = (rawDir: string, target: ITarget): void => {
+  const animDir = join(rawDir, "animations");
+  if (!existsSync(animDir)) {
+    throw new Error(`npc export missing animations/ in ${rawDir}`);
+  }
+  const animNames = readdirSync(animDir);
+  // Idle folders are named by the action description ("standing still in place …"), not "idle".
+  const stationary = /still|almost|in[_ ]?place|motionless|resting/i;
+  const idle =
+    pickAnimDir(animNames, "dle") ?? animNames.find(n => stationary.test(n)) ?? null;
+  if (!idle) {
+    throw new Error(`npc export has no idle animation in ${animDir}`);
+  }
+  const south = join(animDir, idle, "south");
+  const src = existsSync(south) ? south : join(animDir, idle);
+  const out = join(PUBLIC, "overworld", "npc", target.name ?? "");
+  rmSync(out, { recursive: true, force: true });
+  const n = copyFrames(src, out);
+  console.log(`npc ${target.name} -> ${out}  (idle: ${n})`);
+};
 
 // Monster anims may be single-direction (frames directly in the anim folder) or multi-direction
 // (frames under west/south/…). The battle mob faces the hero on the left, so prefer the west view.
@@ -208,6 +236,8 @@ const TYPES: Record<AssetType, (raw: string, target: ITarget) => void> = {
   [AssetType.Item]: importItem,
   [AssetType.Monster]: importMonster,
   [AssetType.Boss]: importBoss,
+  [AssetType.Map]: importMap,
+  [AssetType.Npc]: importNpc,
 };
 
 const USAGE = "usage: bun tools/import-art.ts <raw-folder> --as <type>:<args> [--rm]";

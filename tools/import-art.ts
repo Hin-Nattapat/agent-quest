@@ -14,6 +14,7 @@ export enum AssetType {
   Item = "item",
   Monster = "monster",
   Boss = "boss",
+  Map = "map",
 }
 
 export interface ITarget {
@@ -151,6 +152,9 @@ const importBg = (raw: string, target: ITarget): void =>
   importSingle(raw, target, "scenes");
 const importItem = (raw: string, target: ITarget): void =>
   importSingle(raw, target, "items");
+// Top-down overworld map (PixelLab create-map, one flattened image), e.g. the guild interior.
+const importMap = (raw: string, target: ITarget): void =>
+  importSingle(raw, target, "overworld");
 
 // Monster anims may be single-direction (frames directly in the anim folder) or multi-direction
 // (frames under west/south/…). The battle mob faces the hero on the left, so prefer the west view.
@@ -208,6 +212,7 @@ const TYPES: Record<AssetType, (raw: string, target: ITarget) => void> = {
   [AssetType.Item]: importItem,
   [AssetType.Monster]: importMonster,
   [AssetType.Boss]: importBoss,
+  [AssetType.Map]: importMap,
 };
 
 const USAGE = "usage: bun tools/import-art.ts <raw-folder> --as <type>:<args> [--rm]";

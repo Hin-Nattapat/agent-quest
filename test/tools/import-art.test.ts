@@ -44,6 +44,10 @@ test("parseTarget reads monster name", () => {
   });
 });
 
+test("parseTarget reads map name", () => {
+  expect(parseTarget("map:guild")).toEqual({ type: AssetType.Map, name: "guild" });
+});
+
 test("pickAnimDir finds monster idle/attack folders", () => {
   const names = ["idle_breathing_loop", "attack_lunge_forward"];
   expect(pickAnimDir(names, "dle")).toBe("idle_breathing_loop");

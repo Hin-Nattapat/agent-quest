@@ -4,11 +4,33 @@
   "description": "Live Commit Quest companion panel in VS Code.",
   "version": "0.0.1",
   "publisher": "natpat",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "claude",
+    "claude code",
+    "rpg",
+    "gamification",
+    "ai agent",
+    "pixel art",
+    "companion"
+  ],
+  "galleryBanner": {
+    "color": "#2a2118",
+    "theme": "dark"
+  },
+  "homepage": "https://github.com/Hin-Nattapat/commit-quest#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/Hin-Nattapat/commit-quest"
   },
-  "private": true,
+  "bugs": {
+    "url": "https://github.com/Hin-Nattapat/commit-quest/issues"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -46,6 +68,8 @@
     "build:all": "npm --prefix .. run build && npm run copy-webview && npm run build",
     "package": "npm run build:all && vsce package --no-dependencies",
     "reinstall": "npm run package && code --install-extension \"$(ls -t commit-quest-companion-*.vsix | head -1)\" --force",
+    "publish": "npm run build:all && vsce publish --no-dependencies",
+    "publish:ovsx": "npm run package && ovsx publish \"$(ls -t commit-quest-companion-*.vsix | head -1)\"",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

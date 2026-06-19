@@ -17,6 +17,7 @@ import {
   classTree,
   SecretLine,
   type IClassState,
+  type TLine,
 } from "./classes";
 import {
   rollInventory,
@@ -96,7 +97,7 @@ interface ILevelMilestonesArgs {
   newLevel: number;
   prevTier: number;
   newTier: number;
-  line: string | null;
+  line: TLine | null;
   branch: "a" | "b" | null;
   ts: string;
 }

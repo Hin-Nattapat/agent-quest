@@ -16,11 +16,11 @@ const HeroPanel = (props: IProps) => {
   const aff = klass?.affinity ?? {};
   const stats = state.stats;
   const totalActions = Object.values(stats.actions).reduce((a, b) => a + b, 0);
-  // Real class sprite (idle, east) instead of a fixed mage emoji, so the portrait matches the line.
+  // Real class sprite instead of a fixed mage emoji; south (front-facing) reads best as a portrait.
   const set = klass?.line
     ? heroSpriteSet(klass.line, klass.tier, klass.branch)
     : undefined;
-  const portrait = set?.idle[Facing.East];
+  const portrait = set?.idle[Facing.South];
   const portraitStyle = portrait
     ? { backgroundImage: `url(${assetUrl(portrait)})` }
     : undefined;

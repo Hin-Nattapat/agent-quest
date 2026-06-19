@@ -158,20 +158,26 @@ const animFrameDir = (animPath: string): string => {
   return animPath;
 };
 
-// PixelLab creature export -> sprites/monsters/<theme>/{idle/N, attack/N} (west = faces the hero).
-const importMonster = (rawDir: string, target: ITarget): void => {
-  const theme = target.name ?? "";
-  const out = join(PUBLIC, "sprites", "monsters", theme);
+// PixelLab creature export (monster OR boss) -> sprites/<kind>/<theme>/{idle/N, attack/N}
+// (west = faces the hero). `kind` is the subfolder under sprites/ ("monsters" or "boss").
+const importCreature = (rawDir: string, theme: string, kind: string): void => {
+  const out = join(PUBLIC, "sprites", kind, theme);
   const animDir = join(rawDir, "animations");
   if (!existsSync(animDir)) {
-    throw new Error(`monster export missing animations/ in ${rawDir}`);
+    throw new Error(`${kind} export missing animations/ in ${rawDir}`);
   }
   const animNames = readdirSync(animDir);
-  const idle = pickAnimDir(animNames, "dle");
-  const attack = pickAnimDir(animNames, "ttack");
+  // PixelLab sometimes names a folder by its full action description instead of "idle"/"attack".
+  // Idle prompts read as stationary ("almost still", "in place"), so fall back to that; the attack
+  // is then whatever folder is left (a creature export has just the two animations).
+  const stationary = /still|almost|in[_ ]?place|motionless|resting/i;
+  const idle =
+    pickAnimDir(animNames, "dle") ?? animNames.find(n => stationary.test(n)) ?? null;
   if (!idle) {
-    throw new Error(`monster export has no idle animation in ${animDir}`);
+    throw new Error(`${kind} export has no idle animation in ${animDir}`);
   }
+  const attack =
+    pickAnimDir(animNames, "ttack") ?? animNames.find(n => n !== idle) ?? null;
 
   rmSync(out, { recursive: true, force: true });
   const copyAnim = (animName: string, sub: string): number => {
@@ -191,21 +197,20 @@ const importMonster = (rawDir: string, target: ITarget): void => {
   } else {
     console.warn("  (no attack animation found — skipping attack/)");
   }
-  console.log(`monster ${theme} -> ${out}  (idle: ${idleN}, attack: ${attackN})`);
+  console.log(`${kind} ${theme} -> ${out}  (idle: ${idleN}, attack: ${attackN})`);
 };
 
-const notImplemented = (name: string) => (): void => {
-  throw new Error(
-    `${name} import not implemented yet — see docs/reference/art-import.md (Adding a type)`,
-  );
-};
+const importMonster = (rawDir: string, target: ITarget): void =>
+  importCreature(rawDir, target.name ?? "", "monsters");
+const importBoss = (rawDir: string, target: ITarget): void =>
+  importCreature(rawDir, target.name ?? "", "boss");
 
 const TYPES: Record<AssetType, (raw: string, target: ITarget) => void> = {
   [AssetType.Hero]: importHero,
   [AssetType.Bg]: importBg,
   [AssetType.Item]: importItem,
   [AssetType.Monster]: importMonster,
-  [AssetType.Boss]: notImplemented("boss"),
+  [AssetType.Boss]: importBoss,
 };
 
 const USAGE = "usage: bun tools/import-art.ts <raw-folder> --as <type>:<args> [--rm]";

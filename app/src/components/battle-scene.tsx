@@ -3,6 +3,8 @@ import type { IScene } from "../scene";
 import { ActivityState } from "../activity";
 import { useEncounter } from "../use-encounter";
 import { useSceneDirector } from "../use-scene-director";
+import { useBossFight } from "../use-boss-fight";
+import { HeroAnim } from "../combat";
 import Hero from "./hero";
 import Monster from "./monster";
 import HitEffects from "./hit-effect";
@@ -23,6 +25,13 @@ const BattleScene = (props: IProps) => {
   const { state, activity, sceneInfo, line, tier, branch } = props;
   const encounter = useEncounter(state);
   const scene = useSceneDirector(state, activity);
+  const fight = useBossFight(encounter, line);
+  // During the boss fight the hero is driven ONLY by the fight — never the still-running farming
+  // director. Otherwise the director's own attack ticks fire mid-trade (it keeps swinging at the
+  // hidden ambient mobs) and the two schedules overlap, so it reads as both sides flailing at once
+  // instead of taking clean turns. Between the fight's beats the hero holds a ready battle stance.
+  const heroAnim = encounter ? (fight.heroAnim ?? HeroAnim.Farming) : scene.hero;
+
   return (
     <>
       {!encounter &&
@@ -35,10 +44,12 @@ const BattleScene = (props: IProps) => {
           );
         })}
       {!encounter && <HitEffects effects={scene.effects} />}
-      {!encounter && <HeroHits hits={scene.heroHits} />}
-      <Hero line={line} tier={tier} branch={branch} anim={scene.hero} />
+      <HeroHits hits={encounter ? fight.heroHits : scene.heroHits} />
+      <Hero line={line} tier={tier} branch={branch} anim={heroAnim} />
       <FloatingText floaters={scene.floaters} />
-      {encounter && <BossEncounter encounter={encounter} />}
+      {encounter && (
+        <BossEncounter encounter={encounter} theme={sceneInfo.theme} fight={fight} />
+      )}
     </>
   );
 };

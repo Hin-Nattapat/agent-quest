@@ -786,11 +786,16 @@ body {
   position: absolute;
   right: 14%;
   bottom: 18%;
-  width: 96px;
-  height: 96px;
+  /* cqh so the boss scales with the stage and towers over the 30cqh mobs (was a fixed 96px that
+     read tiny on a large panel). */
+  width: 56cqh;
+  height: 56cqh;
   font-size: 64px;
 }
-.boss-encounter .boss::after {
+/* :not(.has-art) so the 🐉 placeholder only shows when there's no boss sprite — the bare
+   `.boss::after` here loaded after `.sprite.has-art::after{content:none}` and was overriding it,
+   leaving the emoji stamped on top of the real sprite. */
+.boss-encounter .boss:not(.has-art)::after {
   content: "🐉";
 }
 .boss-defeated .boss {

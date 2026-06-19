@@ -556,3 +556,34 @@ The Jester Mirage:      a mischievous illusion jester splitting into mirror-imag
 - พื้นหลังแดน = tileset/gen แยก (PixelLab map หรือ free fantasy tileset) — มอนสเตอร์/บอสมาก่อน, ฉากตามทีหลัง
 - gen ตามลำดับ: base mob (slime/wraith/brute) → บอสสายที่เล่นอยู่ (Mage ก่อน) → ที่เหลือทยอย
 - **3.8b** ฉาก **กิล/เมือง** (home base, โทนอุ่น) + world-transition (fade + ป้าย "Now Entering") — โค้ดใช้ `.scene-guild` + `sceneNow` (Rest/fresh session_start = กิล); ตอนนี้ gradient placeholder, art เสียบหลัง CSS seam
+
+### 7.5 Boss per tier (boss-encounter event) — copy-paste
+
+The random boss-encounter (`.boss`, renders **96px**, currently the 🐉 emoji) is class-agnostic; the
+art escalates with the player's **tier** instead. Four bosses, T1→T4, growing more menacing — a
+coding-fantasy nemesis line. **Character Creator · Mode Humanoid · 64×64** (bigger than the 56×56
+mobs, for a boss-grade silhouette) · **facing left** (west, toward the hero) · idle + keep-first-frame.
+
+**constants** (in every boss prompt): `a massive imposing boss creature, not human, menacing and powerful, full body, centered, slightly stylized, clean 1px black outline`
+
+**idle action** (shared): `a slow menacing idle loop, looming and breathing heavily in place with a subtle threatening sway, the body facing left toward the hero, keeping its form and colors unchanged`
+
+`boss/t1` · **The Null Imp** (T1)
+
+- `a gangly void-imp boss born of a null reference, a tall thin shadow-skinned humanoid with a gaping ragged hole through its chest leaking grey static, long claws, glowing red error-eyes, hunched and twitchy, grey-black body with a red error glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/t2` · **The Stack Overflow** (T2)
+
+- `a towering boss built from an unstable teetering stack of glowing glitch-blocks piled into a crude giant, each block flickering with scrolling code, cracking and spilling over at the top, stubby arms, a single angry eye, teal and amber glitch palette, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/t3` · **The Deadlock Warden** (T3)
+
+- `a colossal two-headed iron golem boss, its two armored halves chained and bolted against each other and straining in opposite directions, heavy rusted riveted plating, glowing orange lock-runes along the chains, immovable and furious, iron-grey body with an orange lock-glow, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+`boss/t4` · **The Kernel Panic** (T4)
+
+- `a gigantic apocalyptic boss titan of corrupted molten code, a screaming many-eyed core wreathed in crashing red glitch-flames with broken terminal windows orbiting its body, jagged shards erupting from its back, overwhelming and final, deep-red and black body with white crash-flash highlights, not human, full body, centered, slightly stylized, clean 1px black outline`
+
+> import (when gen'd): `--as boss:t<N>` (importer's boss type is `notImplemented` today — wire it like
+> monster, output `sprites/boss/t<N>/idle/`) → select by `state.class.tier` in BossEncounter; until
+> then the 🐉 emoji stays. idle is the minimum (the defeat/flee motion is CSS on `.boss`).

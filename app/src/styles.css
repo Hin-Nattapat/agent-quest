@@ -78,7 +78,7 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 9%;
+  padding-bottom: 4%;
 }
 .ng-splash::after {
   content: "";
@@ -781,39 +781,119 @@ body {
   inset: 0;
   pointer-events: none;
 }
-/* boss takes the foe slot on the right (same combat axis as the ambient monster) */
-.boss-encounter .boss {
+/* boss takes the foe slot on the right (same combat axis as the ambient monster). The unit is the
+   positioned box; the sprite fills it and the nameplate floats over its upper area. */
+.boss-unit {
   position: absolute;
-  right: 14%;
-  bottom: 18%;
-  /* cqh so the boss scales with the stage and towers over the 30cqh mobs (was a fixed 96px that
-     read tiny on a large panel). */
-  width: 56cqh;
-  height: 56cqh;
+  right: 12%;
+  /* lower than the hero's 18%: the sprite's transparent bottom-padding, scaled up to 72cqh, lifts
+     the creature off the ground, so drop the box to land its feet on the same ground line. */
+  bottom: 8%;
+  /* cqh so the boss scales with the stage; ~2.4x the 30cqh hero/mobs so it reads as a boss, not a
+     bigger mob. */
+  width: 72cqh;
+  height: 72cqh;
+}
+.boss-unit .boss {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   font-size: 64px;
 }
 /* :not(.has-art) so the 🐉 placeholder only shows when there's no boss sprite — the bare
-   `.boss::after` here loaded after `.sprite.has-art::after{content:none}` and was overriding it,
-   leaving the emoji stamped on top of the real sprite. */
-.boss-encounter .boss:not(.has-art)::after {
+   `.boss::after` loaded after `.sprite.has-art::after{content:none}` and was overriding it. */
+.boss-unit .boss:not(.has-art)::after {
   content: "🐉";
 }
+/* nameplate + HP, mirroring the mob's but scaled up; bottom-anchored just over the creature's head
+   (the sprite bottom-aligns in the tall box, so its head sits high). Fades out as the boss leaves. */
+.boss-plate {
+  position: absolute;
+  left: 50%;
+  bottom: 64%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1cqh;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+.boss-defeated .boss-plate,
+.boss-fled .boss-plate {
+  opacity: 0;
+}
+.boss-name {
+  padding: 0.5cqh 1.6cqh;
+  font-family: "Pixelify Sans", monospace;
+  font-size: 5.5cqh;
+  line-height: 1.1;
+  color: var(--gold-soft);
+  background: rgba(20, 17, 28, 0.7);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  text-shadow: 0 1px 1px #000;
+  white-space: nowrap;
+}
+.boss-hp {
+  width: 34cqh;
+  height: 3cqh;
+  border: 1px solid var(--ink);
+  border-radius: 1px;
+  background: #241636;
+}
+.boss-hp > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, #e0633f, #9c2a2a);
+  transition: width 200ms ease;
+}
+/* exit plays only once the trades end (the .boss-defeated/.boss-fled class is gated on fight.leaving),
+   so no pre-roll delay here: collapse / slip away immediately. */
 .boss-defeated .boss {
-  /* get pummeled (1.5s), then collapse: flash white, pop up, shrink-fall-spin out */
-  animation:
-    boss-hit 0.25s steps(2) 6,
-    boss-die 1s cubic-bezier(0.5, 0, 0.75, 0) 1.5s forwards;
+  animation: boss-die 0.9s cubic-bezier(0.5, 0, 0.75, 0) forwards;
   transform-origin: center bottom;
 }
 .boss-fled .boss {
   animation: boss-flee 1s ease-in forwards;
 }
-@keyframes boss-hit {
-  from {
+/* the hero's blow landing on the boss — a bright burst centred on the sprite so the hero's offence
+   reads (the mob's small slash is lost on a sprite this big), making the trade clearly two-sided. */
+.boss-fx {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 28cqh;
+  height: 28cqh;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    #ffe9a8 30%,
+    #ffb24dcc 52%,
+    transparent 72%
+  );
+  filter: drop-shadow(0 0 8px #ffd27a);
+  animation: zap 0.36s ease-out forwards;
+}
+/* boss flinch: a real knockback + flash, scaled for the big sprite (m-hurt's 7px nudge is invisible). */
+.boss-hurt {
+  animation: boss-hurt 0.36s ease-out 1;
+}
+@keyframes boss-hurt {
+  0% {
     transform: translateX(0);
+    filter: none;
   }
-  to {
-    transform: translateX(5px);
+  30% {
+    transform: translateX(14px);
+    filter: brightness(2.4) saturate(0.4);
+  }
+  100% {
+    transform: translateX(0);
+    filter: none;
   }
 }
 @keyframes boss-die {
@@ -1987,6 +2067,8 @@ body.reduce-motion *::after {
   .mob-spawn,
   .hero-hit,
   .hit-effect,
+  .boss-fx,
+  .boss-hurt,
   .floater {
     animation: none;
   }

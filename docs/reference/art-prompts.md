@@ -367,6 +367,28 @@ template (ฝัง composition แล้ว — เติม `<SCENE>`/`<decor>
 a side-view pixel-art battle background of <SCENE>, a wide open flat <ground> clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, <decor> only at the far left and right edges, <background> behind, completely empty with no people, no characters, no creatures, no figures, <palette + mood>, limited palette, clean pixel art, slightly stylized
 ```
 
+### 7.C Overworld guild map (top-down · PixelLab create-map)
+
+Guild = ฉาก **Overworld** (Idle/Rest) ไม่ใช่ battle bg — render โดย `OverworldRoom` ที่ฮีโร่เดิน ambient
+ทับข้างบน · gen ด้วย **create-map (Pixflux)** ไม่ใช่ create-image · import: `--as map:guild` →
+`overworld/guild.png` แล้วเติม `SceneTheme.Guild` ใน `OVERWORLD_BGS` (`overworld-bg.ts`)
+
+**ตั้งค่า:** Camera view = **Top-down** · canvas **กว้าง-เตี้ย** ให้ใกล้ panel (~3:1; เลือกขนาดใหญ่สุดที่ tier
+รับได้ เช่น 400×~128–200) · render `cover`/center → ห้องควรเต็ม ไม่มีขอบสำคัญติดมุม
+
+⚠️ เหมือน §7.B: **บรรยายแต่ห้อง/เฟอร์นิเจอร์ ห้ามเอ่ย hero/adventurer/characters** ไม่งั้น AI วาดคนลงไป
+
+**ตั้งค่าสำคัญ:** Camera view = **Top-down** (ไม่ใช่ Sidescroller)
+
+⚠️ **กันขอบดำ — อย่าใช้ negation เรื่อง space** (`no walls`/`no void`/`no black`/`no border`): โมเดลมัก
+วาดสิ่งที่เอ่ยถึงแม้มี "no" → ยิ่งสั่งยิ่งมีขอบดำ/พื้นลอยกลาง void · แทนที่ด้วย **คำเชิงบวก**: บรรยายเป็น
+**"พื้น/terrain ที่ปูเต็มทั้งภาพ edge to edge"** (ไม่ใช่ "ห้องมีกำแพง" — พอเป็นห้องมันวาดเป็นวัตถุลอยกลางจอ)
+· เก็บ negation ไว้แค่ `no people/characters` ท้ายสุด
+
+```
+a seamless top-down pixel-art floor of a cozy medieval adventurers' guild hall, warm wooden planks completely covering the whole image edge to edge as the ground, thin stone walls flush along the top, left and right edges seen from straight above, a hanging dusk-purple banner, brass wall torches, arched windows and framed pictures, a long row of wooden tables, chairs and treasure chests along the top, a large ornate rug centered on the open wooden floor, warm and inviting, dusk-purple brass-gold and warm-wood palette, no people, no characters, no adventurers, limited palette, clean pixel art, slightly stylized
+```
+
 ### 7.1 ฉากพื้น T1–T3 (ใช้ร่วมทุกสาย) — มอน + ฉาก
 
 ทุก prompt ด้านล่าง **copy ทั้งบรรทัดวางได้เลย** (constants รวมแล้ว) · Generation Mode = **Humanoid** ทุกตัว · idle/attack วาง Action Description จาก §7.A

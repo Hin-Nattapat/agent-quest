@@ -23,6 +23,7 @@ own target first).
 |---|---|---|
 | hero | `--as hero:<line>:<tier>` (`tier` ∈ `t1 t2 t3 t4a t4b`) | `app/public/sprites/<line>/<tier>/{idle/<dir>.png, walk/<dir>/<N>.png, cast/<N>.png}` |
 | bg | `--as bg:<theme>` | `app/public/scenes/<theme>.png` |
+| map | `--as map:<name>` | `app/public/overworld/<name>.png` |
 | item | `--as item:<id>` | `app/public/items/<id>.png` |
 
 Examples:
@@ -31,7 +32,14 @@ Examples:
 bun tools/import-art.ts art/incoming/Ranger    --as hero:ranger:t1
 bun tools/import-art.ts art/incoming/CloudMage --as hero:mage:t4a --rm
 bun tools/import-art.ts art/incoming/grassland --as bg:grassland
+bun tools/import-art.ts art/incoming/Guild     --as map:guild
 ```
+
+A `map` is a single flattened top-down image from PixelLab **create-map** (Pixflux) — the overworld
+room the hero ambient-walks (e.g. the guild). After importing `overworld/<name>.png`, add the theme
+to `OVERWORLD_BGS` in `app/src/overworld-bg.ts` (mirrors `SCENE_BGS`); until then the room falls back
+to its CSS-placeholder props. The `.guild-bg` layer renders `cover`/centered, so generate it roughly
+landscape (the panel is wide/short) and describe the room **terrain/furniture only, never the hero**.
 
 After a hero import, add one manifest line in `app/src/sprites.ts`:
 `"<line>-<tier>": buildSet("<line>/<tier>", 9),` (the importer touches assets only, never code).

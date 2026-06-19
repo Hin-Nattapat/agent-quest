@@ -1,4 +1,7 @@
 import { ActivityState } from "../activity";
+import { SceneTheme } from "../scene";
+import { hasOverworldBg } from "../overworld-bg";
+import { assetUrl } from "../assets-base";
 import { useWander } from "../use-wander";
 import { useMeasuredSize } from "../use-measured-size";
 import OverworldHero from "./overworld-hero";
@@ -23,8 +26,18 @@ const OverworldRoom = (props: IProps) => {
   const xPx = Math.round((pose.xPct / 100) * size.w);
   const yPx = Math.round((pose.yPct / 100) * size.h);
 
+  // Real top-down map (PixelLab create-map) when imported; .has-art hides the CSS-placeholder props.
+  const hasArt = hasOverworldBg(SceneTheme.Guild);
+
   return (
-    <div className="guild-room" ref={roomRef}>
+    <div className={`guild-room${hasArt ? " has-art" : ""}`} ref={roomRef}>
+      {hasArt && (
+        <div
+          className="guild-bg"
+          aria-hidden="true"
+          style={{ backgroundImage: `url(${assetUrl("/overworld/guild.png")})` }}
+        />
+      )}
       <div className="guild-floor" aria-hidden="true" />
       <div className="guild-rug" aria-hidden="true" />
       <div className="guild-banner" aria-hidden="true">

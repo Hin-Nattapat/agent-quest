@@ -2088,6 +2088,23 @@ body.reduce-motion *::after {
   overflow: hidden;
   background: radial-gradient(120% 80% at 50% 0%, #4a3a24 0%, #3a2e1f 45%, #2a2118 100%);
 }
+.guild-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+/* Real map supplies the room — drop the CSS-placeholder props (hero + 💤 stay on top). */
+.guild-room.has-art .guild-floor,
+.guild-room.has-art .guild-rug,
+.guild-room.has-art .guild-banner,
+.guild-room.has-art .guild-table,
+.guild-room.has-art .guild-npc,
+.guild-room.has-art .guild-chest {
+  display: none;
+}
 .guild-floor {
   position: absolute;
   left: 6%;

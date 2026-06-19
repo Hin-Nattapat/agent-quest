@@ -7,7 +7,6 @@ export enum HeroAnim {
   Attack = "attack",
   Hurt = "hurt",
   Celebrate = "celebrate",
-  Wander = "wander",
 }
 
 export enum MonsterAnim {
@@ -63,11 +62,10 @@ interface IHeroAnimArgs {
   hurt: boolean;
   attack: boolean;
   activity: ActivityState;
-  wander?: boolean;
 }
 
 export const heroAnim = (props: IHeroAnimArgs): HeroAnim => {
-  const { celebrate, hurt, attack, activity, wander } = props;
+  const { celebrate, hurt, attack, activity } = props;
   if (celebrate) {
     return HeroAnim.Celebrate;
   }
@@ -76,9 +74,6 @@ export const heroAnim = (props: IHeroAnimArgs): HeroAnim => {
   }
   if (attack) {
     return HeroAnim.Attack;
-  }
-  if (wander) {
-    return HeroAnim.Wander;
   }
   return HERO_BASE[activity];
 };

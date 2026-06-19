@@ -282,6 +282,19 @@ test("secret base passive multiplies its thematic signal (Maestro/delegate micro
   expect(maestro.xp_total).toBe(10); // 4 + 2 + 2 + 2 (delegates x2 past Lv.5)
 });
 
+test("achievements split into earned, locked goals (with criteria), and a hidden secret count", () => {
+  const s = reduce({ events: [], config: cfgA, today: "2026-06-11" });
+  const a = s.achievements!;
+  // Fresh state: nothing earned → every deed is either a visible locked goal or a hidden secret.
+  expect(a.locked!.length).toBeGreaterThan(0);
+  expect(a.locked!.every(d => d.desc.length > 0 && d.name.length > 0)).toBe(true);
+  expect(a.secret).toBeGreaterThan(0);
+  // The three buckets exactly partition the registry, and locked never overlaps earned.
+  expect(a.earned.length + a.locked!.length + (a.secret ?? 0)).toBe(a.total);
+  const earnedIds = new Set(a.earned);
+  expect(a.locked!.some(d => earnedIds.has(d.id))).toBe(false);
+});
+
 test("earning an unlock achievement fills unlocked_secret_classes; balance gates on level", () => {
   const cfg = easy(makeHome());
   const many = Array.from({ length: 30 }, (_, i) =>

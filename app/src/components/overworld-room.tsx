@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
 import { ActivityState } from "../activity";
 import { useWander } from "../use-wander";
+import { useMeasuredSize } from "../use-measured-size";
 import OverworldHero from "./overworld-hero";
 
 interface IProps {
@@ -13,22 +13,9 @@ interface IProps {
 const OverworldRoom = (props: IProps) => {
   const { line, tier, branch, activity } = props;
   const roaming = activity !== ActivityState.Rest;
+  const resting = !roaming;
   const pose = useWander(roaming);
-  const resting = activity === ActivityState.Rest;
-  const roomRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 0, h: 0 });
-
-  useEffect(() => {
-    const el = roomRef.current;
-    if (!el) {
-      return;
-    }
-    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight });
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  const [roomRef, size] = useMeasuredSize<HTMLDivElement>();
 
   // Move the hero with a compositor transform (pixel coords) instead of left/top %, so the
   // pixel-art sprite is rasterized once and slid on the GPU. left/top motion re-samples the

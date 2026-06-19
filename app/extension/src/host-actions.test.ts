@@ -5,6 +5,7 @@ import { makeHome } from "../../../test/helpers";
 import { rollDrop, LOOT_TABLE, LootKind } from "../../../core/loot";
 import { applyAction } from "./host-actions";
 import { reduceToFile } from "../../../core/reduce";
+import { loadProfile } from "../../../core/profile";
 
 // Zero-weight config so a single session_end is the only trigger: one deterministic clean drop.
 function seedOneClean(home: string) {
@@ -127,4 +128,21 @@ test("applyAction setBranch rejects below Lv.50", () => {
   applyAction(home, { name: "setClass", line: "mage" });
   const r = applyAction(home, { name: "setBranch", branch: "a" });
   expect(r).toBeNull();
+});
+
+test("setName trims, caps at 24, and persists to the profile", () => {
+  const home = makeHome();
+  const out = applyAction(home, {
+    name: "setName",
+    value: "  Gandalf the Grey the White  ",
+  });
+  expect(out).not.toBeNull();
+  expect(loadProfile(home).name).toBe("Gandalf the Grey the Whi"); // trimmed + 24-char cap
+});
+
+test("setName rejects an empty/whitespace value and leaves the profile unchanged", () => {
+  const home = makeHome();
+  const before = loadProfile(home).name;
+  expect(applyAction(home, { name: "setName", value: "   " })).toBeNull();
+  expect(loadProfile(home).name).toBe(before);
 });

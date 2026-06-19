@@ -1,37 +1,54 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Hin-Nattapat/commit-quest/main/app/public/splash.png" alt="Commit Quest" width="600">
+</p>
+
 # Commit Quest Companion
 
-A live Commit Quest companion panel for VS Code — shows your coding RPG character (class, level, XP,
-loot, achievements) and an animated AFK scene, fed from `~/.agentrpg/state.json`.
+A live pixel-RPG companion panel for **Claude Code**, right inside VS Code. It shows your coding
+session gamified as a character — class, level, XP, streak, loot, boss fights, achievements — over an
+animated AFK scene (farming, guild hall with NPCs, tier realms). Ambient and read-only: glance at it
+between turns.
 
-## Install (local `.vsix`)
+> **Needs the Commit Quest engine.** This panel renders `~/.agentrpg/state.json`, which the Commit
+> Quest hooks write while you use Claude Code. Install the engine first (one line):
+>
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/Hin-Nattapat/commit-quest/main/scripts/bootstrap.sh | bash
+> ```
+>
+> Then merge the printed snippet into `~/.claude/settings.json`. Full setup:
+> <https://github.com/Hin-Nattapat/commit-quest#install>
 
-```bash
-cd app/extension
-npm run reinstall   # package + force-install the freshest vsix in one shot
-# or, separately:
-npm run package                                              # → commit-quest-companion-<version>.vsix
-code --install-extension commit-quest-companion-0.0.1.vsix
-```
+## Usage
 
-Reload VS Code (`Developer: Reload Window`), then open the **Commit Quest** panel (next to Terminal / Output).
+1. Install this extension (Marketplace) and reload the window.
+2. Open the **Commit Quest** panel — it sits next to Terminal / Output in the bottom panel.
+3. Run a Claude Code session. The panel updates live as you prompt, edit, and ship.
 
-To remove: `code --uninstall-extension natpat.commit-quest-companion`.
+## Features
 
-## Develop (F5)
-
-```bash
-cd app/extension && npm run build:all   # build app → copy webview → bundle extension
-```
-
-Then press **F5** to launch the Extension Development Host. The panel and the installed vsix load the
-same `webview/` bundle, so always run `build:all` before F5 (and close the dev host before testing an
-installed copy to avoid a panel collision).
+- Live character HUD: class, tier, level, animated XP bar, streak, equipped title.
+- Animated AFK scene: farming, in-place battles, guild hall with NPCs, per-tier realms.
+- Boss encounters, loot, and an achievements / talents / items overlay.
+- Real PixelLab sprites for the four main class lines.
 
 ## How it works
 
 - `src/state-feed.ts` watches `~/.agentrpg/state.json` and pushes it to the webview via `postMessage`.
 - The webview is the `app/` React build (Vite), copied into `webview/` by `scripts/copy-webview.mjs`.
-- The extension host bundles with esbuild (`external: vscode`); the webview HTML is generated in
-  `src/webview-html.ts` with a CSP nonce.
+- The extension host bundles with esbuild; the webview HTML is generated with a CSP nonce.
 
-See `docs/reference/commands.md` for the full command list.
+## Develop & publish
+
+```bash
+npm run build:all   # build app → copy webview → bundle extension (run before F5)
+npm run reinstall   # package + force-install the freshest .vsix locally
+```
+
+Press **F5** for the Extension Development Host (close it before testing an installed copy). Publishing
+to the Marketplace / Open VSX: see
+[`docs/reference/publishing.md`](https://github.com/Hin-Nattapat/commit-quest/blob/main/docs/reference/publishing.md).
+
+## License
+
+[MIT](https://github.com/Hin-Nattapat/commit-quest/blob/main/LICENSE)

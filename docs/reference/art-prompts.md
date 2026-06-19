@@ -141,8 +141,9 @@ CSS keyframes (`styles.css` `.hero-*` / `.m-*`).
 ### 4.0 Novice — ตัวเริ่มต้น (pre-class · ภาพแรกที่ผู้เล่นทุกคนเห็น)
 
 ทุกคนเริ่มที่ **Novice Lv.1** ก่อนเลเวลถึง T1 แล้วเลือกสาย → ตัวนี้คือภาพแรกหลัง install. ยังเป็น emoji
-🧙 fallback อยู่ (ไม่มี `sprites/novice/`). เรียบ ไม่มีสี class · attack ใช้ melee dash ฝั่งเกม (ไม่ต้อง gen
-attack frames) · ทำแค่ **idle + walk** พอ.
+🧙 fallback อยู่ (ไม่มี `sprites/novice/`). เรียบ ไม่มีสี class · `attackStyleFor("novice") = Melee` (พุ่งสั้น
+เข้าฟันด้วยไม้). อย่างน้อยทำ **idle + walk**; **attack** (ตามล่าง) ทำเพิ่มได้ถ้าอยากให้ฟาดมีเฟรมจริง
+(ไม่ทำก็ได้ — melee dash ฝั่งเกมจะใช้ idle/walk แทน).
 
 ตั้งค่า: **Humanoid · 56×56 · Low Top-Down · Highly detailed · Black outline** (เหมือน hero อื่น)
 
@@ -153,10 +154,11 @@ dressed as a plain starting adventurer: a simple undyed linen tunic with a brown
 ```
 **idle:** `standing idle in place, almost motionless, a slow gentle breathing loop, the wooden stick held at ease, facing east, keeping the tunic and earthy colors unchanged`
 **walk:** `walking forward with an unsure eager gait, the plain wooden stick carried in one hand, the other arm swinging, keeping the simple linen tunic and earthy colors unchanged`
+**attack (melee — พุ่งสั้นฟาด):** `stepping forward and swinging the wooden stick down in a clumsy overhead whack, then recovering, the body facing east, keeping the simple linen tunic and earthy colors unchanged`
 
 **import + wire (พอ gen เสร็จ):**
 1. `bun tools/import-art.ts <export> --as hero:novice:t0` → `sprites/novice/t0/`
-2. manifest: `"novice-t0": buildSet("novice/t0", 9)` ใน `app/src/sprites.ts` (ไม่มี attack frames → melee fallback)
+2. manifest: `"novice-t0": buildSet("novice/t0", 9)` ใน `app/src/sprites.ts` — ถ้า gen attack ด้วยใช้ `buildSet("novice/t0", 9, 9)`
 3. test: `app/src/sprites.test.ts` เปลี่ยน `heroSpriteSet("novice", 0)` จาก `.toBeUndefined()` → `.toBeDefined()`
 
 ---

@@ -294,8 +294,10 @@ export const advanceOption = (props: IAdvanceOptionArgs): IAdvanceOption | undef
   if (pending === AdvancementKind.Class) {
     return { kind: "class", options: [...MAIN_LINE_IDS, ...unlockedSecrets] };
   }
-  if (line !== null && !isSecret(line) && level < 50) {
-    return { kind: "respec", options: [...MAIN_LINE_IDS] };
+  // Any hero with a class (main or secret) can respec — at any level — into a main line or an
+  // unlocked secret. Secrets unlock at Lv.20+, so respec is the only way they reach the UI picker.
+  if (line !== null) {
+    return { kind: "respec", options: [...MAIN_LINE_IDS, ...unlockedSecrets] };
   }
   return undefined;
 };

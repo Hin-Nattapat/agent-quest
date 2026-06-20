@@ -53,7 +53,11 @@ const setBranch = (profile: IProfile, branch: string): string => {
 
 const respec = (profile: IProfile, line: string): string => {
   const state = reduceToFile(HOME);
-  const r = respecClass({ profile, line, level: state.level });
+  const r = respecClass({
+    profile,
+    line,
+    unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
+  });
   if (!r.ok) {
     fail(r.error ?? "");
   }

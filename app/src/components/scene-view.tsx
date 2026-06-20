@@ -40,6 +40,7 @@ const SceneView = (props: IProps) => {
   const line = state.class?.line ?? "novice";
   const tier = state.class?.tier ?? 0;
   const branch = state.class?.branch ?? null;
+  const icon = state.class?.icon || "🧙";
   const sceneClass =
     mode === SceneMode.Battle ? `scene scene-${sceneInfo.theme}` : "scene scene-guild";
 
@@ -71,7 +72,13 @@ const SceneView = (props: IProps) => {
           </div>
         )}
         {mode === SceneMode.Overworld && (
-          <OverworldRoom line={line} tier={tier} branch={branch} activity={activity} />
+          <OverworldRoom
+            line={line}
+            tier={tier}
+            branch={branch}
+            activity={activity}
+            icon={icon}
+          />
         )}
         <PortraitFrame state={state} />
         <AreaTag label={mode === SceneMode.Battle ? sceneInfo.label : "Guild Hall"} />

@@ -115,27 +115,31 @@ test("advanceOption: class pick, branch pick, respec, or none", () => {
     advanceOption({ line: ClassLine.Mage, level: 50, branch: null, unlockedSecrets: [] }),
   ).toEqual({ kind: "branch", options: ["a", "b"] });
 
+  // Respec offers the main lines plus any unlocked secret.
   const r = advanceOption({
     line: ClassLine.Mage,
     level: 20,
     branch: null,
-    unlockedSecrets: [],
+    unlockedSecrets: ["maestro"],
   });
   expect(r?.kind).toBe("respec");
-  expect(r?.options).toEqual(["mage", "ranger", "rogue", "sage"]);
+  expect(r?.options).toEqual(["mage", "ranger", "rogue", "sage", "maestro"]);
 
+  // Lv.50+ with a branch already chosen can still respec (the old gate is gone).
   expect(
-    advanceOption({ line: ClassLine.Mage, level: 50, branch: "a", unlockedSecrets: [] }),
-  ).toBeUndefined();
+    advanceOption({ line: ClassLine.Mage, level: 50, branch: "a", unlockedSecrets: [] })
+      ?.kind,
+  ).toBe("respec");
 
+  // A secret-line hero can respec away too.
   expect(
     advanceOption({
       line: SecretLine.Maestro,
       level: 60,
       branch: null,
-      unlockedSecrets: [],
-    }),
-  ).toBeUndefined();
+      unlockedSecrets: ["maestro"],
+    })?.kind,
+  ).toBe("respec");
 
   expect(
     advanceOption({ line: null, level: 3, branch: null, unlockedSecrets: [] }),

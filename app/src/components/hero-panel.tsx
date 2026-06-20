@@ -23,6 +23,7 @@ const HeroPanel = (props: IProps) => {
         <span
           className={`sprite panel-portrait${portrait ? " has-art" : ""}`}
           style={spriteStyle(portrait)}
+          data-emoji={klass?.icon || "🧙"}
           aria-hidden="true"
         />
         <div>

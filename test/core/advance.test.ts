@@ -36,18 +36,38 @@ test("chooseClass: main needs Lv.5; secret needs unlock; unknown rejected", () =
   ).toContain("Unknown");
 });
 
-test("respecClass: main only, below Lv.50; clears branch", () => {
+test("respecClass: main or unlocked secret, any level; clears branch", () => {
   const p = P({ line: ClassLine.Mage, branch: "a" });
-  expect(respecClass({ profile: p, line: "rogue", level: 30 }).ok).toBe(true);
+  expect(respecClass({ profile: p, line: "rogue", unlockedSecrets: [] }).ok).toBe(true);
   expect(p.line).toBe(ClassLine.Rogue);
   expect(p.branch).toBeUndefined();
 
+  // Lv.50+ can respec now (the old gate is gone).
+  const high = P({ line: ClassLine.Mage });
+  expect(respecClass({ profile: high, line: "rogue", unlockedSecrets: [] }).ok).toBe(
+    true,
+  );
+
+  // Respec into an unlocked secret; a locked one is rejected.
+  const sec = P({ line: ClassLine.Mage });
   expect(
-    respecClass({ profile: P({ line: ClassLine.Mage }), line: "rogue", level: 50 }).error,
-  ).toContain("level 50");
+    respecClass({ profile: sec, line: "maestro", unlockedSecrets: ["maestro"] }).ok,
+  ).toBe(true);
+  expect(sec.line).toBe(SecretLine.Maestro);
   expect(
-    respecClass({ profile: P({ line: ClassLine.Mage }), line: "maestro", level: 30 })
-      .error,
+    respecClass({
+      profile: P({ line: ClassLine.Mage }),
+      line: "maestro",
+      unlockedSecrets: [],
+    }).error,
+  ).toContain("locked");
+
+  expect(
+    respecClass({
+      profile: P({ line: ClassLine.Mage }),
+      line: "wizard",
+      unlockedSecrets: [],
+    }).error,
   ).toContain("Unknown");
 });
 

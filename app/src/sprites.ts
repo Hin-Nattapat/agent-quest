@@ -33,6 +33,8 @@ const buildSet = (root: string, walkFrames: number, attackFrames = 0): ISpriteSe
 // key = `${line}-t${tier}`, or `${line}-t4a`/`-t4b` at tier 4 (the form splits by branch). Partial:
 // only forms with real art appear; a missing key returns undefined so the renderer keeps the emoji.
 export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
+  // Novice: the pre-class starter (tier 0); melee dash + the wooden-stick attack frames.
+  "novice-t0": buildSet("novice/t0", 9, 9),
   "mage-t1": buildSet("mage/t1", 9, 9),
   "mage-t2": buildSet("mage/t2", 9, 9),
   "mage-t3": buildSet("mage/t3", 9, 9),

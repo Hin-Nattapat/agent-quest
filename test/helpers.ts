@@ -46,4 +46,42 @@ export function repoCache(home: string, sid: string): string | null {
   return existsSync(p) ? readFileSync(p, "utf8") : null;
 }
 
+export const adapterHookPath = (adapter: string, name: string) =>
+  join(REPO_ROOT, "adapters", adapter, "hooks", name);
+
+export async function runHookAt(
+  adapter: string,
+  name: string,
+  input: object,
+  home: string,
+  extraEnv: Record<string, string> = {},
+) {
+  const proc = Bun.spawn(["bash", adapterHookPath(adapter, name)], {
+    stdin: Buffer.from(JSON.stringify(input)),
+    env: { ...process.env, AGENTRPG_HOME: home, ...extraEnv },
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stdout = await new Response(proc.stdout).text();
+  const stderr = await new Response(proc.stderr).text();
+  const code = await proc.exited;
+  return { stdout, stderr, code };
+}
+
+export async function runEmit(
+  args: string[],
+  home: string,
+  extraEnv: Record<string, string> = {},
+) {
+  const proc = Bun.spawn(["bash", join(REPO_ROOT, "adapters/generic/emit.sh"), ...args], {
+    env: { ...process.env, AGENTRPG_HOME: home, ...extraEnv },
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stdout = await new Response(proc.stdout).text();
+  const stderr = await new Response(proc.stderr).text();
+  const code = await proc.exited;
+  return { stdout, stderr, code };
+}
+
 export { basename };

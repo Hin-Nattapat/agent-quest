@@ -14,7 +14,7 @@ interface IProps {
 }
 
 // Title screen shown on every panel open (the `started` flag lives in app.tsx, per session). The
-// splash.png already carries the "Commit Quest" logo, so the splash stage is just the Start button
+// splash.png already carries the "Agent Quest" logo, so the splash stage is just the Start button
 // over the art; a nameless player then gets a name step (its own scrim + UI for legibility).
 const NewGameOverlay = (props: IProps) => {
   const { state, dispatch, onStart } = props;

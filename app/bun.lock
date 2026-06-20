@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "commit-quest-app",
+      "name": "agent-quest-app",
       "dependencies": {
         "react": "^19.0.0",
         "react-dom": "^19.0.0",

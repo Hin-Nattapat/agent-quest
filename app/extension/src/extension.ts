@@ -7,7 +7,7 @@ import { watchState, readStateText } from "./state-feed";
 import { applyAction } from "./host-actions";
 
 const HOME = process.env.AGENTRPG_HOME || join(homedir(), ".agentrpg");
-const VIEW_ID = "commitQuest.companion";
+const VIEW_ID = "agentQuest.companion";
 
 // base64url avoids +, /, = so the value is unambiguous inside the CSP nonce-source and attribute.
 const nonce = (): string => randomBytes(16).toString("base64url");
@@ -80,7 +80,7 @@ export const activate = (context: vscode.ExtensionContext): void => {
       // Keep the renderer alive when the panel is collapsed so reopening doesn't reload + re-handshake.
       webviewOptions: { retainContextWhenHidden: true },
     }),
-    vscode.commands.registerCommand("commitQuest.openCompanion", () =>
+    vscode.commands.registerCommand("agentQuest.openCompanion", () =>
       vscode.commands.executeCommand(`${VIEW_ID}.focus`),
     ),
   );

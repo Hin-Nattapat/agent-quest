@@ -61,7 +61,11 @@ export const applyAction = (home: string, action: IRawAction): string | null => 
             level: state.level,
             unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
           })
-        : respecClass({ profile, line, level: state.level });
+        : respecClass({
+            profile,
+            line,
+            unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
+          });
     });
   }
   if (action.name === "setBranch") {

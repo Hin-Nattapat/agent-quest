@@ -25,7 +25,7 @@ export const buildWebviewHtml = (args: IBuildWebviewHtmlArgs): string => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="${csp};" />
     <link rel="stylesheet" href="${styleUri}" />
-    <title>Commit Quest</title>
+    <title>Agent Quest</title>
   </head>
   <body>
     <div id="root"></div>

@@ -10,8 +10,8 @@ function seed(home: string) {
   writeFileSync(
     join(dir, "s1.ndjson"),
     [
-      `{"ts":"2026-06-11T00:00:00Z","source":"claude-code","session_id":"s1","type":"session_start","repo":"commit-quest"}`,
-      `{"ts":"2026-06-11T00:00:01Z","source":"claude-code","session_id":"s1","type":"action","action":"edit","repo":"commit-quest","file":"a.ts"}`,
+      `{"ts":"2026-06-11T00:00:00Z","source":"claude-code","session_id":"s1","type":"session_start","repo":"agent-quest"}`,
+      `{"ts":"2026-06-11T00:00:01Z","source":"claude-code","session_id":"s1","type":"action","action":"edit","repo":"agent-quest","file":"a.ts"}`,
       `not valid json`, // must be skipped
     ].join("\n") + "\n",
   );
@@ -28,7 +28,7 @@ test("summarize reports totals and groupings", () => {
   expect(out).toContain("events: 3");
   expect(out).toContain("sessions: 2");
   expect(out).toContain("edit: 1");
-  expect(out).toContain("commit-quest: 2");
+  expect(out).toContain("agent-quest: 2");
 });
 
 test("empty home summarizes to zeros", () => {

@@ -1,6 +1,6 @@
 # Reference — Pixel Agents (reuse map)
 
-> Analysis of `github.com/pixel-agents-hq/pixel-agents` (MIT) for what Commit Quest can
+> Analysis of `github.com/pixel-agents-hq/pixel-agents` (MIT) for what Agent Quest can
 > borrow. This is the **newer, refactored org** — different from the repos named in
 > `claude-code-rpg-design.md` §10.5 (`pablodelucca/pixel-agents`,
 > `rolandal/pixel-agents-standalone`). Prefer this one: it has a clean agent-agnostic
@@ -25,13 +25,13 @@ core/asyncapi.yaml   the WS protocol between server and UI
 
 ⚠️ **Naming is swapped vs ours.** They call the *agent connector* a **provider**
 (`server/src/providers/hook/claude/`) and the *UI host* an **adapter**
-(`adapters/vscode/`). In Commit Quest the *agent connector* is the **adapter**
+(`adapters/vscode/`). In Agent Quest the *agent connector* is the **adapter**
 (`adapters/claude-code/`) and the UI is the **app/hud**. When borrowing code, mind the
 flip.
 
 Role mapping:
 
-| Pixel Agents | Commit Quest |
+| Pixel Agents | Agent Quest |
 |---|---|
 | `server/src/providers/hook/claude/` (provider) | `adapters/claude-code/` (adapter) |
 | `core/` (transport + schemas, render-oriented) | `core/` (events + reducer + state) |

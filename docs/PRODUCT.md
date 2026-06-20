@@ -6,7 +6,7 @@ product
 
 ## Users
 
-A developer using an AI coding agent (Claude Code). While they work, a small **companion panel** sits in their VS Code bottom panel and shows their coding session gamified as an RPG character (Commit Quest). They glance at it between tasks; they are never *in* it as a task. Read-only, ambient, peripheral.
+A developer using an AI coding agent (Claude Code). While they work, a small **companion panel** sits in their VS Code bottom panel and shows their coding session gamified as an RPG character (Agent Quest). They glance at it between tasks; they are never *in* it as a task. Read-only, ambient, peripheral.
 
 ## Product Purpose
 

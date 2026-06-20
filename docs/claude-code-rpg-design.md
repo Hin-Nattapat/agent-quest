@@ -1,4 +1,4 @@
-# Commit Quest — Design Document
+# Agent Quest — Design Document
 
 ระบบ gamify การใช้งาน **AI coding agent** ให้เป็นเกม RPG: เก็บ XP, อัป level, เลือกสาย (class), หาของ (loot) — ยิ่งใช้/prompt เยอะ ตัวละครยิ่งโต โดยไม่แตะการทำงานจริงของ agent
 

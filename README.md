@@ -1,6 +1,6 @@
 <h1 align="center">
-  <a href="https://github.com/Hin-Nattapat/commit-quest">
-    <img src="app/public/splash.png" alt="Commit Quest" width="680">
+  <a href="https://github.com/Hin-Nattapat/agent-quest">
+    <img src="app/public/splash.png" alt="Agent Quest" width="680">
   </a>
 </h1>
 
@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=natpat.commit-quest-companion"><img alt="VS Code Marketplace" src="https://img.shields.io/visual-studio-marketplace/v/natpat.commit-quest-companion?label=Marketplace&color=6b2a7a"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=natpat.agent-quest-companion"><img alt="VS Code Marketplace" src="https://img.shields.io/visual-studio-marketplace/v/natpat.agent-quest-companion?label=Marketplace&color=6b2a7a"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-cdae57"></a>
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-bun%20%2B%20jq-2a2118">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-d4a017">
@@ -19,21 +19,21 @@
 </p>
 
 <p align="center">
-  🛒 <a href="https://marketplace.visualstudio.com/items?itemName=natpat.commit-quest-companion">Marketplace</a>
+  🛒 <a href="https://marketplace.visualstudio.com/items?itemName=natpat.agent-quest-companion">Marketplace</a>
   &nbsp;•&nbsp; 📦 <a href="#-install">Install</a>
   &nbsp;•&nbsp; 🧙 <a href="#-how-it-works">How it works</a>
-  &nbsp;•&nbsp; 🐛 <a href="https://github.com/Hin-Nattapat/commit-quest/issues">Issues</a>
+  &nbsp;•&nbsp; 🐛 <a href="https://github.com/Hin-Nattapat/agent-quest/issues">Issues</a>
   &nbsp;•&nbsp; ☕ <a href="#-support">Support</a>
   &nbsp;•&nbsp; 📜 <a href="LICENSE">License</a>
 </p>
 
 <p align="center">
-  <img src="docs/assets/screenshot.png" alt="The Commit Quest companion panel in VS Code" width="820">
+  <img src="docs/assets/screenshot.png" alt="The Agent Quest companion panel in VS Code" width="820">
 </p>
 
 ---
 
-Commit Quest turns every Claude Code session into character progression. As you prompt, edit, run
+Agent Quest turns every Claude Code session into character progression. As you prompt, edit, run
 commands and ship code, a hook pipeline records the session as an append-only event journal, folds it
 into an RPG character — class, level, XP, streak, loot, boss fights, achievements — and shows it in a
 **live pixel-art companion panel** inside VS Code (plus a one-line status-bar HUD).
@@ -76,7 +76,7 @@ quietly judging your commit messages.
 **1 — Install the engine** (hooks + reducer + CLI):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Hin-Nattapat/commit-quest/main/scripts/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Hin-Nattapat/agent-quest/main/scripts/bootstrap.sh | bash
 ```
 
 This clones the repo, deploys into `~/.agentrpg`, and prints a Claude Code settings snippet.
@@ -84,20 +84,20 @@ This clones the repo, deploys into `~/.agentrpg`, and prints a Claude Code setti
 **2 — Wire Claude Code:** merge the printed `hooks` + `statusLine` snippet into
 `~/.claude/settings.json`.
 
-**3 — Install the companion panel:** search **"Commit Quest"** in the VS Code Extensions view, or:
+**3 — Install the companion panel:** search **"Agent Quest"** in the VS Code Extensions view, or:
 
 ```bash
-code --install-extension natpat.commit-quest-companion
+code --install-extension natpat.agent-quest-companion
 ```
 
-Reload the window, start a Claude Code session, and open the **Commit Quest** panel (next to Terminal /
+Reload the window, start a Claude Code session, and open the **Agent Quest** panel (next to Terminal /
 Output). It updates live as you work. That's the whole setup.
 
 <details>
 <summary>Prefer to install from source / build the extension yourself?</summary>
 
 ```bash
-git clone https://github.com/Hin-Nattapat/commit-quest && cd commit-quest
+git clone https://github.com/Hin-Nattapat/agent-quest && cd agent-quest
 bash tools/install.sh            # deploy engine to ~/.agentrpg (then merge the printed snippet)
 cd app/extension && npm install && npm run reinstall   # build + install the .vsix locally
 ```
@@ -152,7 +152,7 @@ the list. We checked twice.
 
 ## ☕ Support
 
-Commit Quest is free and built in spare cycles. If it made your grind a little more fun, you can buy
+Agent Quest is free and built in spare cycles. If it made your grind a little more fun, you can buy
 me a coffee — it directly funds more sprites, more realms, and more tokens to grind into this thing.
 
 <p align="center">

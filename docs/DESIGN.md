@@ -1,6 +1,6 @@
 # Design
 
-Visual system for the Commit Quest companion panel (VS Code bottom panel, two-column pixel-MMORPG HUD). Anchored to the real PixelLab Mage sprites: **muted purple robe + brass-gold trim + teal terminal-crystal**, 56×56px, low top-down, 1px black outline. The chrome harmonizes with the character — aged, not neon.
+Visual system for the Agent Quest companion panel (VS Code bottom panel, two-column pixel-MMORPG HUD). Anchored to the real PixelLab Mage sprites: **muted purple robe + brass-gold trim + teal terminal-crystal**, 56×56px, low top-down, 1px black outline. The chrome harmonizes with the character — aged, not neon.
 
 ## Color (muted retro palette — OKLCH-checked for AA)
 

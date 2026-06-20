@@ -1,4 +1,4 @@
-# Commit Quest — Art & Image-Gen Prompt Pack
+# Agent Quest — Art & Image-Gen Prompt Pack
 
 > Importing exports into the game: see `art-import.md`.
 

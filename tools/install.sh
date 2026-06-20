@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy Commit Quest to $AGENTRPG_HOME. --link = symlink (dev), default = copy (prod).
+# Deploy Agent Quest to $AGENTRPG_HOME. --link = symlink (dev), default = copy (prod).
 set -euo pipefail
 RPG_HOME="${AGENTRPG_HOME:-$HOME/.agentrpg}"
 SRC="$(cd "$(dirname "$0")/.." && pwd)"   # repo root (tools/ is one level down)

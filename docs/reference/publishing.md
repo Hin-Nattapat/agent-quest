@@ -6,7 +6,7 @@ Cursor / VSCodium / Windsurf). You run these — they need _your_ publisher acco
 > **Before the first publish: make the GitHub repo public.** The Marketplace listing, README image
 > (`app/public/splash.png`), badges, and the `curl | bash` installer all resolve against
 > `raw.githubusercontent.com` / the repo URL — they 404 while the repo is private.
-> `gh repo edit Hin-Nattapat/commit-quest --visibility public --accept-visibility-change-consequences`
+> `gh repo edit Hin-Nattapat/agent-quest --visibility public --accept-visibility-change-consequences`
 
 ## One-time setup
 
@@ -29,7 +29,7 @@ npm run publish            # = build:all (vite → copy-webview → esbuild) the
 `npx vsce publish minor` (or `patch` / `major`) — commit the version bump afterward.
 
 Verify the live listing:
-<https://marketplace.visualstudio.com/items?itemName=natpat.commit-quest-companion>
+<https://marketplace.visualstudio.com/items?itemName=natpat.agent-quest-companion>
 
 ## Open VSX (optional — Cursor / VSCodium / Windsurf)
 

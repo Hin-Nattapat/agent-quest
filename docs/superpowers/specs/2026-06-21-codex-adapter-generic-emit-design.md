@@ -108,14 +108,22 @@ concept; the companion app still renders from `state.json`). `PreToolUse`, `Perm
 
 ### `tool_name` → `AgentAction`
 
-`apply_patch` → `edit` · `Bash`/`shell`/`exec`/`local_shell` → `run` (+ Bash `cmd` classification on
-`.tool_input.command`, reusing the existing `CmdTag` jq ladder) · `read`/`read_file` → `read` ·
-`WebSearch`/web tools → `search` · `mcp__*` → `other` · anything else → `other`. Raw name preserved
-in `--native`.
+`apply_patch` → `write` or `edit` (patch-aware, see below) · `Bash`/`shell`/`exec`/`local_shell` →
+`run` (+ Bash `cmd` classification on `.tool_input.command`, reusing the existing `CmdTag` jq ladder) ·
+`read`/`read_file` → `read` · `WebSearch`/web tools → `search` · `mcp__*` → `other` · anything else →
+`other`. Raw name preserved in `--native`.
 
-`apply_patch` is mapped to `edit` for v1 (it covers both create and modify); distinguishing
-`write` (new file) by inspecting the patch body is deferred. `.tool_input.file_path` → `--file`
-when present.
+**`apply_patch` (patch-aware):** Codex's single file-mutation tool carries a structured patch
+envelope (`*** Add File:` / `*** Update File:` / `*** Delete File:` / `*** Move to:` markers). The
+patch text's exact `tool_input` field name is unconfirmed, so the hook reads it field-agnostically as
+`(.tool_input | tostring)` and inspects the markers:
+
+- **action:** `write` when the patch contains `*** Add File:` and **no** `*** Update File:` / `*** Delete File:`
+  marker (a pure new-file creation); otherwise `edit` (modify, delete, move, or mixed).
+- **file (`--file`):** the path from the first `*** (Add|Update|Delete|Move to) File:` line (jq
+  `capture`). One path per line keeps it < 4 KB; multi-file patches record the first.
+
+For non-`apply_patch` tools, `.tool_input.file_path` → `--file` when present.
 
 ### Failure detection (best-effort, refine on capture)
 
@@ -147,8 +155,9 @@ journal line, `exit 0`, empty stdout).
   (incl. conditional `repo`/`cmd`/`file`/`start`/`model`).
 - **Codex hooks**: spawn each script feeding a docs-derived fixture JSON on stdin; assert (a) the
   journal line (type, action, native, cmd, repo), (b) `exit 0`, (c) empty stdout. Cover: SessionStart
-  (start+model), UserPromptSubmit, PostToolUse for `apply_patch`→edit and `Bash`→run+`force_push`
-  cmd, and a `tool_response` error → `action_fail`.
+  (start+model), UserPromptSubmit, PostToolUse for `apply_patch` `*** Update File:`→edit (file path
+  extracted), `apply_patch` `*** Add File:`→write, `Bash`→run+`force_push` cmd, and a `tool_response`
+  error → `action_fail`.
 - **Regression**: existing `claude-code` hook tests stay green after convergence.
 - No `any` in tests; use `core/events.ts` types.
 
@@ -156,7 +165,7 @@ journal line, `exit 0`, empty stdout).
 
 HTTP emit (all current/known agents support command hooks; revisit only for a non-local/non-command
 agent) · Cursor & Copilot adapters (see appendix) · Codex statusLine · `session_end` for Codex ·
-exact `apply_patch` edit-vs-write split · per-tool MCP sub-mapping · forwarding prompt/command text.
+per-tool MCP sub-mapping · forwarding prompt/command text.
 
 ## 8. Appendix — future adapters (forward-compatibility, not built now)
 
@@ -177,4 +186,6 @@ across agents. HTTP emit remains unnecessary for these three.
 
 - Exact Codex `tool_response` error shape (drives the `action_fail` heuristic).
 - Real Codex tool names (`apply_patch` vs `shell`/`exec` vs `local_shell`) — confirm the map.
+- The `tool_input` field that holds the `apply_patch` patch text — confirm the `*** … File:` markers
+  survive there so the field-agnostic `tostring` parse stays correct.
 - Whether Codex emits a usable turn boundary beyond `Stop` for multi-turn XP pacing.

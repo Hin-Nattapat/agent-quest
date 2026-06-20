@@ -58,11 +58,15 @@ export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
   "sage-t3": buildSet("sage/t3", 9, 9),
   "sage-t4a": buildSet("sage/t4a", 9, 9),
   "sage-t4b": buildSet("sage/t4b", 9, 9),
-  // Maestro: the first secret line with art — branchless, so the T4 key carries no a/b.
+  // Secret lines: branchless, so the T4 key carries no a/b.
   "maestro-t1": buildSet("maestro/t1", 9, 9),
   "maestro-t2": buildSet("maestro/t2", 9, 9),
   "maestro-t3": buildSet("maestro/t3", 9, 9),
   "maestro-t4": buildSet("maestro/t4", 9, 9),
+  "night_owl-t1": buildSet("night_owl/t1", 9, 9),
+  "night_owl-t2": buildSet("night_owl/t2", 9, 9),
+  "night_owl-t3": buildSet("night_owl/t3", 9, 9),
+  "night_owl-t4": buildSet("night_owl/t4", 9, 9),
 };
 
 // At tier 4 the form branches (a/b) so the key carries it; below tier 4 the branch is ignored.

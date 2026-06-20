@@ -97,14 +97,32 @@ CSS keyframes (`styles.css` `.hero-*` / `.m-*`).
 - walk: `walking forward with a slow measured gait, the glowing tome closed and carried under one arm, the other arm swinging gently, keeping the amber-trimmed robe and round glasses unchanged`
 - attack (เสกรูน, ยืน): `standing and raising the open glowing tome, projecting a bright amber rune-glyph forward, keeping the amber robe and round glasses unchanged`
 
-**สายลับ (attack — walk = พกของผ่อนข้างตัวแบบเดียวกัน):**
-| สาย | attack |
-|---|---|
-| Maestro | `a sweeping conductor's baton flourish releasing a burst of light forward` |
-| Night Owl | `casting a glowing crescent-moon bolt forward` |
-| Ascetic | `a calm forward palm-strike releasing a ring of light` |
-| Gremlin | `a chaotic forward glitch-zap, electric sparks bursting` |
-| Trickster | `flinging a fan of playing cards forward` |
+**สายลับ — idle/walk/attack แยกสาย (คนละคาแรคเตอร์ ไม่ใช้ idle ร่วม):** แต่ละสายบุคลิกต่างกันชัด → idle ก็ต่าง (Maestro สง่า · Night Owl ง่วง · Ascetic นิ่ง · Gremlin ซน · Trickster เจ้าเล่ห์)
+
+**Maestro 🎼 — gold tailcoat + baton + agent-orbs (วาทยกรสง่า theatrical)**
+- idle: `standing poised as if about to begin a performance, almost motionless, a slow gentle breathing loop, the baton held lightly at the chest and the agent-orbs drifting in a slow rhythm around, facing east, keeping the gold tailcoat and colors unchanged`
+- walk: `striding forward with theatrical confidence, chin up, the baton tucked under one arm and the agent-orbs trailing like a following orchestra, keeping the gold tailcoat and colors unchanged`
+- attack: `a grand sweeping conductor's baton flourish, sweeping the baton up and forward to release a burst of golden light forward, facing east, keeping the gold tailcoat and colors unchanged`
+
+**Night Owl 🦉 — indigo cloak + owl familiar (ง่วงเงียบ nocturnal)**
+- idle: `standing drowsily in place, almost motionless, a slow sleepy breathing loop with the head dipping now and then, the owl familiar preening on the shoulder and soft moonlight glowing, facing east, keeping the indigo cloak and colors unchanged`
+- walk: `walking forward at an unhurried quiet pace, shoulders relaxed and hands tucked into the cloak, the owl familiar bobbing gently on the shoulder, keeping the indigo cloak and colors unchanged`
+- attack: `lazily raising one hand and flicking a glowing crescent-moon bolt forward, facing east, keeping the indigo cloak and colors unchanged`
+
+**The Ascetic 🧘 — undyed robes + prayer beads + glyph (นิ่งสงบ meditative)**
+- idle: `standing in deep stillness, eyes closed, almost perfectly motionless, only the faintest slow breath, one palm turned up with a single glyph hovering above it, facing east, keeping the plain undyed robes and stone-white colors unchanged`
+- walk: `gliding forward in slow deliberate barefoot steps, hands together in a calm prayer, the prayer beads swaying gently, keeping the plain undyed robes and stone-white colors unchanged`
+- attack: `a single calm unhurried forward palm-strike releasing a clean ring of light, facing east, keeping the plain undyed robes and stone-white colors unchanged`
+
+**The Gremlin 👺 — patched gear + sparks (ซนกระตุก hyperactive)**
+- idle: `unable to keep still, twitching and fidgeting in place with a wide snickering grin, hopping foot to foot as electric sparks flicker around it, facing east, keeping the patched-up gear and glitch-green colors unchanged`
+- walk: `scampering forward in a hunched erratic scuttle, arms flailing eagerly, electric sparks and glitch artifacts trailing behind, keeping the patched-up gear and glitch-green colors unchanged`
+- attack: `gleefully hurling a chaotic forward glitch-zap with both hands, electric sparks bursting everywhere, facing east, keeping the patched-up gear and glitch-green colors unchanged`
+
+**The Trickster ✦ — harlequin motley + fanned cards (เจ้าเล่ห์ showman)**
+- idle: `lounging on one hip with a sly smirk, almost motionless, idly riffling the fanned playing cards from hand to hand, a faint mirror-shimmer flickering around the body, facing east, keeping the harlequin motley and iridescent colors unchanged`
+- walk: `sauntering forward with a jaunty bouncing strut, twirling a single card between the fingers and the cape-tails swaying, a faint mirror-shimmer trailing, keeping the harlequin motley and iridescent colors unchanged`
+- attack: `with a showman's flourish, flinging a fanning spread of playing cards forward, facing east, keeping the harlequin motley and iridescent colors unchanged`
 
 > **โพรเจกไทล์** (ลูกเวท/ธนู/รูน) ที่วิ่งไปหามอน = **VFX ฝั่งเกม** (CSS/sprite) anim ทำแค่ "ท่าตัวละคร" (+ แสงปลายอาวุธ) · Mage/Ranger/Sage = ยืนยิง · **Rogue = melee** (พุ่งสั้นเข้าฟัน)
 
@@ -319,6 +337,11 @@ dressed as an ascetic: plain undyed robes, barefoot, prayer beads, a single floa
 a mischievous tiny imp-like coder (not human), wide grin, small chaotic build, green-tinted skin, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —
 dressed as a gremlin: patched-up gear, electric sparks and glitch artifacts around it, glitch-green palette
 ```
+**The Trickster** (✦ legendary · mother-of-pearl rainbow)
+```
+a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a trickster jester: a harlequin outfit of shifting diamond-pattern motley with a soft belled collar, fanning a hand of glowing playing cards, a faint mirror-illusion shimmer around the body, iridescent mother-of-pearl rainbow palette
+```
 **??? — Sir Quacks-a-lot** (easter egg)
 ```
 a heroic rubber duck (not human) wearing tiny knight armor and a small cape, holding a toothpick sword, standing proud, full body head-to-toe, centered, clean 1px black outline, legendary joke cosmetic
@@ -336,10 +359,11 @@ gen ตัวฐาน 1 ครั้ง (prompt ข้างบน) → tier �
 | **Night Owl** | a brighter moonlight glow and a few drifting glowing stars | deeper indigo, a luminous crescent-moon halo behind, streaming stardust, the owl familiar glowing brighter | a dark eclipse aura with a glowing ringed eclipse-moon behind the head, a swirling starfield, intense cosmic indigo glow |
 | **The Ascetic** | a faint serene white aura and a second floating glyph | a calm glowing halo, several softly floating glyphs orbiting, gentle light | a radiant white enlightenment aura, a full ring of glowing glyphs orbiting, levitating slightly, transcendent |
 | **The Gremlin** | more electric sparks and glitchy distortion artifacts | a semi-translucent flickering form, swirling glitch artifacts and floating broken-pixel debris, eerie green glow | a chaotic storm of corrupted glitch energy, a menacing daemonic aura, glowing toxic-green eyes, larger and more monstrous |
+| **The Trickster** | a brighter iridescent shimmer and a few floating playing cards drifting around | faint mirror-image duplicates flanking the body, swirling playing-card confetti, stronger prismatic shimmer | a dazzling carnival of mirror-illusions, a storm of swirling confetti and prismatic shimmer, mesmerizing |
 
 วิธีใช้ช่อง Create State: วางข้อความใน column ของ tier นั้น เช่น Maestro T4 → วาง `a blazing radiant golden aura, a full swirling orchestra of glowing instruments and notes surrounding, majestic` (ติ๊ก use-palette เพราะยังทอง)
 
-> **Trickster (✦ legendary)** ยังไม่มี base ใน §4.5 — ธีม jester/เป็ดลวงตา (ดู §7.3 The Jester Mirage). base แนะนำ: `a mischievous illusion jester, harlequin diamond pattern, holding fanned playing cards, mother-of-pearl rainbow palette` → escalate T3 `splitting into mirror-image duplicates, playing-card confetti` · T4 `a dazzling carnival of mirror-illusions, swirling confetti and prismatic shimmer`
+> **Trickster (✦ legendary)** base อยู่ใน §4.5 + escalate ในตารางแล้ว — ธีม jester/illusion (จับคู่กับ §7.3 The Jester Mirage). escalate ของ Trickster เพิ่มสี prismatic/rainbow → **อย่าติ๊ก** "Use color palette from reference"
 > **Sir Quacks-a-lot** = cosmetic ตัวเดียว ไม่มี tier (gen ครั้งเดียวจบ)
 
 ---

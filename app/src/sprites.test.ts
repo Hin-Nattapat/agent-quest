@@ -27,7 +27,14 @@ test("heroSpriteSet resolves every Mage form (T1-T3 + both T4 branches)", () => 
 test("heroSpriteSet returns undefined for forms with no art", () => {
   expect(heroSpriteSet("mage", 4, null)).toBeUndefined(); // tier 4 before a branch is chosen
   expect(heroSpriteSet("maestro", 1)).toBeUndefined(); // secret line, no art yet
-  expect(heroSpriteSet("novice", 0)).toBeUndefined();
+});
+
+test("heroSpriteSet resolves the Novice starter (tier 0)", () => {
+  expect(heroKey("novice", 0)).toBe("novice-t0");
+  expect(heroSpriteSet("novice", 0)?.idle[Facing.South]).toBe(
+    "/sprites/novice/t0/idle/south.png",
+  );
+  expect(heroSpriteSet("novice", 0)?.attack?.length).toBe(9);
 });
 
 test("directionalFrames cycles walk when moving, else the idle still", () => {

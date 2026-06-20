@@ -26,7 +26,7 @@ test("heroSpriteSet resolves every Mage form (T1-T3 + both T4 branches)", () => 
 
 test("heroSpriteSet returns undefined for forms with no art", () => {
   expect(heroSpriteSet("mage", 4, null)).toBeUndefined(); // tier 4 before a branch is chosen
-  expect(heroSpriteSet("night_owl", 1)).toBeUndefined(); // secret line, no art yet
+  expect(heroSpriteSet("ascetic", 1)).toBeUndefined(); // secret line, no art yet
 });
 
 test("heroSpriteSet resolves every Maestro secret form (T1-T4, branchless)", () => {
@@ -37,6 +37,17 @@ test("heroSpriteSet resolves every Maestro secret form (T1-T4, branchless)", () 
   expect(heroSpriteSet("maestro", 3)?.attack?.length).toBe(9);
   expect(heroSpriteSet("maestro", 4)?.idle[Facing.West]).toBe(
     "/sprites/maestro/t4/idle/west.png",
+  );
+});
+
+test("heroSpriteSet resolves every Night Owl secret form (T1-T4, branchless)", () => {
+  expect(heroSpriteSet("night_owl", 1)?.idle[Facing.East]).toBe(
+    "/sprites/night_owl/t1/idle/east.png",
+  );
+  expect(heroSpriteSet("night_owl", 2)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("night_owl", 3)?.attack?.length).toBe(9);
+  expect(heroSpriteSet("night_owl", 4)?.idle[Facing.West]).toBe(
+    "/sprites/night_owl/t4/idle/west.png",
   );
 });
 

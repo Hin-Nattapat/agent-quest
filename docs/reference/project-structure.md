@@ -1,4 +1,4 @@
-# Reference — Commit Quest Project Structure
+# Reference — Agent Quest Project Structure
 
 > Authoritative repo layout for all phases. Organized by **the seam** (design §2) and
 > shaped by the clean split in `pixel-agents-hq` (see `pixel-agents.md`). Phase 0 fills
@@ -20,7 +20,7 @@
 ## Tree
 
 ```
-commit-quest/
+agent-quest/
 ├── README.md
 ├── package.json                       # Bun scripts; deps = none in Phase 0 (jq+bun only)
 ├── config/
@@ -84,7 +84,7 @@ commit-quest/
 │
 └── docs/
     ├── claude-code-rpg-design.md      # full game design (all phases)
-    ├── commit-quest-build-spec.md     # original Phase 0 brief (superseded)
+    ├── agent-quest-build-spec.md     # original Phase 0 brief (superseded)
     ├── reference/
     │   ├── pixel-agents.md            # reuse map
     │   └── project-structure.md       # this file
@@ -141,7 +141,7 @@ The companion installs as a local `.vsix`:
 
 - `cd app/extension && npm run package` → builds the app (Vite), copies `app/dist/assets` into
   `app/extension/webview/` (gitignored), bundles the extension host (esbuild), and runs `vsce package`
-  → `commit-quest-companion-<version>.vsix`.
-- Install: `code --install-extension commit-quest-companion-<version>.vsix`.
+  → `agent-quest-companion-<version>.vsix`.
+- Install: `code --install-extension agent-quest-companion-<version>.vsix`.
 - The webview loads its bundle from the in-extension `webview/` dir, so the same artifacts run under
   F5 and in the installed vsix — **run `npm run build:all` before pressing F5.**

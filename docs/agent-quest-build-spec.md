@@ -1,11 +1,11 @@
-# Commit Quest — Build Spec (Phase 0 handoff)
+# Agent Quest — Build Spec (Phase 0 handoff)
 
 > Implementation brief for an AI coding agent (Claude Code). Build **Phase 0 only**.
-> Full game design (Thai, all phases) lives in `commit-quest-design.md` — read it for context on later phases, but Phase 0 below is self-contained.
+> Full game design (Thai, all phases) lives in `agent-quest-design.md` — read it for context on later phases, but Phase 0 below is self-contained.
 
 ---
 
-## 1. What Commit Quest is
+## 1. What Agent Quest is
 
 A system that gamifies **AI coding agent** usage into an RPG: the developer earns XP, levels up, picks a class, and finds loot — purely by using a coding agent. It is **observational only**: it never modifies or interferes with the agent's real work.
 
@@ -203,7 +203,7 @@ Read every `*.ndjson` in `$AGENTRPG_HOME/journal`, parse lines (skip malformed),
 
 ## 9. Out of scope (later phases — do not build now)
 
-XP weights & level curve, classes / up-class / secret classes, loot, achievements, statusline HUD, companion app (Pixel Agents fork), backfill importer, generic emit, second adapter. See `commit-quest-design.md`:
+XP weights & level curve, classes / up-class / secret classes, loot, achievements, statusline HUD, companion app (Pixel Agents fork), backfill importer, generic emit, second adapter. See `agent-quest-design.md`:
 - §5 XP/level · §6 classes + secret classes · §7 loot + achievements
 - §9 statusline · §10 companion app (Pixel Agents) · §12 backfill · §13 roadmap
 

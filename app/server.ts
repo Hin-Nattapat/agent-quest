@@ -95,5 +95,5 @@ if (import.meta.main) {
       return new Response(Bun.file(join(DIST, "index.html"))); // SPA fallback
     },
   });
-  console.log(`commit-quest app on http://localhost:${PORT}`);
+  console.log(`agent-quest app on http://localhost:${PORT}`);
 }

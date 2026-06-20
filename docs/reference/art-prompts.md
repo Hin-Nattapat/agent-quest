@@ -313,58 +313,132 @@ dressed as an orchestration master, a grand conductor of many: regal amber-and-g
 
 ---
 
-### 4.5 สายลับ (secret) — 1 ตัวฐานต่อสาย, tier = เพิ่ม glow/สีเข้มผ่าน Create State
+### 4.5 สายลับ (secret) — prompt เต็มแยกทุก tier (self-contained, ไม่ใช้ Create-State delta)
 
-แต่ละสายลับเป็นคนละคน (identity เฉพาะ) gen ตัวฐาน 1 ครั้ง แล้ว tier สูงขึ้น = ใช้ Create State เพิ่มแสง/อนุภาค/สีเข้มขึ้น (ไม่ทำ 4-tier เต็มเหมือนสายหลัก — ดู design §6.5)
+⚠️ **บทเรียน:** เดิมเล็งใช้ Create State วาง delta สั้น ๆ (เช่น `a brighter moonlight glow`) — **ใช้ไม่ได้กับสายลับ**: (1) delta สั้นเกาะ base เดิม → T2/T3 ออกมา**แทบเหมือนกัน** · (2) ถ้า clone จาก Mage แล้วไม่แทน base → ได้ **Mage ทับทุก tier**. แก้: **เขียน prompt เต็มแยกทุก tier** (identity + costume ครบ) เหมือนสายหลัก §4.1–4.4 → แต่ละ tier ชัด ไม่พึ่ง base. identity (ครึ่งหน้า) คงที่ทุก tier = คนเดิม, escalate ที่ครึ่ง `dressed as...`
 
-**Maestro** (gold · flagship)
+**Maestro** 🎼 (gold · flagship · **ทำแล้ว ✅**) — identity: `an elegant senior engineer around 35, commanding graceful presence, refined build, deep brown skin, neat dark hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —`
+
+T1 · Conductor
 ```
 an elegant senior engineer around 35, commanding graceful presence, refined build, deep brown skin, neat dark hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a maestro: a gold tailcoat, holding a glowing baton, small floating agent-orbs orbiting like an orchestra, gold palette
+dressed as an apprentice conductor: a simple gold tailcoat with black trim, holding a thin glowing baton, a couple of small floating agent-orbs orbiting nearby, limited gold palette
 ```
-**Night Owl** (indigo)
+T2 · Maestro
+```
+an elegant senior engineer around 35, commanding graceful presence, refined build, deep brown skin, neat dark hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a maestro: a richer gold tailcoat with ornate trim and a brighter golden glow, holding a glowing baton, several floating glowing music-note orbs orbiting like a small orchestra, gold palette
+```
+T3 · Virtuoso
+```
+an elegant senior engineer around 35, commanding graceful presence, refined build, deep brown skin, neat dark hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a virtuoso maestro: ornate resplendent gold attire with a radiant golden aura, a glowing baton trailing ribbons of light, many swirling golden notes and light-ribbons orbiting the body, rich gold palette
+```
+T4 · Grand Symphony
+```
+an elegant senior engineer around 35, commanding graceful presence, refined build, deep brown skin, neat dark hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a grand-symphony maestro: magnificent gold regalia blazing with a radiant golden aura, baton raised high, a full swirling orchestra of glowing golden instruments and music notes surrounding the body, majestic gold palette
+```
+**Night Owl** 🦉 (indigo) — identity: `a calm night-shift coder around 29, sleepy focused expression, slender build, fair skin, dark hair with a single pale streak, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —`
+
+T1 · Night Owl
 ```
 a calm night-shift coder around 29, sleepy focused expression, slender build, fair skin, dark hair with a single pale streak, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a night owl: an indigo cloak, a small glowing owl familiar on the shoulder, a crescent-moon motif and faint starlight glow, indigo palette
+dressed as a night owl: a deep indigo hooded cloak with a small crescent-moon clasp, a little glowing owl familiar perched on the shoulder, a faint starlight shimmer, limited indigo palette
 ```
-**The Ascetic** (off-white / stone)
+T2 · Moonlighter
+```
+a calm night-shift coder around 29, sleepy focused expression, slender build, fair skin, dark hair with a single pale streak, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a moonlighter night owl: a deep indigo hooded cloak edged with glowing moonlight-silver, the owl familiar glowing softly on the shoulder, a luminous crescent-moon motif on the chest and a few drifting glowing stars, indigo with bright moonlight-silver
+```
+T3 · Nocturne
+```
+a calm night-shift coder around 29, sleepy focused expression, slender build, fair skin, dark hair with a single pale streak, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a nocturne night owl: a flowing darker-indigo cloak streaming faint stardust, a luminous crescent-moon halo glowing behind the head, the owl familiar bright and radiant on the shoulder, swirling motes of starlight around the body, deep indigo with glowing silver
+```
+T4 · Eclipse
+```
+a calm night-shift coder around 29, sleepy focused expression, slender build, fair skin, dark hair with a single pale streak, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as an eclipse night owl: a cosmic dark-indigo cloak swirling with a starfield, a great glowing ringed eclipse-moon hanging behind the head, the owl familiar blazing with cosmic light, an intense aura of deep indigo and silver, majestic and otherworldly
+```
+**The Ascetic** 🧘 (off-white / stone) — identity: `a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —`
+
+T1 · Initiate
 ```
 a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as an ascetic: plain undyed robes, barefoot, prayer beads, a single floating glyph above an open palm, off-white and stone palette
+dressed as an ascetic initiate: plain undyed off-white robes, barefoot, simple wooden prayer beads, a single softly glowing glyph hovering above one open palm, off-white and stone palette
 ```
-**The Gremlin** (glitch-green)
+T2 · Ascetic
+```
+a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as an ascetic: plain undyed off-white robes with a faint serene white aura, barefoot, prayer beads, two glowing glyphs floating around an open palm, calm off-white and stone palette
+```
+T3 · Hermit
+```
+a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a hermit sage: flowing pale-stone robes with a calm glowing halo behind the head, barefoot and serene, several glowing glyphs slowly orbiting the body, gentle white light, off-white and luminous stone palette
+```
+T4 · Enlightened
+```
+a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as an enlightened master: radiant white robes wrapped in a brilliant enlightenment aura, levitating slightly off the ground in a meditative cross-legged pose, a full ring of glowing glyphs orbiting the body, transcendent white-and-stone glow
+```
+**The Gremlin** 👺 (glitch-green) — identity: `a mischievous tiny imp-like coder (not human), wide grin, small chaotic build, green-tinted skin, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —`
+
+T1 · Imp
 ```
 a mischievous tiny imp-like coder (not human), wide grin, small chaotic build, green-tinted skin, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —
-dressed as a gremlin: patched-up gear, electric sparks and glitch artifacts around it, glitch-green palette
+dressed as a glitch imp: small ragged patched-up scavenged gear, a wide toothy grin, a few electric sparks and glitch artifacts crackling around it, glitch-green palette
 ```
-**The Trickster** (✦ legendary · mother-of-pearl rainbow)
+T2 · Gremlin
+```
+a mischievous tiny imp-like coder (not human), wide grin, small chaotic build, green-tinted skin, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —
+dressed as a gremlin: ragged patched scavenged gear, a wider manic grin, more electric sparks and glitchy distortion artifacts crackling around the body, eerie glitch-green palette
+```
+T3 · Poltergeist
+```
+a mischievous tiny imp-like coder (not human), wide grin, small chaotic build, green-tinted skin, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —
+dressed as a glitch poltergeist: a semi-translucent flickering body in tattered patched gear, swirling glitch artifacts and floating broken-pixel debris around it, an eerie green glow, unstable glitch-green palette
+```
+T4 · Chaos Daemon
+```
+a mischievous tiny imp-like coder (not human), wide grin, small chaotic build, green-tinted skin, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —
+dressed as a chaos-daemon gremlin: a larger, more monstrous corrupted form wreathed in a chaotic storm of glitch energy, a menacing daemonic aura, glowing toxic-green eyes and a jagged grin, intense toxic glitch-green palette
+```
+**The Trickster** ✦ (legendary · mother-of-pearl rainbow) — identity: `a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —`
+
+T1 · Prankster
 ```
 a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a trickster jester: a harlequin outfit of shifting diamond-pattern motley with a soft belled collar, fanning a hand of glowing playing cards, a faint mirror-illusion shimmer around the body, iridescent mother-of-pearl rainbow palette
+dressed as a prankster jester: a harlequin outfit of diamond-pattern motley with a soft belled collar, fanning a small hand of glowing playing cards, a faint mirror-illusion shimmer, iridescent mother-of-pearl palette
+```
+T2 · Trickster
+```
+a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as a trickster jester: a shimmering harlequin motley with a belled collar, fanning glowing playing cards, a brighter iridescent shimmer and a few playing cards drifting around, mother-of-pearl rainbow palette
+```
+T3 · Illusionist
+```
+a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as an illusionist jester: harlequin motley with faint mirror-image duplicates flanking the body, swirling playing-card confetti, a strong prismatic shimmer, iridescent rainbow palette
+```
+T4 · Archfool
+```
+a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
+dressed as an archfool, the grand mirage: a dazzling carnival of mirror-illusion duplicates, a storm of swirling playing-card confetti and prismatic shimmer all around, mesmerizing iridescent mother-of-pearl rainbow palette
 ```
 **??? — Sir Quacks-a-lot** (easter egg)
 ```
 a heroic rubber duck (not human) wearing tiny knight armor and a small cape, holding a toothpick sword, standing proud, full body head-to-toe, centered, clean 1px black outline, legendary joke cosmetic
 ```
 
-### 4.5.1 Tier-up ผ่าน Create State (เพิ่มความเข้ม ไม่ redesign)
+### 4.5.1 หมายเหตุ gen สายลับ
 
-gen ตัวฐาน 1 ครั้ง (prompt ข้างบน) → tier สูงขึ้น = เปิด **Create State** วาง "describe the new state" สั้นๆ (เพิ่ม glow / อนุภาค / สีเข้ม) **คนเดิม ท่าเดิม** ไม่ต้องบรรยายตัวละครซ้ำ
-- checkbox **"Use color palette from reference"**: **ติ๊ก** = เพิ่ม glow โทนเดิม (ไม่มีสีใหม่) · **ไม่ติ๊ก** = เพิ่ม/เข้มสีใหม่ (เช่น eclipse, glitch, daemon)
-- T1 = ตัวฐานเลย (ไม่ต้อง Create State) · T2–T4 = ไล่ตามตาราง
-
-| สาย | T2 | T3 | T4 (apex) |
-|---|---|---|---|
-| **Maestro** | a brighter golden glow and a few more floating glowing music-note orbs | richer ornate gold attire with a radiant aura, many swirling golden notes and light-ribbons orbiting | a blazing radiant golden aura, a full swirling orchestra of glowing instruments and notes surrounding, majestic |
-| **Night Owl** | a brighter moonlight glow and a few drifting glowing stars | deeper indigo, a luminous crescent-moon halo behind, streaming stardust, the owl familiar glowing brighter | a dark eclipse aura with a glowing ringed eclipse-moon behind the head, a swirling starfield, intense cosmic indigo glow |
-| **The Ascetic** | a faint serene white aura and a second floating glyph | a calm glowing halo, several softly floating glyphs orbiting, gentle light | a radiant white enlightenment aura, a full ring of glowing glyphs orbiting, levitating slightly, transcendent |
-| **The Gremlin** | more electric sparks and glitchy distortion artifacts | a semi-translucent flickering form, swirling glitch artifacts and floating broken-pixel debris, eerie green glow | a chaotic storm of corrupted glitch energy, a menacing daemonic aura, glowing toxic-green eyes, larger and more monstrous |
-| **The Trickster** | a brighter iridescent shimmer and a few floating playing cards drifting around | faint mirror-image duplicates flanking the body, swirling playing-card confetti, stronger prismatic shimmer | a dazzling carnival of mirror-illusions, a storm of swirling confetti and prismatic shimmer, mesmerizing |
-
-วิธีใช้ช่อง Create State: วางข้อความใน column ของ tier นั้น เช่น Maestro T4 → วาง `a blazing radiant golden aura, a full swirling orchestra of glowing instruments and notes surrounding, majestic` (ติ๊ก use-palette เพราะยังทอง)
-
-> **Trickster (✦ legendary)** base อยู่ใน §4.5 + escalate ในตารางแล้ว — ธีม jester/illusion (จับคู่กับ §7.3 The Jester Mirage). escalate ของ Trickster เพิ่มสี prismatic/rainbow → **อย่าติ๊ก** "Use color palette from reference"
-> **Sir Quacks-a-lot** = cosmetic ตัวเดียว ไม่มี tier (gen ครั้งเดียวจบ)
+- **คนละ character ต่อสาย** — อย่า clone Mage (description ค้างเป็น Mage → ดู §7.C.1). สร้างใหม่ วาง T1 เต็ม
+- **ทุก tier = prompt เต็ม** (identity ครึ่งหน้าเดิม + `dressed as...` ของ tier นั้น). ถ้าใช้ Create State ก็**วางเต็ม** ไม่ใช่ delta สั้น — ไม่งั้น T2/T3 ออกมาเหมือนกัน
+- **import เหมือนสายหลัก:** `bun tools/import-art.ts <export>/T<N>_<Class> --as hero:<line>:t<N>` → wire `"<line>-t<N>": buildSet("<line>/t<N>", 9, 9)` (branchless — T4 ไม่มี a/b)
+- **"Use color palette from reference"**: ติ๊กได้ถ้า tier นั้นคุมโทนเดิม · ไม่ติ๊กถ้าเพิ่มสีใหม่ (eclipse คราม-เงิน · glitch toxic-green · prismatic rainbow)
+- **Trickster/Sir Quacks** แดน = §7.3 (Fool's Mirage). **Sir Quacks-a-lot** = cosmetic ตัวเดียว ไม่มี tier (gen ครั้งเดียวจบ)
 
 ---
 

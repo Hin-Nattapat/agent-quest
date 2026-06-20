@@ -24,6 +24,7 @@ const PortraitFrame = (props: IProps) => {
         <span
           className={`sprite portrait-face${face ? " has-art" : ""}`}
           style={spriteStyle(face)}
+          data-emoji={klass?.icon || "🧙"}
           aria-hidden="true"
         />
       </div>

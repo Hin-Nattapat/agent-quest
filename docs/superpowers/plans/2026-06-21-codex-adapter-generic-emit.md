@@ -25,6 +25,7 @@
 ## File Structure
 
 - `adapters/generic/emit.sh` — **create**: flag-driven emitter (build + repo-resolve + append).
+- `adapters/generic/cmd-tag.jq` — **create**: shared jq module classifying a shell command → `CmdTag`; both on-tool hooks `include` it (no duplicated ladder).
 - `adapters/generic/README.md` — **create**: emit CLI reference.
 - `test/helpers.ts` — **modify**: add `adapterHookPath`, `runHookAt`, `runEmit`.
 - `test/adapters/generic-emit.test.ts` — **create**: emit.sh tests.
@@ -49,10 +50,12 @@ claude-code's `on-prompt.sh` / `on-stop.sh` / `on-session-end.sh` already call `
 
 **Files:**
 - Create: `adapters/generic/emit.sh`
+- Create: `adapters/generic/cmd-tag.jq`
 - Modify: `test/helpers.ts`
 - Test: `test/adapters/generic-emit.test.ts`
 
 **Interfaces:**
+- Produces: `cmd-tag.jq` jq module — `def cmd_tag($c)` returns a `CmdTag` string (`git_rebase_onto`, `force_push`, `test_run`, …) or `""`; loaded via `jq -L <generic-dir> 'include "cmd-tag"; …'`.
 - Produces: `emit.sh` CLI — `emit.sh --type <T> --session <sid> [--source <id>] [--cwd <p>] [--repo <r>] [--start <s>] [--model <m>] [--action <a>] [--native <n>] [--cmd <c>] [--file <f>]`. Appends one NDJSON line to `$AGENTRPG_HOME/journal/<sid>.ndjson`; resolves+caches repo from `--cwd` when `--repo` absent and no cache; emits `cwd`/`start`/`model` only for `--type session_start`; omits empty optional fields; exits 0 always.
 - Produces (test helpers): `runEmit(args: string[], home: string, extraEnv?) => {stdout,stderr,code}`; `adapterHookPath(adapter, name)`; `runHookAt(adapter, name, input, home, extraEnv?) => {stdout,stderr,code}`.
 - Consumes: `core/events.ts` `isNormalizedEvent`, `EventType`, `AgentAction`.
@@ -182,12 +185,23 @@ test("missing --type writes nothing and exits 0", async () => {
   expect(stdout).toBe("");
   expect(journalLines(home, "e6").length).toBe(0);
 });
+
+test("cmd-tag.jq classifies a command, else empty", () => {
+  const lib = join(import.meta.dir, "../../adapters/generic");
+  const run = (c: string) =>
+    Bun.spawnSync(["jq", "-L", lib, "-rn", 'include "cmd-tag"; cmd_tag($c)', "--arg", "c", c])
+      .stdout.toString()
+      .trim();
+  expect(run("git push --force origin x")).toBe("force_push");
+  expect(run("bun test")).toBe("test_run");
+  expect(run("ls -la")).toBe("");
+});
 ```
 
 - [ ] **Step 3: Run test to verify it fails**
 
 Run: `bun test test/adapters/generic-emit.test.ts`
-Expected: FAIL (emit.sh does not exist).
+Expected: FAIL (emit.sh / cmd-tag.jq do not exist).
 
 - [ ] **Step 4: Write `adapters/generic/emit.sh`**
 
@@ -249,20 +263,41 @@ line="$(jq -nc \
 exit 0
 ```
 
-- [ ] **Step 5: Make it executable**
+- [ ] **Step 5: Write `adapters/generic/cmd-tag.jq`**
+
+A definitions-only jq module (no top-level expression) so adapters can `include` it:
+
+```jq
+# Classify a shell command string into a CmdTag (core/events.ts), or "" if none.
+# Shared by every adapter's tool hook so the ladder lives in exactly one place.
+def cmd_tag($c):
+  if   ($c|test("git\\s+rebase\\b.*--onto")) then "git_rebase_onto"
+  elif ($c|test("git\\s+rebase\\b.*(-i|--interactive)")) then "git_rebase_i"
+  elif ($c|test("git\\s+cherry-pick")) then "cherry_pick"
+  elif ($c|test("git\\s+push\\b.*(--force|-f\\b)")) then "force_push"
+  elif ($c|test("git\\s+bisect")) then "bisect"
+  elif ($c|test("git\\s+reflog")) then "reflog"
+  elif ($c|test("git\\s+stash")) then "stash"
+  elif ($c|test("gh\\s+pr\\s+merge")) then "pr_merge"
+  elif ($c|test("git\\s+(push|merge)\\b.*\\b(main|master|prod|production|uat)\\b")) then "cowboy"
+  elif ($c|test("(bun|npm|pnpm|yarn)\\s+(run\\s+)?test|pytest|go\\s+test|jest|vitest|cargo\\s+test|mocha|rspec")) then "test_run"
+  else "" end;
+```
+
+- [ ] **Step 6: Make emit.sh executable**
 
 Run: `chmod +x adapters/generic/emit.sh`
 
-- [ ] **Step 6: Run test to verify it passes**
+- [ ] **Step 7: Run test to verify it passes**
 
 Run: `bun test test/adapters/generic-emit.test.ts`
-Expected: PASS (6 tests).
+Expected: PASS (7 tests).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
-git add adapters/generic/emit.sh test/helpers.ts test/adapters/generic-emit.test.ts
-git commit -m "feat(adapters): generic agent-agnostic emit.sh"
+git add adapters/generic/emit.sh adapters/generic/cmd-tag.jq test/helpers.ts test/adapters/generic-emit.test.ts
+git commit -m "feat(adapters): generic emit.sh + shared cmd-tag.jq"
 ```
 
 ---
@@ -330,25 +365,14 @@ exit 0
 ```bash
 #!/usr/bin/env bash
 DIR="$(cd "$(dirname "$0")" && pwd)"; . "$DIR/_common.sh"
+LIB="$(cd "$DIR/../../generic" && pwd)"
 IFS= read -rd '' input || true
 
-IFS=$'\t' read -r sid cwd type action native cmd file < <(printf '%s' "$input" | jq -r '
+IFS=$'\t' read -r sid cwd type action native cmd file < <(printf '%s' "$input" | jq -L "$LIB" -r '
+  include "cmd-tag";
   ({ "Edit":"edit","MultiEdit":"edit","Write":"write","Bash":"run",
      "Read":"read","Grep":"search","Glob":"search","Task":"delegate" }[.tool_name] // "other") as $a |
-  (.tool_input.command // "") as $c |
-  (if .tool_name == "Bash" then
-     (if   ($c|test("git\\s+rebase\\b.*--onto")) then "git_rebase_onto"
-      elif ($c|test("git\\s+rebase\\b.*(-i|--interactive)")) then "git_rebase_i"
-      elif ($c|test("git\\s+cherry-pick")) then "cherry_pick"
-      elif ($c|test("git\\s+push\\b.*(--force|-f\\b)")) then "force_push"
-      elif ($c|test("git\\s+bisect")) then "bisect"
-      elif ($c|test("git\\s+reflog")) then "reflog"
-      elif ($c|test("git\\s+stash")) then "stash"
-      elif ($c|test("gh\\s+pr\\s+merge")) then "pr_merge"
-      elif ($c|test("git\\s+(push|merge)\\b.*\\b(main|master|prod|production|uat)\\b")) then "cowboy"
-      elif ($c|test("(bun|npm|pnpm|yarn)\\s+(run\\s+)?test|pytest|go\\s+test|jest|vitest|cargo\\s+test|mocha|rspec")) then "test_run"
-      else "" end)
-   else "" end) as $cmd |
+  (if .tool_name == "Bash" then cmd_tag(.tool_input.command // "") else "" end) as $cmd |
   (if .hook_event_name=="PostToolUseFailure" then "action_fail" else "action" end) as $type |
   [(.session_id // "unknown"), (.cwd // ""), $type, $a,
    (.tool_name // "unknown"), $cmd, (.tool_input.file_path // "")] | @tsv
@@ -676,13 +700,14 @@ Expected: FAIL (on-tool.sh does not exist).
 ```bash
 #!/usr/bin/env bash
 DIR="$(cd "$(dirname "$0")" && pwd)"; . "$DIR/_common.sh"
+LIB="$(cd "$DIR/../../generic" && pwd)"
 IFS= read -rd '' input || true
 
-IFS=$'\t' read -r sid cwd type action native cmd file < <(printf '%s' "$input" | jq -r '
+IFS=$'\t' read -r sid cwd type action native cmd file < <(printf '%s' "$input" | jq -L "$LIB" -r '
+  include "cmd-tag";
   (.tool_name // "") as $t |
   # apply_patch: read the patch text field-agnostically; markers drive action + file.
   (.tool_input.patch // .tool_input.input // .tool_input.changes // (.tool_input | tostring)) as $patch |
-  (.tool_input.command // "") as $c |
   (if   $t == "apply_patch" then
         (if ($patch|test("\\*\\*\\* Add File:")) and (($patch|test("\\*\\*\\* (Update|Delete) File:"))|not)
          then "write" else "edit" end)
@@ -690,19 +715,7 @@ IFS=$'\t' read -r sid cwd type action native cmd file < <(printf '%s' "$input" |
    elif ($t|test("^(read|read_file)$";"i")) then "read"
    elif ($t|test("websearch|web_search";"i")) then "search"
    else "other" end) as $a |
-  (if ($t|test("^(bash|shell|exec|local_shell)$";"i")) then
-     (if   ($c|test("git\\s+rebase\\b.*--onto")) then "git_rebase_onto"
-      elif ($c|test("git\\s+rebase\\b.*(-i|--interactive)")) then "git_rebase_i"
-      elif ($c|test("git\\s+cherry-pick")) then "cherry_pick"
-      elif ($c|test("git\\s+push\\b.*(--force|-f\\b)")) then "force_push"
-      elif ($c|test("git\\s+bisect")) then "bisect"
-      elif ($c|test("git\\s+reflog")) then "reflog"
-      elif ($c|test("git\\s+stash")) then "stash"
-      elif ($c|test("gh\\s+pr\\s+merge")) then "pr_merge"
-      elif ($c|test("git\\s+(push|merge)\\b.*\\b(main|master|prod|production|uat)\\b")) then "cowboy"
-      elif ($c|test("(bun|npm|pnpm|yarn)\\s+(run\\s+)?test|pytest|go\\s+test|jest|vitest|cargo\\s+test|mocha|rspec")) then "test_run"
-      else "" end)
-   else "" end) as $cmd |
+  (if ($t|test("^(bash|shell|exec|local_shell)$";"i")) then cmd_tag(.tool_input.command // "") else "" end) as $cmd |
   (if $t == "apply_patch" then
      (($patch | capture("\\*\\*\\* (Add|Update|Delete|Move to) File: (?<p>[^\\n]+)").p) // "" | gsub("^\\s+|\\s+$";""))
    else (.tool_input.file_path // "") end) as $file |

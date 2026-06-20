@@ -21,10 +21,11 @@ interface IProps {
   tier: number;
   branch: string | null;
   activity: ActivityState;
+  icon: string;
 }
 
 const OverworldRoom = (props: IProps) => {
-  const { line, tier, branch, activity } = props;
+  const { line, tier, branch, activity, icon } = props;
   const roaming = activity !== ActivityState.Rest;
   const resting = !roaming;
   const pose = useWander(roaming);
@@ -49,6 +50,7 @@ const OverworldRoom = (props: IProps) => {
       moving={pose.moving}
       xPx={xPx}
       yPx={yPx}
+      icon={icon}
     />
   );
   const zzz = resting ? (

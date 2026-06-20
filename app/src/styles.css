@@ -341,7 +341,7 @@ body {
   height: 30cqh;
 }
 .hero::after {
-  content: "🧙";
+  content: attr(data-emoji);
 }
 .sprite.has-art::after {
   content: none;
@@ -356,7 +356,7 @@ body {
   opacity: 0.85;
 }
 .hero-rest::after {
-  content: "🧙";
+  content: attr(data-emoji);
   filter: grayscale(0.4);
 }
 .monster-unit {
@@ -493,7 +493,7 @@ body {
   background-position: center 18%;
 }
 .portrait-face::after {
-  content: "🧙";
+  content: attr(data-emoji);
 }
 .portrait-body {
   flex: 1;
@@ -1471,7 +1471,7 @@ body {
   border: 2px solid var(--ink);
 }
 .panel-portrait::after {
-  content: "🧙";
+  content: attr(data-emoji);
 }
 .hp-name {
   font-family: var(--font-display);
@@ -2187,7 +2187,7 @@ body.reduce-motion *::after {
   will-change: transform;
 }
 .ow-hero:not(.has-art)::after {
-  content: "🧙";
+  content: attr(data-emoji);
   font-size: 34px;
 }
 /* On-map guild NPCs — anchored at their feet, same size as the hero (32cqh); the imported idle loop

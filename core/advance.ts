@@ -41,21 +41,26 @@ export const chooseClass = (props: IChooseClassArgs): IAdvanceResult => {
 interface IRespecClassArgs {
   profile: IProfile;
   line: string;
-  level: number;
+  unlockedSecrets: string[];
 }
 
-// Respec an existing main class below Lv.50. Sets line, clears branch.
+// Respec an existing class — at any level — into a main line or an unlocked secret. Clears branch.
 export const respecClass = (props: IRespecClassArgs): IAdvanceResult => {
-  const { profile, line, level } = props;
-  if (!MAIN_LINES.includes(line)) {
-    return { ok: false, error: `Unknown class "${line}".` };
+  const { profile, line, unlockedSecrets } = props;
+  if (MAIN_LINES.includes(line)) {
+    profile.line = line as ClassLine;
+    profile.branch = undefined;
+    return { ok: true };
   }
-  if (level >= 50) {
-    return { ok: false, error: "Cannot respec at level 50." };
+  if (SECRET_LINES.includes(line)) {
+    if (!unlockedSecrets.includes(line)) {
+      return { ok: false, error: `Secret class "${line}" is locked.` };
+    }
+    profile.line = line as SecretLine;
+    profile.branch = undefined;
+    return { ok: true };
   }
-  profile.line = line as ClassLine;
-  profile.branch = undefined;
-  return { ok: true };
+  return { ok: false, error: `Unknown class "${line}".` };
 };
 
 interface IChooseBranchArgs {

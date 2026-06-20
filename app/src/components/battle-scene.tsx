@@ -23,6 +23,8 @@ interface IProps {
 
 const BattleScene = (props: IProps) => {
   const { state, activity, sceneInfo, line, tier, branch } = props;
+  // No-art classes (Novice, secret lines without sprites yet) fall back to their own emoji icon.
+  const icon = state.class?.icon || "🧙";
   const encounter = useEncounter(state);
   const scene = useSceneDirector(state, activity);
   const fight = useBossFight(encounter, line);
@@ -45,7 +47,7 @@ const BattleScene = (props: IProps) => {
         })}
       {!encounter && <HitEffects effects={scene.effects} />}
       <HeroHits hits={encounter ? fight.heroHits : scene.heroHits} />
-      <Hero line={line} tier={tier} branch={branch} anim={heroAnim} />
+      <Hero line={line} tier={tier} branch={branch} anim={heroAnim} icon={icon} />
       <FloatingText floaters={scene.floaters} />
       {encounter && (
         <BossEncounter encounter={encounter} theme={sceneInfo.theme} fight={fight} />

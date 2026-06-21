@@ -14,7 +14,7 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=natpat.agent-quest-companion"><img alt="VS Code Marketplace" src="https://img.shields.io/visual-studio-marketplace/v/natpat.agent-quest-companion?label=Marketplace&color=6b2a7a"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-cdae57"></a>
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-bun%20%2B%20jq-2a2118">
-  <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-d4a017">
+  <img alt="Agents" src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor-d4a017">
   <img alt="Powered by leftover tokens" src="https://img.shields.io/badge/powered%20by-leftover%20tokens-b5651d">
 </p>
 
@@ -59,13 +59,14 @@ quietly judging your commit messages.
   NPCs), and battles through tier realms. Real pixel sprites for all four main class lines.
 - 📊 **Status-bar HUD** — `Lv.N ███░░ %  ·  model  ·  $cost  ·  ctx %` right in the Claude Code status
   line, for when the panel is too much commitment.
-- 🔌 **Genuinely clean architecture** — agent-awareness lives only in adapters; the engine is a pure
-  reducer over a normalized event contract. Runtime dependencies: `bun` + `jq`. No `node_modules`
-  black hole.
+- 🔌 **Genuinely clean architecture** — agent-awareness lives only in adapters (Claude Code, Codex,
+  and Cursor today); the engine is a pure reducer over a normalized event contract. Runtime
+  dependencies: `bun` + `jq`. No `node_modules` black hole.
 
 ## 📋 Requirements
 
-- [Claude Code](https://claude.com/claude-code) — the thing generating the events
+- [Claude Code](https://claude.com/claude-code) — the thing generating the events (Codex and Cursor
+  work too, via their own adapters)
 - [Bun](https://bun.sh) and [`jq`](https://jqlang.github.io/jq/) on your `PATH`
 - [VS Code](https://code.visualstudio.com/) — for the companion panel
 
@@ -125,8 +126,9 @@ driven by what you actually did.
 agents ──(adapters)──► append-only journal (NDJSON) ──(reducer)──► state.json ──► HUD / companion
 ```
 
-- **Adapters** (`adapters/claude-code/hooks/*.sh`) are the only agent-aware code. They run on Claude
-  Code's hot path, stay tiny, and append one normalized event per line to a per-session journal.
+- **Adapters** (`adapters/<agent>/hooks/*.sh` — Claude Code, Codex, Cursor) are the only agent-aware
+  code. They run on the agent's hot path, stay tiny, and append one normalized event per line to a
+  per-session journal.
 - The **reducer** (`core/`) folds the journal into `state.json` — a pure function over the event
   contract in `core/events.ts`. It knows nothing about Claude Code, and likes it that way.
 - The **companion** (`app/`, React + Vite) and the **status-bar HUD** (`hud/`) are read-only consumers
@@ -145,10 +147,17 @@ the list. We checked twice.
 
 - Single developer, single machine. Progression is local and meant to be _grinded_ — there's no
   backfill, because instantly jumping to Level 40 would defeat the entire bit.
-- Currently emits from Claude Code only; other agents need an adapter (the seam is built for it, nobody
-  has written one yet).
+- **Multi-agent, but Claude Code is the one that's actually grinded.** Adapters ship for Claude Code,
+  Codex, and Cursor — same journal, same hero. Claude Code is what I daily-drive, so it's the most
+  battle-tested; the others are built to the same contract but see less mileage.
 - `--continue` / `--resume` replay recorded hook output and don't re-run hooks, so resumed spans can be
   sparse. We know. It's on the list.
+
+> **🙏 Calling all Cursor users.** Full confession: I don't actually use Cursor. The adapter is built,
+> unit-tested, and *should* work — but it has never met a real Cursor session in the wild. If you live
+> in Cursor, please kick the tires and [open a PR](https://github.com/Hin-Nattapat/agent-quest/pulls)
+> (or an [issue](https://github.com/Hin-Nattapat/agent-quest/issues)) telling me what broke. I'll
+> trade you a sprite. 🧙
 
 ## ☕ Support
 

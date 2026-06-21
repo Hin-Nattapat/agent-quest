@@ -153,11 +153,13 @@ the list. We checked twice.
 - `--continue` / `--resume` replay recorded hook output and don't re-run hooks, so resumed spans can be
   sparse. We know. It's on the list.
 
-> **🙏 Calling all Cursor users.** Full confession: I don't actually use Cursor. The adapter is built,
-> unit-tested, and *should* work — but it has never met a real Cursor session in the wild. If you live
-> in Cursor, please kick the tires and [open a PR](https://github.com/Hin-Nattapat/agent-quest/pulls)
-> (or an [issue](https://github.com/Hin-Nattapat/agent-quest/issues)) telling me what broke. I'll
-> trade you a sprite. 🧙
+> **🦦 Cursor users, an otter needs you.** Full confession: I don't use Cursor. I built the adapter,
+> unit-tested every hook, and shipped it on pure vibes — it has never met a real Cursor session in the
+> wild, because I'm an otter who codes in Claude Code and feeds all his coffee to a robot. So this part
+> is *genuinely* untested out there. If Cursor is your natural habitat, please [kick the
+> tires](https://github.com/Hin-Nattapat/agent-quest/pulls) and tell me what exploded (PR or
+> [issue](https://github.com/Hin-Nattapat/agent-quest/issues)). Land a fix and you get a changelog
+> credit, an otter's undying gratitude, and — fine — a sprite. 🧙
 
 ## ☕ Support
 

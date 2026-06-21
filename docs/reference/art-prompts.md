@@ -741,7 +741,7 @@ a side-view pixel-art battle background of the grand performance stage of a gold
 ```
 `midnight_roost` (Night Owl · Midnight Roost)
 ```
-a side-view pixel-art battle background of a moonlit midnight tower rooftop, a wide open flat dark indigo stone floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, weathered dark battlements and hanging moon-lanterns only at the far left and right edges, a giant glowing crescent moon and a deep starfield with drifting clouds behind, completely empty with no people, no characters, no creatures, no figures, deep indigo and moonlight-silver, serene and nocturnal, limited palette, clean pixel art, slightly stylized
+a side-view pixel-art battle background of an open moonlit stone terrace high on a dark castle wall, a wide open flat bare pale-stone terrace floor across the entire lower third, the foreground level, completely clear and unobstructed with open floor on both the left and right, weathered dark battlements and hanging moon-lanterns only at the far left and right edges, a giant glowing crescent moon, a deep starfield and a small distant dark tower silhouette behind, completely empty with no people, no characters, no creatures, no figures, deep indigo and moonlight-silver with a softly moonlit floor, serene and nocturnal, limited palette, clean pixel art, slightly stylized
 ```
 `silent_summit` (Ascetic · Silent Summit)
 ```
@@ -749,7 +749,7 @@ a side-view pixel-art battle background of a serene mountain monastery summit, a
 ```
 `glitch_pit` (Gremlin · The Glitch Pit)
 ```
-a side-view pixel-art battle background of a corrupted glitch pit of broken machinery, a wide open flat cracked circuit-board floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, floating broken hardware shards and glitching pixel debris only at the far left and right edges, a corrupted dark void with green scan-lines and datamosh streaks behind, completely empty with no people, no characters, no creatures, no figures, toxic glitch-green and dark, chaotic and unstable, limited palette, clean pixel art, slightly stylized
+a side-view pixel-art battle background of a corrupted glitch pit, a wide open flat bare dark cracked-stone floor across the entire lower third, the foreground level, completely clear and unobstructed with open floor on both the left and right, floating broken hardware shards and a few glitching pixel-debris only at the far left and right edges, a corrupted dark void with toxic-green scan-lines and faint datamosh streaks deep in the background behind, completely empty with no people, no characters, no creatures, no figures, dark stone with toxic-green glitch glow confined to the background, eerie and unstable, limited palette, clean pixel art, slightly stylized
 ```
 `fools_mirage` (Trickster · Fool's Mirage)
 ```

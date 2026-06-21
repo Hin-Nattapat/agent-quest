@@ -1,6 +1,7 @@
 import { test, expect } from "bun:test";
 import { runHookAt, journalLines, repoCache, makeHome, basename } from "../helpers";
 import { EventType } from "../../core/events";
+import { existsSync, readFileSync } from "fs";
 import { mkdtempSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
@@ -80,4 +81,16 @@ test("codex prompt: malformed stdin still exits 0 with no stdout", async () => {
   const stdout = await new Response(proc.stdout).text();
   expect(await proc.exited).toBe(0);
   expect(stdout).toBe("");
+});
+
+test("codex config snippet wires all four hooks", () => {
+  const root = join(import.meta.dir, "../../adapters/codex");
+  expect(existsSync(join(root, "README.md"))).toBe(true);
+  const toml = readFileSync(join(root, "config.snippet.toml"), "utf8");
+  for (const h of ["on-session-start.sh", "on-prompt.sh", "on-tool.sh", "on-stop.sh"]) {
+    expect(toml).toContain(h);
+  }
+  for (const e of ["SessionStart", "UserPromptSubmit", "PostToolUse", "Stop"]) {
+    expect(toml).toContain(e);
+  }
 });

@@ -1,0 +1,25 @@
+# Agent Quest — Codex adapter hooks.
+# Paste into ~/.codex/config.toml (or ~/.codex/hooks.json equivalent). The installer deploys the
+# adapter to ~/.agentrpg/adapters/codex; emit.sh resolves automatically from there.
+
+[[hooks.SessionStart]]
+matcher = "startup|resume"
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = "~/.agentrpg/adapters/codex/hooks/on-session-start.sh"
+
+[[hooks.UserPromptSubmit]]
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = "~/.agentrpg/adapters/codex/hooks/on-prompt.sh"
+
+[[hooks.PostToolUse]]
+matcher = "apply_patch|shell|exec|local_shell|read|read_file|WebSearch"
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "~/.agentrpg/adapters/codex/hooks/on-tool.sh"
+
+[[hooks.Stop]]
+[[hooks.Stop.hooks]]
+type = "command"
+command = "~/.agentrpg/adapters/codex/hooks/on-stop.sh"

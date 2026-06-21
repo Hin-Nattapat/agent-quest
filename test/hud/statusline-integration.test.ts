@@ -51,3 +51,46 @@ test("statusline never throws on empty stdin / empty home", async () => {
   expect(await proc.exited).toBe(0);
   expect(out).toContain("Lv.1");
 });
+
+test("statusline shows the active source only when >= 2 sources", async () => {
+  const seed = (home: string, bySource: object, lastSource: string | null) => {
+    writeFileSync(
+      join(home, "state.json"),
+      JSON.stringify({
+        version: 1,
+        updated_at: "t",
+        xp_total: 224,
+        level: 5,
+        xp_in_level: 0,
+        xp_to_next: 167,
+        stats: { prompts: 0, actions: {}, sessions: 0, by_source: bySource, by_repo: {} },
+        ...(lastSource
+          ? { last_event: { ts: "t", type: "prompt", source: lastSource } }
+          : {}),
+      }),
+    );
+  };
+  const run = async (home: string) => {
+    const proc = Bun.spawn(["bun", SCRIPT], {
+      stdin: Buffer.from(JSON.stringify({ model: { display_name: "M" } })),
+      env: { ...process.env, AGENTRPG_HOME: home },
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const out = await new Response(proc.stdout).text();
+    expect(await proc.exited).toBe(0);
+    return out;
+  };
+
+  const multi = makeHome();
+  seed(
+    multi,
+    { "claude-code": { xp: 100, sessions: 1 }, codex: { xp: 50, sessions: 1 } },
+    "codex",
+  );
+  expect(await run(multi)).toContain("via Codex");
+
+  const solo = makeHome();
+  seed(solo, { "claude-code": { xp: 100, sessions: 1 } }, "claude-code");
+  expect(await run(solo)).not.toContain("via");
+});

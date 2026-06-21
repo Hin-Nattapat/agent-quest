@@ -3,7 +3,7 @@ import { randomBytes } from "crypto";
 import { join } from "path";
 import { homedir } from "os";
 import { buildWebviewHtml } from "./webview-html";
-import { watchState, readStateText } from "./state-feed";
+import { watchState, refreshStateText } from "./state-feed";
 import { applyAction } from "./host-actions";
 
 const HOME = process.env.AGENTRPG_HOME || join(homedir(), ".agentrpg");
@@ -42,7 +42,7 @@ const resolveView = (
   const messageSub = webview.onDidReceiveMessage(
     (message: { type?: string; name?: string; kind?: string; id?: string }) => {
       if (message.type === "ready") {
-        const text = readStateText(HOME);
+        const text = refreshStateText(HOME);
         if (text) {
           webview.postMessage({ type: "state", json: text });
         }

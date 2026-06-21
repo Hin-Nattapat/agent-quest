@@ -4,7 +4,7 @@ IFS= read -rd '' input || true
 
 # Use STX (\x02) as separator so IFS-read preserves empty fields (e.g. empty cwd).
 IFS=$'\002' read -r sid cwd start model < <(printf '%s' "$input" \
-  | jq -rj '[.session_id // "unknown", .cwd // "", .source // "", .model // ""] | join("")' 2>/dev/null)
+  | jq -rj '[.session_id // "unknown", .cwd // "", .source // "", .model // ""] | join("\u0002")' 2>/dev/null)
 [ -z "$sid" ] && sid="unknown"
 
 args=(--type session_start --source "$SOURCE" --session "$sid" --cwd "$cwd")

@@ -7,24 +7,25 @@ IFS= read -rd '' input || true
 IFS=$'\002' read -r sid cwd type action native cmd file < <(printf '%s' "$input" | jq -L "$LIB" -rj '
   include "cmd-tag";
   (.tool_name // "") as $t |
-  # apply_patch: read the patch text field-agnostically; markers drive action + file.
-  (.tool_input.patch // .tool_input.input // .tool_input.changes // (.tool_input | tostring)) as $patch |
+  ($t|test("^(bash|shell|exec|local_shell)$";"i")) as $isShell |
+  # apply_patch: read the patch text from its known input fields; markers drive action + file.
+  (.tool_input.patch // .tool_input.input // .tool_input.changes // "") as $patch |
   (if   $t == "apply_patch" then
         (if ($patch|test("\\*\\*\\* Add File:")) and (($patch|test("\\*\\*\\* (Update|Delete) File:"))|not)
          then "write" else "edit" end)
-   elif ($t|test("^(bash|shell|exec|local_shell)$";"i")) then "run"
+   elif $isShell then "run"
    elif ($t|test("^(read|read_file)$";"i")) then "read"
-   elif ($t|test("websearch|web_search";"i")) then "search"
+   elif ($t|test("^(websearch|web_search)$";"i")) then "search"
    else "other" end) as $a |
-  (if ($t|test("^(bash|shell|exec|local_shell)$";"i")) then cmd_tag(.tool_input.command // "") else "" end) as $cmd |
+  (if $isShell then cmd_tag(.tool_input.command // "") else "" end) as $cmd |
   (if $t == "apply_patch" then
-     (($patch | capture("\\*\\*\\* (?:Add|Update|Delete|Move to) File: (?<p>[^\n]+)").p) // "" | gsub("^\\s+|\\s+$";""))
+     (($patch | capture("\\*\\*\\* (?:Add|Update|Delete) File: (?<p>[^\n]+)").p) // "" | gsub("^\\s+|\\s+$";""))
    else (.tool_input.file_path // "") end) as $file |
   (if ((.tool_response.error // "") != "")
       or ((.tool_response.exit_code // 0) != 0)
       or ((.tool_response.success) == false)
    then "action_fail" else "action" end) as $type |
-  [(.session_id // "unknown"), (.cwd // ""), $type, $a, $t, $cmd, $file] | join("")
+  [(.session_id // "unknown"), (.cwd // ""), $type, $a, $t, $cmd, $file] | join("\u0002")
 ' 2>/dev/null)
 [ -z "$sid" ] && sid="unknown"
 [ -z "$type" ] && exit 0

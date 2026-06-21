@@ -23,5 +23,5 @@ Tool → action: `apply_patch`→`write` (pure new file) or `edit`; `shell`/`exe
 ## Known approximations (refine against a real payload)
 
 - Failure is heuristic: `tool_response.error`, non-zero `exit_code`, or `success == false`.
-- `apply_patch` patch text is read field-agnostically (`patch`/`input`/`changes`/whole input).
+- `apply_patch` patch text is read from its known input fields (`patch`/`input`/`changes`); an unknown layout falls back to `edit` with no file path. The file path comes from the first `*** Add|Update|Delete File:` marker.
 - No `SessionEnd` hook in Codex; no statusline (the companion app renders from `state.json`).

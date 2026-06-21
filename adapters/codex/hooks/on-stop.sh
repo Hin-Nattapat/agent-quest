@@ -4,7 +4,7 @@ IFS= read -rd '' input || true
 
 # Use STX (\x02) as separator so IFS-read preserves empty fields (e.g. empty cwd).
 IFS=$'\002' read -r sid cwd < <(printf '%s' "$input" \
-  | jq -rj '[.session_id // "unknown", .cwd // ""] | join("")' 2>/dev/null)
+  | jq -rj '[.session_id // "unknown", .cwd // ""] | join("\u0002")' 2>/dev/null)
 [ -z "$sid" ] && sid="unknown"
 "$EMIT" --type turn_end --source "$SOURCE" --session "$sid" --cwd "$cwd"
 exit 0

@@ -7,17 +7,17 @@ type="" sid="" source="${RPG_SOURCE:-claude-code}" repo="" cwd="" start="" model
 action="" native="" cmd="" file=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --type)    type="$2";   shift 2;;
-    --session) sid="$2";    shift 2;;
-    --source)  source="$2"; shift 2;;
-    --repo)    repo="$2";   shift 2;;
-    --cwd)     cwd="$2";    shift 2;;
-    --start)   start="$2";  shift 2;;
-    --model)   model="$2";  shift 2;;
-    --action)  action="$2"; shift 2;;
-    --native)  native="$2"; shift 2;;
-    --cmd)     cmd="$2";    shift 2;;
-    --file)    file="$2";   shift 2;;
+    --type)    type="$2";   shift 2 2>/dev/null || shift;;
+    --session) sid="$2";    shift 2 2>/dev/null || shift;;
+    --source)  source="$2"; shift 2 2>/dev/null || shift;;
+    --repo)    repo="$2";   shift 2 2>/dev/null || shift;;
+    --cwd)     cwd="$2";    shift 2 2>/dev/null || shift;;
+    --start)   start="$2";  shift 2 2>/dev/null || shift;;
+    --model)   model="$2";  shift 2 2>/dev/null || shift;;
+    --action)  action="$2"; shift 2 2>/dev/null || shift;;
+    --native)  native="$2"; shift 2 2>/dev/null || shift;;
+    --cmd)     cmd="$2";    shift 2 2>/dev/null || shift;;
+    --file)    file="$2";   shift 2 2>/dev/null || shift;;
     *) shift;;
   esac
 done

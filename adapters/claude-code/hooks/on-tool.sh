@@ -11,7 +11,7 @@ IFS=$'\002' read -r sid cwd type action native cmd file < <(printf '%s' "$input"
   (if .tool_name == "Bash" then cmd_tag(.tool_input.command // "") else "" end) as $cmd |
   (if .hook_event_name=="PostToolUseFailure" then "action_fail" else "action" end) as $type |
   [(.session_id // "unknown"), (.cwd // ""), $type, $a,
-   (.tool_name // "unknown"), $cmd, (.tool_input.file_path // "")] | join("")
+   (.tool_name // "unknown"), $cmd, (.tool_input.file_path // "")] | join("\u0002")
 ' 2>/dev/null)
 
 [ -z "$sid" ] && sid="unknown"

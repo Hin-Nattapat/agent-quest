@@ -1,5 +1,6 @@
 import type { IState } from "../../../core/state";
-import { displayName, spriteStyle } from "../view";
+import { displayName, spriteStyle, sourceBreakdown } from "../view";
+import { sourceLabel } from "../../../core/events";
 import { heroPortrait } from "../sprites";
 
 interface IProps {
@@ -78,6 +79,23 @@ const HeroPanel = (props: IProps) => {
             <dd>{state.streak?.best_days ?? 0}d</dd>
           </dl>
         </section>
+
+        {Object.keys(stats.by_source).length >= 2 ? (
+          <section className="hero-col">
+            <div className="panel-head">Sources</div>
+            <div className="aff-bars">
+              {sourceBreakdown(stats.by_source).map(share => (
+                <div key={share.source} className="aff-row">
+                  <span className="aff-label">{sourceLabel(share.source)}</span>
+                  <div className="aff-bar">
+                    <i style={{ width: `${share.pct}%` }} />
+                  </div>
+                  <span className="aff-pct">{share.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
     </div>
   );

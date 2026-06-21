@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      { "command": "~/.agentrpg/adapters/cursor/hooks/on-session-start.sh" }
+    ],
+    "beforeSubmitPrompt": [
+      { "command": "~/.agentrpg/adapters/cursor/hooks/on-prompt.sh" }
+    ],
+    "postToolUse": [{ "command": "~/.agentrpg/adapters/cursor/hooks/on-tool.sh" }],
+    "postToolUseFailure": [{ "command": "~/.agentrpg/adapters/cursor/hooks/on-tool.sh" }],
+    "subagentStart": [{ "command": "~/.agentrpg/adapters/cursor/hooks/on-subagent.sh" }],
+    "stop": [{ "command": "~/.agentrpg/adapters/cursor/hooks/on-stop.sh" }],
+    "sessionEnd": [{ "command": "~/.agentrpg/adapters/cursor/hooks/on-session-end.sh" }]
+  }
+}

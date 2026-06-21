@@ -3,7 +3,6 @@ import { join } from "path";
 import { reduceThrottled } from "../core/reduce";
 import { levelProgress, DEFAULT_DIFFICULTY } from "../core/xp";
 import { defaultHome } from "../core/config";
-import { sourceLabel } from "../core/events";
 import type { IState } from "../core/state";
 
 export interface ITail {
@@ -65,14 +64,9 @@ export const renderHud = (props: IRenderHudArgs): string => {
       : "";
   const bagCount = (state.inventory ?? []).reduce((sum, item) => sum + item.count, 0);
   const bag = bagCount > 0 ? ` 🎒${bagCount}` : "";
-  const bySource = state.stats?.by_source ?? {};
-  const via =
-    Object.keys(bySource).length >= 2 && state.last_event?.source
-      ? ` · via ${sourceLabel(state.last_event.source)}`
-      : "";
   const left =
     `${coloredName} · ${label}${pending}  ` +
-    `Lv.${state.level} ${coloredBar}${maxed} ${Math.round(pct * 100)}%${fire}${bag}${via}`;
+    `Lv.${state.level} ${coloredBar}${maxed} ${Math.round(pct * 100)}%${fire}${bag}`;
 
   const model = tail.model || "?";
   const cost = tail.cost == null ? "0.00" : tail.cost.toFixed(2);

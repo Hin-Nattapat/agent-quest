@@ -404,6 +404,7 @@ test("last_event is the latest event by ts (or undefined when empty)", () => {
   expect(reduce({ events: evs, config: cfg, today: "2026-06-11" }).last_event).toEqual({
     ts: "2026-06-11T12:05:00Z",
     type: EventType.SessionEnd,
+    source: "claude-code",
   });
   expect(
     reduce({ events: [], config: cfg, today: "2026-06-11" }).last_event,

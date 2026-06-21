@@ -7,6 +7,7 @@ const NOW = Date.parse("2026-06-11T12:00:00Z");
 const ev = (type: EventType, agoMs: number): IState["last_event"] => ({
   ts: new Date(NOW - agoMs).toISOString(),
   type,
+  source: "claude-code",
 });
 
 test("activityState maps the last event + recency to a state", () => {

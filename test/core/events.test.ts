@@ -42,3 +42,11 @@ test("CmdTag members carry the wire strings the hook emits", () => {
   expect(CmdTag.TestRun as string).toBe("test_run");
   expect(CmdTag.Cowboy as string).toBe("cowboy");
 });
+
+import { sourceLabel } from "../../core/events";
+
+test("sourceLabel humanizes adapter source ids", () => {
+  expect(sourceLabel("claude-code")).toBe("Claude Code");
+  expect(sourceLabel("codex")).toBe("Codex");
+  expect(sourceLabel("cursor")).toBe("Cursor");
+});

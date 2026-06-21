@@ -1,0 +1,20 @@
+---
+description: Agent Quest project rules — architecture seam, TS conventions, hook safety
+globs:
+alwaysApply: true
+---
+
+This repo's coding rules are canonical in [CLAUDE.md](mdc:CLAUDE.md) and mirrored in
+[AGENTS.md](mdc:AGENTS.md). Read one before changing code. Highlights:
+
+- **The seam:** agent-awareness lives ONLY in `adapters/`; `core/` is a pure source-agnostic reducer
+  over the `core/events.ts` contract. The app imports only `core/state` (type-only) + `core/events`.
+- **Runtime deps = `bun` + `jq` only.** No runtime npm packages.
+- **TypeScript:** arrow-`const` functions (never `function` decls), `interface I*` / `type T*`, no
+  `any`, string enums (never bare `"a" | "b"` unions), braces on every `if`/`else`, kebab-case files.
+  Bun doesn't type-check — run `bunx tsc --noEmit`.
+- **Hook scripts (`adapters/*/hooks/*.sh`):** never write stdout, always `exit 0`, append-only one
+  journal file per session, build JSON via `jq`, no network. Multi-field parse uses `IFS=$'\002'` +
+  jq `join("")` (visible escapes, never a raw control byte).
+- **Tests:** `bun test`. Hook scripts are tested by spawning the real script against fixture JSON.
+- **Commits:** Conventional Commits; one logical change each.

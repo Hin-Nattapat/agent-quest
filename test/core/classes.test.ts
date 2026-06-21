@@ -83,7 +83,7 @@ test("a secret line never pends a branch, even at level 50", () => {
     null,
   );
   expect(advancementPending({ line: ClassLine.Mage, level: 50, branch: null })).toBe(
-    "branch",
+    AdvancementKind.Branch,
   ); // main unchanged
 });
 

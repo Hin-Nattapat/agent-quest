@@ -2,6 +2,7 @@ import { test, expect } from "bun:test";
 import {
   evaluateAchievements,
   DEFAULT_ACHIEVEMENTS,
+  DistinctScope,
   type IAchievementDef,
 } from "../../core/achievements";
 import type { IState } from "../../core/state";
@@ -30,7 +31,7 @@ const registry: Record<string, IAchievementDef> = {
   explorer: {
     name: "Explorer",
     desc: "",
-    cond: { distinct: "repo", gte: 2 },
+    cond: { distinct: DistinctScope.Repo, gte: 2 },
     points: 15,
   },
   combo: {

@@ -12,4 +12,5 @@ Observational only: never writes stdout, always exits 0, appends one line per ev
 | Stop | on-stop.sh | turn_end |
 | SessionEnd | on-session-end.sh | session_end |
 
-See `docs/superpowers/specs/2026-06-10-commit-quest-phase0-design.md`.
+The normalized event contract lives in `core/events.ts`; the shared emitter is `adapters/generic/emit.sh`
+(see [`adapters/generic/README.md`](../generic/README.md)).

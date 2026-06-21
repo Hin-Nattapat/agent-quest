@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  engine:
+    name: engine (bun test + tsc + format)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: sudo apt-get update && sudo apt-get install -y jq
+      - run: bun install --frozen-lockfile
+      # test/ only — the engine/adapter/hud/integration/tools suites (no app/React deps).
+      - run: bun test test/
+      - run: bunx tsc --noEmit
+      - run: bun run format:check
+
+  app:
+    name: app (typecheck + component tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: cd app && bun install --frozen-lockfile
+      - run: cd app && bun run typecheck
+      - run: cd app && bun test src/
+
+  extension:
+    name: extension (typecheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: cd app/extension && npm ci && npm run typecheck

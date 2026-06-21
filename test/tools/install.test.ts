@@ -35,6 +35,20 @@ test("copy mode copies real files (not symlinks)", async () => {
   expect(existsSync(join(home, "tools/inspect.ts"))).toBe(true);
 });
 
+test("copy mode makes every adapter's hooks executable (codex included)", async () => {
+  const home = makeHome();
+  const { code } = await runInstall(home, []);
+  expect(code).toBe(0);
+  for (const hook of [
+    "adapters/claude-code/hooks/on-tool.sh",
+    "adapters/codex/hooks/on-tool.sh",
+  ]) {
+    const p = join(home, hook);
+    expect(existsSync(p)).toBe(true);
+    expect((lstatSync(p).mode & 0o111) !== 0).toBe(true); // executable
+  }
+});
+
 test("does not overwrite an existing config.json", async () => {
   const home = makeHome();
   const cfg = join(home, "config.json");

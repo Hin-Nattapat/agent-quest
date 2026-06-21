@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=natpat.agent-quest-companion"><img alt="VS Code Marketplace" src="https://img.shields.io/visual-studio-marketplace/v/natpat.agent-quest-companion?label=Marketplace&color=6b2a7a"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=NattaP.agent-quest"><img alt="VS Code Marketplace" src="https://img.shields.io/visual-studio-marketplace/v/NattaP.agent-quest?label=Marketplace&color=6b2a7a"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-cdae57"></a>
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-bun%20%2B%20jq-2a2118">
   <img alt="Agents" src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor-d4a017">
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  🛒 <a href="https://marketplace.visualstudio.com/items?itemName=natpat.agent-quest-companion">Marketplace</a>
+  🛒 <a href="https://marketplace.visualstudio.com/items?itemName=NattaP.agent-quest">Marketplace</a>
   &nbsp;•&nbsp; 📦 <a href="#-install">Install</a>
   &nbsp;•&nbsp; 🧙 <a href="#-how-it-works">How it works</a>
   &nbsp;•&nbsp; 🐛 <a href="https://github.com/Hin-Nattapat/agent-quest/issues">Issues</a>
@@ -88,7 +88,7 @@ This clones the repo, deploys into `~/.agentrpg`, and prints a Claude Code setti
 **3 — Install the companion panel:** search **"Agent Quest"** in the VS Code Extensions view, or:
 
 ```bash
-code --install-extension natpat.agent-quest-companion
+code --install-extension NattaP.agent-quest
 ```
 
 Reload the window, start a Claude Code session, and open the **Agent Quest** panel (next to Terminal /
@@ -167,7 +167,7 @@ Agent Quest is free and built in spare cycles. If it made your grind a little mo
 me a coffee — it directly funds more sprites, more realms, and more tokens to grind into this thing.
 
 <p align="center">
-  <a href="https://buymeacoffee.com/natta_p"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
+  <a href="https://buymeacoffee.com/NattaP"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
 </p>
 
 ## 🤝 Contributing

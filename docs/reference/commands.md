@@ -31,7 +31,7 @@ Browser dev = `npm run serve` (one terminal) + `npm run dev` (another), open the
 ```bash
 cd app/extension
 npm run build:all   # app build → copy webview → bundle extension (run this BEFORE pressing F5)
-npm run package     # build:all + vsce package → agent-quest-companion-<version>.vsix
+npm run package     # build:all + vsce package → agent-quest-<version>.vsix
 npm run reinstall   # package + (re)install the freshest vsix into VS Code, in one shot
 npm run build       # just the extension host (esbuild → dist/extension.js)
 npm run copy-webview # just copy app/dist/assets → app/extension/webview/assets
@@ -41,8 +41,8 @@ Install / run the packaged extension:
 
 ```bash
 npm run reinstall                                  # repackage + force-install the latest vsix (then reload window)
-code --install-extension app/extension/agent-quest-companion-0.0.1.vsix
-code --uninstall-extension natpat.agent-quest-companion
+code --install-extension app/extension/agent-quest-0.0.1.vsix
+code --uninstall-extension NattaP.agent-quest
 code --list-extensions | grep agent-quest        # confirm it's installed
 ```
 

@@ -139,7 +139,7 @@ The companion installs as a local `.vsix`:
 
 - `cd app/extension && npm run package` → builds the app (Vite), copies `app/dist/assets` into
   `app/extension/webview/` (gitignored), bundles the extension host (esbuild), and runs `vsce package`
-  → `agent-quest-companion-<version>.vsix`.
-- Install: `code --install-extension agent-quest-companion-<version>.vsix`.
+  → `agent-quest-<version>.vsix`.
+- Install: `code --install-extension agent-quest-<version>.vsix`.
 - The webview loads its bundle from the in-extension `webview/` dir, so the same artifacts run under
   F5 and in the installed vsix — **run `npm run build:all` before pressing F5.**

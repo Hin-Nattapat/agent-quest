@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, watch } from "fs";
 import { join } from "path";
 import { homedir } from "os";
+import { refreshStateText } from "../core/reduce";
 
 const HOME = process.env.AGENTRPG_HOME || join(homedir(), ".agentrpg");
 const PORT = Number(process.env.AGENTRPG_PORT) || 7070;
@@ -19,6 +20,9 @@ export const readState = (home: string): string | null => {
   }
 };
 
+// Reduce-then-read (the journal "catch up"); the logic lives in core so the extension shares it.
+export const refreshState = refreshStateText;
+
 // state.json is pretty-printed (multi-line); SSE requires a `data:` prefix on EVERY line,
 // otherwise the browser's EventSource only keeps the first line and JSON.parse fails.
 export const sseMessage = (stateJson: string): string => {
@@ -33,8 +37,7 @@ if (import.meta.main) {
   const encoder = new TextEncoder();
   const clients = new Set<ReadableStreamDefaultController<Uint8Array>>();
 
-  const pushAll = () => {
-    const text = readState(HOME);
+  const push = (text: string | null) => {
     if (!text) {
       return;
     }
@@ -47,18 +50,46 @@ if (import.meta.main) {
       }
     }
   };
+  const pushReduced = () => push(refreshState(HOME));
+  const pushRead = () => push(readState(HOME));
 
-  // Watch the home dir (survives the reducer's tmp+rename swap) and debounce.
-  let timer: ReturnType<typeof setTimeout> | null = null;
+  // A journal change re-reduces (agents without a statusline — Codex — never reduce themselves), with
+  // a trailing reduce past the ~2s throttle so the last burst lands. A state.json change is pushed
+  // read-only — keeping reduce off that path stops our own reduce-write from looping back.
+  const DEBOUNCE_MS = 50;
+  const TRAILING_MS = 2100;
+  let reduceTimer: ReturnType<typeof setTimeout> | null = null;
+  let trailingTimer: ReturnType<typeof setTimeout> | null = null;
+  let readTimer: ReturnType<typeof setTimeout> | null = null;
+  const onJournal = () => {
+    if (reduceTimer) {
+      clearTimeout(reduceTimer);
+    }
+    reduceTimer = setTimeout(pushReduced, DEBOUNCE_MS);
+    if (trailingTimer) {
+      clearTimeout(trailingTimer);
+    }
+    trailingTimer = setTimeout(pushReduced, TRAILING_MS);
+  };
+  const onState = () => {
+    if (readTimer) {
+      clearTimeout(readTimer);
+    }
+    readTimer = setTimeout(pushRead, DEBOUNCE_MS);
+  };
   watch(HOME, (_event, filename) => {
-    if (filename !== "state.json") {
-      return;
+    if (filename === "state.json") {
+      onState();
     }
-    if (timer) {
-      clearTimeout(timer);
-    }
-    timer = setTimeout(pushAll, 50);
   });
+  const journal = join(HOME, "journal");
+  if (existsSync(journal)) {
+    watch(journal, (_event, filename) => {
+      if (filename && filename.endsWith(".ndjson")) {
+        onJournal();
+      }
+    });
+  }
 
   Bun.serve({
     port: PORT,
@@ -70,7 +101,7 @@ if (import.meta.main) {
           start(controller) {
             self = controller;
             clients.add(controller);
-            const text = readState(HOME);
+            const text = refreshState(HOME);
             if (text) {
               controller.enqueue(encoder.encode(sseMessage(text)));
             }

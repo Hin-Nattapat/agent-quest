@@ -731,6 +731,29 @@ The Chaos Gremlin King: a cackling gremlin king on a throne of broken hardware, 
 The Jester Mirage:      a mischievous illusion jester splitting into mirror-image duplicates, harlequin pattern, playing-card confetti, whimsical (จับคู่กับ Sir Quacks-a-lot §4.5 — จะให้เป็ดยักษ์ลวงตาก็ได้) — rainbow harlequin
 ```
 
+**scene background ต่อแดน (เติม §7.B แล้ว · copy วางได้เลย)** — create-image · Sidescroller · ~400×128 (3:1) · remove-bg OFF · import `bun tools/import-art.ts <export> --as bg:<theme>` → `scenes/<theme>.png` (theme key map ใน `app/src/scene.ts` แล้ว · CSS gradient/letterbox มีอยู่)
+
+`grand_concert_vault` (Maestro · Grand Concert Vault)
+```
+a side-view pixel-art battle background of a grand golden opera concert hall, a wide open flat polished gold marble floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, ornate gilded columns and floating golden instruments only at the far left and right edges, tiered opera balconies and a vast glowing pipe organ behind, completely empty with no people, no characters, no creatures, no figures, opulent gold and warm amber with chandelier light, majestic, limited palette, clean pixel art, slightly stylized
+```
+`midnight_roost` (Night Owl · Midnight Roost)
+```
+a side-view pixel-art battle background of a moonlit midnight tower rooftop, a wide open flat dark indigo stone floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, weathered dark battlements and hanging moon-lanterns only at the far left and right edges, a giant glowing crescent moon and a deep starfield with drifting clouds behind, completely empty with no people, no characters, no creatures, no figures, deep indigo and moonlight-silver, serene and nocturnal, limited palette, clean pixel art, slightly stylized
+```
+`silent_summit` (Ascetic · Silent Summit)
+```
+a side-view pixel-art battle background of a serene mountain monastery summit, a wide open flat pale stone terrace clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, simple stone lanterns and a single bare tree only at the far left and right edges, distant misty peaks and a soft pale sky with thin drifting mist behind, completely empty with no people, no characters, no creatures, no figures, off-white and pale stone, calm and minimalist, limited palette, clean pixel art, slightly stylized
+```
+`glitch_pit` (Gremlin · The Glitch Pit)
+```
+a side-view pixel-art battle background of a corrupted glitch pit of broken machinery, a wide open flat cracked circuit-board floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, floating broken hardware shards and glitching pixel debris only at the far left and right edges, a corrupted dark void with green scan-lines and datamosh streaks behind, completely empty with no people, no characters, no creatures, no figures, toxic glitch-green and dark, chaotic and unstable, limited palette, clean pixel art, slightly stylized
+```
+`fools_mirage` (Trickster · Fool's Mirage)
+```
+a side-view pixel-art battle background of a whimsical illusion carnival of mirrors, a wide open flat checkered harlequin-tile floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, tall ornate mirrors and striped carnival tents only at the far left and right edges, swirling playing-card confetti and prismatic mirage shimmer in a dreamlike sky behind, completely empty with no people, no characters, no creatures, no figures, iridescent mother-of-pearl rainbow, whimsical and surreal, limited palette, clean pixel art, slightly stylized
+```
+
 ### 7.4 หมายเหตุ implementation
 
 - **3.7 ✅** map `sceneFor(tier=4, line, branch)` → theme key ของแดน (เช่น `skyforge_aether`) ครบ 13 แดน — โค้ดอ้าง theme key, art เสียบหลัง CSS seam (ตอนนี้เป็น gradient + emoji placeholder)

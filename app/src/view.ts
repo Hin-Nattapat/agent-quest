@@ -97,3 +97,24 @@ export const cmdLabel = (tag: string): string => CMD_LABELS[tag] ?? titleCase(ta
 export const byCountDesc = (rec: Record<string, number>): [string, number][] => {
   return Object.entries(rec).sort((a, b) => b[1] - a[1]);
 };
+
+export interface ISourceShare {
+  source: string;
+  xp: number;
+  pct: number;
+}
+
+// Per-source XP shares of the hero's total, highest first (ties broken by source name). pct is an
+// integer percent; every share is 0 when no XP has been earned yet.
+export const sourceBreakdown = (
+  bySource: Record<string, { xp: number; sessions: number }>,
+): ISourceShare[] => {
+  const total = Object.values(bySource).reduce((sum, group) => sum + group.xp, 0);
+  return Object.entries(bySource)
+    .map(([source, group]) => ({
+      source,
+      xp: group.xp,
+      pct: total === 0 ? 0 : Math.round((group.xp / total) * 100),
+    }))
+    .sort((a, b) => b.xp - a.xp || a.source.localeCompare(b.source));
+};

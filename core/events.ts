@@ -75,3 +75,12 @@ export const isNormalizedEvent = (o: unknown): o is INormalizedEvent => {
     (Object.values(EventType) as string[]).includes(e.type)
   );
 };
+
+// Human label for an adapter source id ("claude-code" → "Claude Code", "codex" → "Codex").
+// Splits on - and _ (titleCase in the app splits on _ only, so it cannot be reused here).
+export const sourceLabel = (source: string): string =>
+  source
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");

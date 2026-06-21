@@ -7,6 +7,7 @@ import {
   TimelineTone,
   cmdLabel,
   byCountDesc,
+  sourceBreakdown,
 } from "./view";
 import { TimelineKind } from "../../core/events";
 import type { IState } from "../../core/state";
@@ -78,4 +79,23 @@ test("byCountDesc sorts entries by value descending", () => {
     ["a", 1],
   ]);
   expect(byCountDesc({})).toEqual([]);
+});
+
+test("sourceBreakdown: shares sorted desc by xp, integer pct, 0 when no xp", () => {
+  expect(sourceBreakdown({})).toEqual([]);
+  expect(
+    sourceBreakdown({
+      "claude-code": { xp: 30, sessions: 1 },
+      codex: { xp: 70, sessions: 2 },
+    }),
+  ).toEqual([
+    { source: "codex", xp: 70, pct: 70 },
+    { source: "claude-code", xp: 30, pct: 30 },
+  ]);
+  expect(
+    sourceBreakdown({ b: { xp: 0, sessions: 0 }, a: { xp: 0, sessions: 0 } }),
+  ).toEqual([
+    { source: "a", xp: 0, pct: 0 },
+    { source: "b", xp: 0, pct: 0 },
+  ]);
 });

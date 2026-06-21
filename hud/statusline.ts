@@ -38,52 +38,81 @@ interface IRenderHudArgs {
   cols?: number;
 }
 
-export const renderHud = (props: IRenderHudArgs): string => {
-  const { state, tail, cols = 0 } = props;
-  const pct =
-    state.xp_to_next === 0
-      ? 1
-      : state.xp_in_level / (state.xp_in_level + state.xp_to_next);
-  const filled = Math.round(pct * 10);
-  const bar = "█".repeat(filled) + "░".repeat(10 - filled);
-  const maxed = state.xp_to_next === 0 ? " MAX" : "";
-  const themeColor = state.cosmetics?.theme_color;
-  const coloredBar = themeColor ? `\x1b[${themeColor}m${bar}\x1b[0m` : bar;
+// Wrap text in an ANSI SGR color, or return it unchanged when no color is set.
+const colored = (text: string, sgr: string | null | undefined): string =>
+  sgr ? `\x1b[${sgr}m${text}\x1b[0m` : text;
 
-  const name = state.name || "Adventurer";
-  const titleSuffix = state.cosmetics?.title ? ` the ${state.cosmetics.title}` : "";
-  const nameColor = state.cosmetics?.name_color;
-  const namePlate = `${name}${titleSuffix}`;
-  const coloredName = nameColor ? `\x1b[${nameColor}m${namePlate}\x1b[0m` : namePlate;
+// The 0..1 fraction of the current level that's filled.
+const levelFraction = (state: IState): number => {
+  if (state.xp_to_next === 0) {
+    return 1;
+  }
+  return state.xp_in_level / (state.xp_in_level + state.xp_to_next);
+};
+
+// "Name the Title", tinted with the player's chosen name color.
+const heroName = (state: IState): string => {
+  const title = state.cosmetics?.title ? ` the ${state.cosmetics.title}` : "";
+  return colored(`${state.name || "Adventurer"}${title}`, state.cosmetics?.name_color);
+};
+
+// "🎼 Maestro" (or "Novice"), with a ✨ when an advancement is available.
+const heroClass = (state: IState): string => {
   const cls = state.class;
   const label = cls && cls.line ? `${cls.icon} ${cls.form}` : "Novice";
-  const pending = cls?.advancement_pending ? " ✨" : "";
-  const fire =
-    state.streak && state.streak.current_days >= 1
-      ? ` 🔥${state.streak.current_days}d`
-      : "";
-  const bagCount = (state.inventory ?? []).reduce((sum, item) => sum + item.count, 0);
-  const bag = bagCount > 0 ? ` 🎒${bagCount}` : "";
-  const left =
-    `${coloredName} · ${label}${pending}  ` +
-    `Lv.${state.level} ${coloredBar}${maxed} ${Math.round(pct * 100)}%${fire}${bag}`;
+  return cls?.advancement_pending ? `${label} ✨` : label;
+};
 
-  const model = tail.model || "?";
+// "Lv.5 ██████░░░░ 60%" — themed 10-cell bar, " MAX" at the level cap.
+const xpMeter = (state: IState): string => {
+  const fraction = levelFraction(state);
+  const filled = Math.round(fraction * 10);
+  const bar = colored(
+    "█".repeat(filled) + "░".repeat(10 - filled),
+    state.cosmetics?.theme_color,
+  );
+  const maxed = state.xp_to_next === 0 ? " MAX" : "";
+  return `Lv.${state.level} ${bar}${maxed} ${Math.round(fraction * 100)}%`;
+};
+
+// Trailing 🔥 streak + 🎒 inventory badges, each omitted when empty.
+const badges = (state: IState): string => {
+  const days = state.streak?.current_days ?? 0;
+  const fire = days >= 1 ? ` 🔥${days}d` : "";
+  const items = (state.inventory ?? []).reduce((sum, item) => sum + item.count, 0);
+  const bag = items > 0 ? ` 🎒${items}` : "";
+  return `${fire}${bag}`;
+};
+
+// Left side: the hero — "Name the Title · 🎼 Maestro ✨  Lv.5 ██████░░░░ 60% 🔥3d 🎒2".
+const heroGroup = (state: IState): string =>
+  `${heroName(state)} · ${heroClass(state)}  ${xpMeter(state)}${badges(state)}`;
+
+// Right side: the session — "Opus 4.8  $0.42  ·  ctx 8%  ·  5h 40%  ·  7d 12%".
+const sessionGroup = (tail: ITail): string => {
   const cost = tail.cost == null ? "0.00" : tail.cost.toFixed(2);
   const ctx = tail.ctx == null ? 0 : Math.round(tail.ctx);
   const rate5 = tail.five_hour == null ? "" : `  ·  5h ${Math.round(tail.five_hour)}%`;
   const rate7 = tail.seven_day == null ? "" : `  ·  7d ${Math.round(tail.seven_day)}%`;
-  const right = `${model}  $${cost}  ·  ctx ${ctx}%${rate5}${rate7}`;
+  return `${tail.model || "?"}  $${cost}  ·  ctx ${ctx}%${rate5}${rate7}`;
+};
 
-  // CC reports COLUMNS as the full terminal width, but the rendered line loses a few columns
-  // to the terminal's right edge / CC's own padding. Reserve a small safety gap so the right
-  // group is never clipped — a few blank columns on the right are imperceptible.
-  const RIGHT_SAFETY = 4;
+// CC reports COLUMNS as the full terminal width, but the rendered line loses a few columns to the
+// terminal's right edge / CC's own padding. Reserve a small gap so the right group is never clipped.
+const RIGHT_SAFETY = 4;
+
+// Right-align the session group when the terminal is wide enough, else join with a separator.
+const layout = (left: string, right: string, cols: number): string => {
   const used = displayWidth(left) + displayWidth(right);
   if (cols > used + RIGHT_SAFETY + 1) {
     return left + " ".repeat(cols - used - RIGHT_SAFETY) + right;
   }
   return `${left}  |  ${right}`;
+};
+
+export const renderHud = (props: IRenderHudArgs): string => {
+  const { state, tail, cols = 0 } = props;
+  return layout(heroGroup(state), sessionGroup(tail), cols);
 };
 
 const HOME = defaultHome();

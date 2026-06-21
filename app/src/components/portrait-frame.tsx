@@ -1,5 +1,6 @@
 import type { IState } from "../../../core/state";
 import { displayName, passiveMultiplier, xpPercent, spriteStyle } from "../view";
+import { sourceLabel } from "../../../core/events";
 import { heroPortrait } from "../sprites";
 
 interface IProps {
@@ -50,6 +51,11 @@ const PortraitFrame = (props: IProps) => {
           {days > 0 ? <span className="chip chip-streak">🔥 {days}d</span> : null}
           <span className="chip chip-items">💎 {items}</span>
           <span className="chip chip-mult">{passiveMultiplier(state)}x</span>
+          {Object.keys(state.stats.by_source).length >= 2 && state.last_event?.source ? (
+            <span className="chip chip-source">
+              via {sourceLabel(state.last_event.source)}
+            </span>
+          ) : null}
         </div>
       </div>
     </div>

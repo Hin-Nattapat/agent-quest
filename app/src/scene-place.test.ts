@@ -4,7 +4,11 @@ import { ActivityState } from "./activity";
 import { SceneTheme } from "./scene";
 import { ScenePlace, placeFor, sceneNow } from "./scene-place";
 
-const ev = (type: EventType) => ({ ts: "2026-06-14T00:00:00.000Z", type });
+const ev = (type: EventType) => ({
+  ts: "2026-06-14T00:00:00.000Z",
+  type,
+  source: "claude-code",
+});
 
 test("placeFor: guild on rest or a fresh session_start, else field", () => {
   expect(placeFor(ActivityState.Rest, ev(EventType.SessionEnd))).toBe(ScenePlace.Guild);

@@ -56,6 +56,6 @@ export interface IState {
   inventory?: IInventoryItem[];
   cosmetics?: ICosmetics;
   unlocked_secret_classes?: SecretLine[];
-  last_event?: { ts: string; type: EventType };
+  last_event?: { ts: string; type: EventType; source: string };
   recent?: ITimelineEntry[];
 }

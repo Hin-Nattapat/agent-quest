@@ -401,7 +401,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   }
   const lastEv = sorted[sorted.length - 1];
   if (lastEv) {
-    prelim.last_event = { ts: lastEv.ts, type: lastEv.type };
+    prelim.last_event = { ts: lastEv.ts, type: lastEv.type, source: lastEv.source };
   }
   const achievements = evaluateAchievements(prelim, config.achievements);
   const unlocked = collectUnlocks({

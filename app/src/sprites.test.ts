@@ -51,6 +51,17 @@ test("heroSpriteSet resolves every Night Owl secret form (T1-T4, branchless)", (
   );
 });
 
+test("heroSpriteSet resolves every Gremlin secret form (T1-T4, branchless)", () => {
+  expect(heroSpriteSet("gremlin", 1)?.idle[Facing.East]).toBe(
+    "/sprites/gremlin/t1/idle/east.png",
+  );
+  expect(heroSpriteSet("gremlin", 2)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("gremlin", 3)?.attack?.length).toBe(9);
+  expect(heroSpriteSet("gremlin", 4)?.idle[Facing.West]).toBe(
+    "/sprites/gremlin/t4/idle/west.png",
+  );
+});
+
 test("heroSpriteSet resolves the Novice starter (tier 0)", () => {
   expect(heroKey("novice", 0)).toBe("novice-t0");
   expect(heroSpriteSet("novice", 0)?.idle[Facing.South]).toBe(

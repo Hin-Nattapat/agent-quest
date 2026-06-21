@@ -21,9 +21,11 @@ deploy hud
 # config: copy default only if absent — never overwrite the user's tuning.
 [ -f "$RPG_HOME/config.json" ] || cp "$SRC/config/default.json" "$RPG_HOME/config.json"
 
-# hook scripts must be executable (run via `command` in settings.json).
-chmod +x "$SRC"/adapters/claude-code/hooks/*.sh 2>/dev/null || true
-if [ "$MODE" = "copy" ]; then chmod +x "$RPG_HOME"/adapters/claude-code/hooks/*.sh 2>/dev/null || true; fi
+# Every adapter's hook scripts must be executable (run via `command` from the agent's config).
+# git already tracks them 100755 and cp -R preserves that; this is the belt-and-suspenders for a
+# source that lost the bit. Glob all adapters so a new one (codex, …) is covered without edits.
+chmod +x "$SRC"/adapters/*/hooks/*.sh 2>/dev/null || true
+if [ "$MODE" = "copy" ]; then chmod +x "$RPG_HOME"/adapters/*/hooks/*.sh 2>/dev/null || true; fi
 
 # CLI ergonomics: an `rpg` wrapper on PATH + shell completions (activation is printed, not auto-wired).
 mkdir -p "$RPG_HOME/bin" "$RPG_HOME/completions"

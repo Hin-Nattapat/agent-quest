@@ -132,3 +132,25 @@ test("non-Bash tools never get a cmd", async () => {
   );
   expect(journalLines(home, "c3").at(-1).cmd).toBeUndefined();
 });
+
+import { mkdtempSync } from "fs";
+import { tmpdir } from "os";
+import { basename } from "../helpers";
+
+test("action events carry the repo derived from a git cwd", async () => {
+  const home = makeHome();
+  const gitdir = mkdtempSync(join(tmpdir(), "cq-gitrepo-"));
+  Bun.spawnSync(["git", "init", gitdir]);
+  await runHook(
+    "on-tool.sh",
+    {
+      session_id: "r1",
+      cwd: gitdir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Edit",
+      tool_input: { file_path: "x.ts" },
+    },
+    home,
+  );
+  expect(journalLines(home, "r1").at(-1).repo).toBe(basename(gitdir));
+});

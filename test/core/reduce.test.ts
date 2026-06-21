@@ -1,6 +1,7 @@
 import { test, expect } from "bun:test";
 import { reduce } from "../../core/reduce";
 import { EventType } from "../../core/events";
+import { AdvancementKind } from "../../core/classes";
 import { DEFAULT_WEIGHTS, DEFAULT_DIFFICULTY } from "../../core/xp";
 
 const cfg = { weights: DEFAULT_WEIGHTS, difficulty: DEFAULT_DIFFICULTY };
@@ -97,7 +98,7 @@ test("no profile -> Novice class with affinity", () => {
 test("at level 5 with no line, advancement_pending is 'class'", () => {
   const s = reduce({ events: promptsTo5, config: cfgA, today: "2026-06-11" });
   expect(s.level).toBe(5);
-  expect(s.class?.advancement_pending).toBe("class");
+  expect(s.class?.advancement_pending).toBe(AdvancementKind.Class);
 });
 
 test("a chosen line resolves to its tier form + name", () => {
@@ -290,7 +291,7 @@ test("achievements split into earned, locked goals (with criteria), and a hidden
   expect(a.locked!.every(d => d.desc.length > 0 && d.name.length > 0)).toBe(true);
   expect(a.secret).toBeGreaterThan(0);
   // The three buckets exactly partition the registry, and locked never overlaps earned.
-  expect(a.earned.length + a.locked!.length + (a.secret ?? 0)).toBe(a.total);
+  expect(a.earned.length + a.locked!.length + (a.secret ?? 0)).toBe(a.total!);
   const earnedIds = new Set(a.earned);
   expect(a.locked!.some(d => earnedIds.has(d.id))).toBe(false);
 });

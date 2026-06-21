@@ -85,11 +85,9 @@ agent-quest/
 └── docs/
     ├── claude-code-rpg-design.md      # full game design (all phases)
     ├── agent-quest-build-spec.md     # original Phase 0 brief (superseded)
-    ├── reference/
-    │   ├── pixel-agents.md            # reuse map
-    │   └── project-structure.md       # this file
-    └── superpowers/specs/
-        └── 2026-06-10-commit-quest-phase0-design.md
+    └── reference/
+        ├── pixel-agents.md            # reuse map
+        └── project-structure.md       # this file
 ```
 
 ## Source → runtime mapping

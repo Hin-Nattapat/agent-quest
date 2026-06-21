@@ -7,3 +7,6 @@ app/extension/webview/
 *.vsix
 .superpowers/
 art/
+
+# internal AI planning artifacts (specs/plans) — not for the public repo
+docs/superpowers/

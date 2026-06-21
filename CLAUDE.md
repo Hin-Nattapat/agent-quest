@@ -12,7 +12,7 @@ agents ──(adapters)──► append-only journal (NDJSON) ──(reducer)─
 
 - **Agent-awareness lives ONLY in `adapters/`.** Everything else consumes the normalized event and knows nothing about Claude Code.
 - **One contract: `core/events.ts`.** Adapters may import the event *types* only — never game logic. `core/` never imports an adapter.
-- Authoritative layout: `docs/reference/project-structure.md`. Spec/plans live in `docs/superpowers/`.
+- Authoritative layout: `docs/reference/project-structure.md`.
 
 ## 2. Dependencies
 

@@ -1,8 +1,8 @@
 import { test, expect } from "bun:test";
-import { mkdtempSync, writeFileSync, rmSync } from "fs";
+import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
-import { readState, sseMessage } from "./server";
+import { readState, refreshState, sseMessage } from "./server";
 
 function tmpHome(): string {
   return mkdtempSync(join(tmpdir(), "cq-app-"));
@@ -25,4 +25,20 @@ test("sseMessage prefixes every line of pretty-printed JSON with data:", () => {
   expect(sseMessage(pretty)).toBe(
     'event: state\ndata: {\ndata:   "level": 7\ndata: }\n\n',
   );
+});
+
+test("refreshState folds journal into state.json", () => {
+  const home = tmpHome();
+  try {
+    mkdirSync(join(home, "journal"));
+    writeFileSync(
+      join(home, "journal", "codex.ndjson"),
+      '{"ts":"2026-06-21T00:00:00Z","source":"codex","session_id":"codex","type":"prompt"}\n',
+    );
+    const state = JSON.parse(refreshState(home) ?? "{}");
+    expect(state.stats.prompts).toBe(1);
+    expect(state.stats.by_source.codex.sessions).toBe(1);
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
 });

@@ -1,4 +1,4 @@
-import { writeFileSync, renameSync, existsSync, statSync } from "fs";
+import { writeFileSync, renameSync, existsSync, statSync, readFileSync } from "fs";
 import { join } from "path";
 import { EventType, AgentAction, type INormalizedEvent } from "./events";
 import { xpFor, levelProgress, levelFor, basePct } from "./xp";
@@ -483,4 +483,24 @@ export const reduceThrottled = (home: string, maxAgeMs = 2000): void => {
     return;
   }
   reduceToFile(home);
+};
+
+// Fold the journal into state.json (throttled), then return state.json's text. Shared by the dev
+// server and the extension so the "catch up to the journal" reduce-then-read lives in one place —
+// the companion needs it because agents without a statusline (Codex) never trigger a reduce.
+export const refreshStateText = (home: string): string | null => {
+  try {
+    reduceThrottled(home);
+  } catch {
+    // A malformed journal line must not blank the HUD — keep the last good state.json.
+  }
+  const p = join(home, "state.json");
+  if (!existsSync(p)) {
+    return null;
+  }
+  try {
+    return readFileSync(p, "utf8");
+  } catch {
+    return null;
+  }
 };

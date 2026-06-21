@@ -33,6 +33,44 @@ test("codex SessionStart: repo resolved + cached, start/model/cwd present, sourc
   expect(repoCache(home, "x1")).toBe(basename(gitdir));
 });
 
+test("codex SessionStart: omitted cwd does not shift model into cwd (empty-cwd regression)", async () => {
+  const home = makeHome();
+  const { code, stdout } = await runHookAt(
+    "codex",
+    "on-session-start.sh",
+    {
+      session_id: "x0",
+      hook_event_name: "SessionStart",
+      source: "startup",
+      model: "gpt-5-codex",
+    },
+    home,
+  );
+  expect(code).toBe(0);
+  expect(stdout).toBe("");
+  const e = journalLines(home, "x0").at(-1);
+  // model must not be shifted into another field
+  expect(e.model).toBe("gpt-5-codex");
+  // repo must not be derived from the model slug (may be absent when cwd is omitted)
+  if (typeof e.repo === "string") {
+    expect(e.repo).not.toContain("gpt");
+  }
+  expect(e.start).toBe("startup");
+});
+
+test("codex Stop -> turn_end with code=0 and stdout empty", async () => {
+  const home = makeHome();
+  const { code, stdout } = await runHookAt(
+    "codex",
+    "on-stop.sh",
+    { session_id: "x3b", cwd: "/tmp/cq-not-a-repo", hook_event_name: "Stop" },
+    home,
+  );
+  expect(code).toBe(0);
+  expect(stdout).toBe("");
+  expect(journalLines(home, "x3b").at(-1).type).toBe(EventType.TurnEnd);
+});
+
 test("codex UserPromptSubmit -> prompt (source=codex)", async () => {
   const home = makeHome();
   const { code, stdout } = await runHookAt(

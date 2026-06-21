@@ -51,3 +51,27 @@ test("session_start: non-git cwd falls back to basename", async () => {
   expect(e.repo).toBe("cq-not-a-repo");
   expect(e.start).toBe("resume");
 });
+
+test("session_start: omitted cwd does not shift model into cwd (empty-cwd regression)", async () => {
+  const home = makeHome();
+  const { code, stdout } = await runHook(
+    "on-session-start.sh",
+    {
+      session_id: "s3",
+      hook_event_name: "SessionStart",
+      source: "startup",
+      model: "claude-opus-4-5",
+    },
+    home,
+  );
+  expect(code).toBe(0);
+  expect(stdout).toBe("");
+  const e = journalLines(home, "s3").at(-1);
+  // model must not be shifted into another field
+  expect(e.model).toBe("claude-opus-4-5");
+  // repo must not be derived from the model slug (may be absent when cwd is omitted)
+  if (typeof e.repo === "string") {
+    expect(e.repo).not.toContain("claude");
+  }
+  expect(e.start).toBe("startup");
+});

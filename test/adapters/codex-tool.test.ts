@@ -70,6 +70,8 @@ test("shell command classifies cmd (force_push) and never stores the raw command
   const e = journalLines(home, "c1").at(-1);
   expect(e.action).toBe("run");
   expect(e.cmd).toBe("force_push");
+  // Raw command text must not appear in the journal
+  expect(JSON.stringify(e)).not.toContain("secret-branch");
 });
 
 test("tool_response error -> action_fail", async () => {
@@ -87,6 +89,23 @@ test("tool_response error -> action_fail", async () => {
     home,
   );
   expect(journalLines(home, "f1").at(-1).type).toBe("action_fail");
+});
+
+test("tool_response success:false -> action_fail", async () => {
+  const home = makeHome();
+  await runHookAt(
+    "codex",
+    "on-tool.sh",
+    {
+      ...base,
+      session_id: "f3",
+      tool_name: "shell",
+      tool_input: { command: "ls" },
+      tool_response: { success: false },
+    },
+    home,
+  );
+  expect(journalLines(home, "f3").at(-1).type).toBe("action_fail");
 });
 
 test("tool_response non-zero exit_code -> action_fail", async () => {

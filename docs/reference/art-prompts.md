@@ -733,9 +733,11 @@ The Jester Mirage:      a mischievous illusion jester splitting into mirror-imag
 
 **scene background ต่อแดน (เติม §7.B แล้ว · copy วางได้เลย)** — create-image · Sidescroller · ~400×128 (3:1) · remove-bg OFF · import `bun tools/import-art.ts <export> --as bg:<theme>` → `scenes/<theme>.png` (theme key map ใน `app/src/scene.ts` แล้ว · CSS gradient/letterbox มีอยู่)
 
+> ⚠️ **interior ที่สื่อ furniture** (concert hall, library, throne room) AI ชอบปูเฟอร์นิเจอร์เต็มพื้น → กิน "ที่ยืน". เฟรมพื้นเป็น **open/bare stage/floor**, ดันของไป **background behind / edges**, และเลี่ยงคำที่สื่อ furniture ในพื้น (เช่น "concert hall" → ใช้ "performance stage of an opera hall"). Maestro โดนมาแล้ว — prompt ด้านล่างแก้แล้ว.
+
 `grand_concert_vault` (Maestro · Grand Concert Vault)
 ```
-a side-view pixel-art battle background of a grand golden opera concert hall, a wide open flat polished gold marble floor clearing across the entire lower third, the foreground level, clear and unobstructed with open ground on both the left and right, ornate gilded columns and floating golden instruments only at the far left and right edges, tiered opera balconies and a vast glowing pipe organ behind, completely empty with no people, no characters, no creatures, no figures, opulent gold and warm amber with chandelier light, majestic, limited palette, clean pixel art, slightly stylized
+a side-view pixel-art battle background of the grand performance stage of a golden opera hall, a wide open flat bare polished-gold stage floor across the entire lower third, the foreground level, completely clear and unobstructed with open floor on both the left and right, ornate gilded columns and floating golden instruments only at the far left and right edges, tiered opera balconies and a vast glowing pipe organ rising in the background behind, completely empty with no people, no characters, no creatures, no figures, opulent gold and warm amber with chandelier light, majestic, limited palette, clean pixel art, slightly stylized
 ```
 `midnight_roost` (Night Owl · Midnight Roost)
 ```

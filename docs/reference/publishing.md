@@ -11,12 +11,12 @@ Cursor / VSCodium / Windsurf). You run these — they need _your_ publisher acco
 ## One-time setup
 
 1. **Create a publisher** at <https://marketplace.visualstudio.com/manage>. The publisher ID **must
-   match** `publisher` in `app/extension/package.json` (currently `natpat`).
+   match** `publisher` in `app/extension/package.json` (currently `NattaP`).
 2. **Create a Personal Access Token (PAT)** in Azure DevOps (<https://dev.azure.com>):
    - Organization: **All accessible organizations**
    - Scopes: **Marketplace → Manage**
    - Copy the token (shown once).
-3. Log in once: `cd app/extension && npx vsce login natpat` (paste the PAT).
+3. Log in once: `cd app/extension && npx vsce login NattaP` (paste the PAT).
 
 ## Publish
 
@@ -29,12 +29,12 @@ npm run publish            # = build:all (vite → copy-webview → esbuild) the
 `npx vsce publish minor` (or `patch` / `major`) — commit the version bump afterward.
 
 Verify the live listing:
-<https://marketplace.visualstudio.com/items?itemName=natpat.agent-quest-companion>
+<https://marketplace.visualstudio.com/items?itemName=NattaP.agent-quest>
 
 ## Open VSX (optional — Cursor / VSCodium / Windsurf)
 
 1. Create a token at <https://open-vsx.org> (sign in with GitHub → Access Tokens), and create the
-   `natpat` namespace once: `npx ovsx create-namespace natpat -p <token>`.
+   `NattaP` namespace once: `npx ovsx create-namespace NattaP -p <token>`.
 2. Publish: `cd app/extension && OVSX_PAT=<token> npm run publish:ovsx`.
 
 ## Checklist before publishing

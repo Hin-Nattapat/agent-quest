@@ -1,9 +1,9 @@
 {
-  "name": "agent-quest-companion",
-  "displayName": "Agent Quest Companion",
-  "description": "Live Agent Quest companion panel in VS Code.",
+  "name": "agent-quest",
+  "displayName": "Agent Quest",
+  "description": "Your AI coding sessions, gamified into a pixel-art RPG — a live companion panel for Claude Code, Codex & Cursor.",
   "version": "0.0.1",
-  "publisher": "natpat",
+  "publisher": "NattaP",
   "license": "MIT",
   "icon": "media/icon.png",
   "categories": [
@@ -13,15 +13,21 @@
   "keywords": [
     "claude",
     "claude code",
+    "codex",
+    "cursor",
+    "ai agent",
     "rpg",
     "gamification",
-    "ai agent",
     "pixel art",
-    "companion"
+    "hud",
+    "productivity"
   ],
   "galleryBanner": {
-    "color": "#2a2118",
+    "color": "#241a33",
     "theme": "dark"
+  },
+  "sponsor": {
+    "url": "https://buymeacoffee.com/natta_p"
   },
   "homepage": "https://github.com/Hin-Nattapat/agent-quest#readme",
   "repository": {
@@ -67,9 +73,9 @@
     "copy-webview": "node scripts/copy-webview.mjs",
     "build:all": "npm --prefix .. run build && npm run copy-webview && npm run build",
     "package": "npm run build:all && vsce package --no-dependencies",
-    "reinstall": "npm run package && code --install-extension \"$(ls -t agent-quest-companion-*.vsix | head -1)\" --force",
+    "reinstall": "npm run package && code --install-extension \"$(ls -t agent-quest-*.vsix | head -1)\" --force",
     "publish": "npm run build:all && vsce publish --no-dependencies",
-    "publish:ovsx": "npm run package && ovsx publish \"$(ls -t agent-quest-companion-*.vsix | head -1)\"",
+    "publish:ovsx": "npm run package && ovsx publish \"$(ls -t agent-quest-*.vsix | head -1)\"",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

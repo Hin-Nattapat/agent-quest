@@ -217,6 +217,25 @@ export const reduce = (props: IReduceArgs): TReducedState => {
 
   const line = profile?.line ?? null;
   const branch = profile?.branch ?? null;
+  const classEpochs = [...(profile?.history ?? [])].sort(
+    (a, b) => tsOrder(a.ts) - tsOrder(b.ts),
+  );
+  // The class active when an event was earned. Legacy saves carry no history, so we fall back to the
+  // current class throughout — preserving their existing totals while new switches are dated.
+  const lineAt = (ts: string): TLine | null => {
+    if (classEpochs.length === 0) {
+      return line;
+    }
+    const at = tsOrder(ts);
+    let active: TLine | null = null;
+    for (const epoch of classEpochs) {
+      if (tsOrder(epoch.ts) > at) {
+        break;
+      }
+      active = epoch.line;
+    }
+    return active;
+  };
   const lootTable = config.loot ?? LOOT_TABLE;
   const dropTables = config.drops ?? DROP_TABLES;
   const sorted = [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts));
@@ -228,8 +247,9 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     const base = xpFor(e, config.weights);
     const level = levelFor(running, config.difficulty); // from XP accrued so far (causal)
     // tierForLevel already floors to 0 below level 5, so no explicit level guard is needed.
-    const tier = line != null ? tierForLevel(level) : 0;
-    const isSignal = line != null && isPassiveSignal(line, e);
+    const activeLine = lineAt(e.ts);
+    const tier = activeLine != null ? tierForLevel(level) : 0;
+    const isSignal = activeLine != null && isPassiveSignal(activeLine, e);
     const mult = isSignal && tier >= 1 ? 1 + basePct(tier, config.passive) : 1;
     const gained = base * mult;
     running += gained;

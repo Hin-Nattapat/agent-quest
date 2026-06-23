@@ -54,17 +54,20 @@ export const applyAction = (home: string, action: IRawAction): string | null => 
     return applyAdvance(home, profile => {
       const state = reduceToFile(home);
       const line = action.line ?? "";
+      const ts = new Date().toISOString();
       return profile.line == null
         ? chooseClass({
             profile,
             line,
             level: state.level,
             unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
+            ts,
           })
         : respecClass({
             profile,
             line,
             unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
+            ts,
           });
     });
   }

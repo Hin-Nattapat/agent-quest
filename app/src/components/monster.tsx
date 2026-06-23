@@ -2,9 +2,9 @@ import type { IScene } from "../scene";
 import { MonsterAnim } from "../combat";
 import { slotPos } from "../mob-slots";
 import { monsterSet, monsterFrames } from "../monsters";
-import { useSpriteFrame } from "../use-sprite-frame";
 import { usePreloadSprites } from "../use-preload";
-import { spriteStyle, hpPercent } from "../view";
+import { hpPercent } from "../view";
+import SpriteFrames from "./sprite-frames";
 
 interface IProps {
   scene: IScene;
@@ -21,9 +21,8 @@ const Monster = (props: IProps) => {
   usePreloadSprites(set);
   const attacking = anim === MonsterAnim.Attack && Boolean(set?.attack.length);
   const frames = monsterFrames(set, anim);
-  const frame = useSpriteFrame(frames, MONSTER_FPS, frames.length > 1);
 
-  const artClass = frame ? " has-art" : "";
+  const artClass = frames.length > 0 ? " has-art" : "";
   // Keep m-hurt (flash) / m-die (fade) over the sprite; drop the m-attack lunge when real attack
   // frames carry the motion themselves.
   const animClass = attacking ? "" : ` m-${anim}`;
@@ -35,9 +34,10 @@ const Monster = (props: IProps) => {
       </div>
       <span
         className={`sprite monster monster-${scene.theme}${animClass}${artClass}`}
-        style={spriteStyle(frame)}
         aria-label={scene.monster}
-      />
+      >
+        <SpriteFrames frames={frames} fps={MONSTER_FPS} playing={frames.length > 1} />
+      </span>
     </div>
   );
 };

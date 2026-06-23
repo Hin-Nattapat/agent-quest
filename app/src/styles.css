@@ -334,6 +334,18 @@ body {
   background-size: contain;
   image-rendering: pixelated;
 }
+/* One stacked layer per animation frame: the image is fixed (decoded once at mount) and only opacity
+   flips between layers, so the webview's GPU compositor never re-decodes a background-image mid-cycle
+   — the swap that read as flicker. Fills its positioned sprite host (.hero/.ow-hero/.monster/…). */
+.sprite-frame {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
 .hero {
   left: 22%;
   /* low on the floor, near the front mob's row, facing the echelon of mobs */
@@ -369,9 +381,10 @@ body {
   /* per-slot depth `scale` (from mob-slots) shrinks toward the feet, so far mobs stay grounded */
   transform-origin: bottom center;
 }
-/* sprite sits inside the unit, so drop the absolute placement from .sprite */
+/* sprite sits inside the unit, so drop the absolute placement from .sprite — but stay `relative` so
+   it's the positioning context its stacked .sprite-frame layers (inset:0) fill. */
 .monster-unit .monster {
-  position: static;
+  position: relative;
   width: 42cqh;
   height: 42cqh;
   font-size: 34px;

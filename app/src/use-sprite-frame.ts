@@ -15,17 +15,19 @@ const prefersReducedMotion = (): boolean => {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 };
 
-// Returns the current frame url. playing=false, a single frame, or reduced-motion holds frames[0].
-// frames=[] returns "" so the caller can treat it as "no art".
-export const useSpriteFrame = (
-  frames: string[],
+// Active frame index for an N-frame loop. playing=false, a single frame, or reduced-motion holds 0.
+// The frames live as stacked, always-decoded layers (see SpriteFrames) so only this index — never a
+// background-image url — changes per frame: the GPU just flips which layer is opaque, with nothing to
+// re-decode, which is what kills the per-frame flash a background-image swap causes in the webview.
+export const useSpriteIndex = (
+  frameCount: number,
   fps: number,
   playing: boolean,
-): string => {
+): number => {
   const [index, setIndex] = useState(0);
   const startRef = useRef<number | null>(null);
 
-  const active = playing && frames.length > 1 && !prefersReducedMotion();
+  const active = playing && frameCount > 1 && !prefersReducedMotion();
 
   useEffect(() => {
     if (!active) {
@@ -38,17 +40,20 @@ export const useSpriteFrame = (
       if (startRef.current === null) {
         startRef.current = now;
       }
-      setIndex(frameAt(now - startRef.current, frames.length, fps));
+      const next = frameAt(now - startRef.current, frameCount, fps);
+      // rAF ticks ~60Hz but the frame only changes at `fps`; bail when unchanged so we re-render at
+      // the animation rate, not every paint.
+      setIndex(prev => (prev === next ? prev : next));
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [active, frames.length, fps]);
+  }, [active, frameCount, fps]);
 
-  if (frames.length === 0) {
-    return "";
+  if (frameCount === 0) {
+    return 0;
   }
-  // Clamp: on the render where `frames` shrinks, `index` can still hold a stale value from the
+  // Clamp: on the render where the frame set shrinks, `index` can still hold a stale value from the
   // previous longer set until the effect re-runs and resets it — guard against a transient OOB read.
-  return frames[Math.min(index, frames.length - 1)];
+  return Math.min(index, frameCount - 1);
 };

@@ -5,8 +5,7 @@ const MOTION_EVENT = "cq:reducemotion";
 
 // Effective reduced-motion = the user's explicit in-app pref OR the OS-level setting. Pure so the
 // combine rule is unit-tested without a DOM.
-export const effectiveReducedMotion = (pref: boolean, os: boolean): boolean =>
-  pref || os;
+export const effectiveReducedMotion = (pref: boolean, os: boolean): boolean => pref || os;
 
 const readPref = (): boolean => {
   try {

@@ -1,9 +1,8 @@
 import { HeroAnim, attackStyleFor, isRanged } from "../combat";
 import { Facing } from "../facing";
 import { heroSpriteSet, directionalFrames } from "../sprites";
-import { useSpriteFrame } from "../use-sprite-frame";
 import { usePreload } from "../use-preload";
-import { spriteStyle } from "../view";
+import SpriteFrames from "./sprite-frames";
 
 interface IProps {
   line: string;
@@ -25,18 +24,18 @@ const Hero = (props: IProps) => {
   // is CSS (.hero-farming/.hero-idle). No wander-walk — it used to slide backward while farming.
   const battleFrames = set ? directionalFrames(set, Facing.East, false) : [];
   const frames = attacking ? (set?.attack ?? []) : battleFrames;
-  const frame = useSpriteFrame(frames, ATTACK_FPS, attacking);
-  const artClass = frame ? " has-art" : "";
+  const artClass = frames.length > 0 ? " has-art" : "";
   // Ranged attack stands (the `cast` class drops the .hero-attack dash); a melee attack keeps the
-  // dash class AND cycles the stab frames (transform + background-image are independent).
+  // dash class AND cycles the stab frames (transform + sprite frames are independent).
   const animClass = attacking && ranged ? "cast" : anim;
   return (
     <div
       className={`sprite hero hero-${line} hero-${animClass}${artClass}`}
-      style={spriteStyle(frame)}
       data-emoji={icon}
       aria-label="hero"
-    />
+    >
+      <SpriteFrames frames={frames} fps={ATTACK_FPS} playing={attacking} />
+    </div>
   );
 };
 

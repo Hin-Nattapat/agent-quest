@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Facing, facingFromDelta } from "./facing";
+import { useReducedMotion } from "./use-reduce-motion";
 
 export interface IWanderPose {
   xPct: number;
@@ -87,13 +88,6 @@ const SPEED_PCT_PER_SEC = 9;
 const PAUSE_MIN_MS = 900;
 const PAUSE_MAX_MS = 2200;
 
-const prefersReducedMotion = (): boolean => {
-  if (typeof window === "undefined" || !window.matchMedia) {
-    return false;
-  }
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-};
-
 // Pick a route index different from the current one (rand ∈ [0,1)). Maps rand onto the count-1
 // other routes, so the hero never replays the route it just finished. Pure for unit testing.
 export const pickNextRoute = (current: number, count: number, rand: number): number => {
@@ -127,8 +121,9 @@ export const useWander = (roaming: boolean): IWanderPose => {
   const pauseRef = useRef(0);
   const posRef = useRef({ x: first.x, y: first.y });
   const lastRef = useRef<number | null>(null);
+  const reduced = useReducedMotion();
 
-  const active = roaming && !prefersReducedMotion();
+  const active = roaming && !reduced;
 
   useEffect(() => {
     if (!active) {

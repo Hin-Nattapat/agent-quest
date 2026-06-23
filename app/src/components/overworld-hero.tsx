@@ -1,8 +1,7 @@
 import type { Facing } from "../facing";
 import { heroSpriteSet, directionalFrames } from "../sprites";
-import { useSpriteFrame } from "../use-sprite-frame";
 import { usePreload } from "../use-preload";
-import { spriteStyle } from "../view";
+import SpriteFrames from "./sprite-frames";
 
 interface IProps {
   line: string;
@@ -22,11 +21,9 @@ const OverworldHero = (props: IProps) => {
   const set = heroSpriteSet(line, tier, branch);
   usePreload(set);
   const frames = set ? directionalFrames(set, facing, moving) : [];
-  const frame = useSpriteFrame(frames, WALK_FPS, moving);
-  const artClass = frame ? " has-art" : "";
+  const artClass = frames.length > 0 ? " has-art" : "";
   const style = {
     transform: `translate3d(${xPx}px, ${yPx}px, 0) translate(-50%, -85%)`,
-    ...spriteStyle(frame),
   };
   return (
     <div
@@ -34,7 +31,9 @@ const OverworldHero = (props: IProps) => {
       style={style}
       data-emoji={icon}
       aria-label="hero"
-    />
+    >
+      <SpriteFrames frames={frames} fps={WALK_FPS} playing={moving} />
+    </div>
   );
 };
 

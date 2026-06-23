@@ -2,9 +2,9 @@ import { GameEventType, type IGameEvent } from "../game-events";
 import type { SceneTheme } from "../scene";
 import { MonsterAnim } from "../combat";
 import { bossSet, bossName } from "../boss";
-import { useSpriteFrame } from "../use-sprite-frame";
 import { usePreloadSprites } from "../use-preload";
-import { spriteStyle, hpPercent } from "../view";
+import { hpPercent } from "../view";
+import SpriteFrames from "./sprite-frames";
 import type { IBossFightView } from "../use-boss-fight";
 import LootToast from "./loot-toast";
 
@@ -27,12 +27,11 @@ const BossEncounter = (props: IProps) => {
   const attacking = fight.bossAnim === MonsterAnim.Attack && Boolean(set?.attack.length);
   const frames = attacking ? (set?.attack ?? []) : (set?.idle ?? []);
   const fps = attacking ? BOSS_ATTACK_FPS : BOSS_IDLE_FPS;
-  const frame = useSpriteFrame(frames, fps, frames.length > 1);
 
   const outcome = encounter.type === GameEventType.BossFled ? "fled" : "defeated";
   // The exit (die/flee) only plays once the trades are over, so the boss fights in place first.
   const outcomeClass = fight.leaving ? ` boss-${outcome}` : "";
-  const artClass = frame ? " has-art" : "";
+  const artClass = frames.length > 0 ? " has-art" : "";
   // boss-hurt is a knockback + flash scaled for the big sprite (the mob's m-hurt is a 7px nudge,
   // invisible at this size).
   const hurtClass = !attacking && fight.bossAnim === MonsterAnim.Hurt ? " boss-hurt" : "";
@@ -47,11 +46,9 @@ const BossEncounter = (props: IProps) => {
             <i style={{ width: `${hpPercent(fight.bossHp)}%` }} />
           </div>
         </div>
-        <div
-          className={`sprite boss${hurtClass}${artClass}`}
-          style={spriteStyle(frame)}
-          aria-label={name}
-        />
+        <div className={`sprite boss${hurtClass}${artClass}`} aria-label={name}>
+          <SpriteFrames frames={frames} fps={fps} playing={frames.length > 1} />
+        </div>
         {fight.bossHits.map(id => (
           <span key={id} className="boss-fx" aria-hidden="true" />
         ))}

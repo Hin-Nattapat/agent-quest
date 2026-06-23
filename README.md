@@ -167,7 +167,7 @@ Agent Quest is free and built in spare cycles. If it made your grind a little mo
 me a coffee — it directly funds more sprites, more realms, and more tokens to grind into this thing.
 
 <p align="center">
-  <a href="https://buymeacoffee.com/NattaP"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
+  <a href="https://buymeacoffee.com/natta_p"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
 </p>
 
 ## 🤝 Contributing

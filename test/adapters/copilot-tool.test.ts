@@ -34,7 +34,13 @@ test("camelCase toolName + toolArgs are read", async () => {
   await runHookAt(
     "copilot",
     "on-tool.sh",
-    { cwd: "/x", hook_event_name: "PostToolUse", sessionId: "cc1", toolName: "create_file", toolArgs: { path: "src/x.ts" } },
+    {
+      cwd: "/x",
+      hook_event_name: "PostToolUse",
+      sessionId: "cc1",
+      toolName: "create_file",
+      toolArgs: { path: "src/x.ts" },
+    },
     home,
   );
   const e = journalLines(home, "cc1").at(-1);
@@ -47,7 +53,12 @@ test("shell command classifies cmd (force_push) and never stores the raw command
   await runHookAt(
     "copilot",
     "on-tool.sh",
-    { ...base, session_id: "c1", tool_name: "shell", tool_input: { command: "git push --force origin secret-branch" } },
+    {
+      ...base,
+      session_id: "c1",
+      tool_name: "shell",
+      tool_input: { command: "git push --force origin secret-branch" },
+    },
     home,
   );
   const e = journalLines(home, "c1").at(-1);
@@ -61,7 +72,12 @@ test("file path comes from tool_input.file_path", async () => {
   await runHookAt(
     "copilot",
     "on-tool.sh",
-    { ...base, session_id: "fp1", tool_name: "str_replace", tool_input: { file_path: "src/a.ts" } },
+    {
+      ...base,
+      session_id: "fp1",
+      tool_name: "str_replace",
+      tool_input: { file_path: "src/a.ts" },
+    },
     home,
   );
   const e = journalLines(home, "fp1").at(-1);
@@ -74,7 +90,14 @@ test("PostToolUseFailure emits action_fail", async () => {
   await runHookAt(
     "copilot",
     "on-tool-fail.sh",
-    { cwd: "/x", hook_event_name: "PostToolUseFailure", session_id: "f1", tool_name: "shell", tool_input: { command: "ls" }, error: { message: "boom" } },
+    {
+      cwd: "/x",
+      hook_event_name: "PostToolUseFailure",
+      session_id: "f1",
+      tool_name: "shell",
+      tool_input: { command: "ls" },
+      error: { message: "boom" },
+    },
     home,
   );
   const e = journalLines(home, "f1").at(-1);
@@ -85,8 +108,16 @@ test("PostToolUseFailure emits action_fail", async () => {
 test("malformed stdin still exits 0 with no stdout", async () => {
   const home = makeHome();
   const proc = Bun.spawn(
-    ["bash", new URL("../../adapters/copilot/hooks/on-tool.sh", import.meta.url).pathname],
-    { stdin: Buffer.from("not json"), env: { ...process.env, AGENTRPG_HOME: home }, stdout: "pipe", stderr: "pipe" },
+    [
+      "bash",
+      new URL("../../adapters/copilot/hooks/on-tool.sh", import.meta.url).pathname,
+    ],
+    {
+      stdin: Buffer.from("not json"),
+      env: { ...process.env, AGENTRPG_HOME: home },
+      stdout: "pipe",
+      stderr: "pipe",
+    },
   );
   const stdout = await new Response(proc.stdout).text();
   expect(await proc.exited).toBe(0);

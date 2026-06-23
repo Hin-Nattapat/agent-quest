@@ -9,7 +9,14 @@ test("config snippet is valid JSON, version 1, wires the six post/lifecycle even
   const cfg = JSON.parse(readFileSync(snippetPath, "utf8"));
   expect(cfg.version).toBe(1);
   const events = Object.keys(cfg.hooks);
-  for (const ev of ["SessionStart", "UserPromptSubmit", "PostToolUse", "PostToolUseFailure", "Stop", "SessionEnd"]) {
+  for (const ev of [
+    "SessionStart",
+    "UserPromptSubmit",
+    "PostToolUse",
+    "PostToolUseFailure",
+    "Stop",
+    "SessionEnd",
+  ]) {
     expect(events).toContain(ev);
   }
   // never hook the fail-closed pre-events

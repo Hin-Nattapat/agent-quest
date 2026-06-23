@@ -47,12 +47,16 @@ test("UserPromptSubmit emits prompt and never stores the text", async () => {
 
 test("Stop emits turn_end", async () => {
   const home = makeHome();
-  await runHookAt("copilot", "on-stop.sh", { hook_event_name: "Stop", session_id: "t1", cwd: "/x" }, home);
+  const { code, stdout } = await runHookAt("copilot", "on-stop.sh", { hook_event_name: "Stop", session_id: "t1", cwd: "/x" }, home);
+  expect(code).toBe(0);
+  expect(stdout).toBe("");
   expect(journalLines(home, "t1").at(-1).type).toBe("turn_end");
 });
 
 test("SessionEnd emits session_end", async () => {
   const home = makeHome();
-  await runHookAt("copilot", "on-session-end.sh", { hook_event_name: "SessionEnd", session_id: "e1", reason: "user_exit" }, home);
+  const { code, stdout } = await runHookAt("copilot", "on-session-end.sh", { hook_event_name: "SessionEnd", session_id: "e1", reason: "user_exit" }, home);
+  expect(code).toBe(0);
+  expect(stdout).toBe("");
   expect(journalLines(home, "e1").at(-1).type).toBe("session_end");
 });

@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=NattaP.agent-quest"><img alt="VS Code Marketplace" src="https://img.shields.io/visual-studio-marketplace/v/NattaP.agent-quest?label=Marketplace&color=6b2a7a"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=NattaP.agent-quest"><img alt="VS Code Marketplace" src="https://vsmarketplacebadges.dev/version-short/NattaP.agent-quest.svg?label=Marketplace&color=6b2a7a"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-cdae57"></a>
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-bun%20%2B%20jq-2a2118">
   <img alt="Agents" src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20Copilot-d4a017">

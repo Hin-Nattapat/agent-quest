@@ -75,7 +75,7 @@
     "package": "npm run build:all && vsce package --no-dependencies",
     "reinstall": "npm run package && code --install-extension \"$(ls -t agent-quest-*.vsix | head -1)\" --force",
     "publish": "npm run build:all && vsce publish --no-dependencies",
-    "publish:ovsx": "npm run package && ovsx publish \"$(ls -t agent-quest-*.vsix | head -1)\"",
+    "publish:ovsx": "npm run package && npx -y ovsx publish \"$(ls -t agent-quest-*.vsix | head -1)\"",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

@@ -9,7 +9,10 @@ test("slotPos gives each pack slot a distinct staggered position; clamps out of 
     expect(typeof p.right).toBe("string");
     expect(typeof p.bottom).toBe("string");
   }
+  // Echelon: each slot steps up (bottom) and toward centre (right) — distinct on both axes.
   expect(new Set([a.bottom, b.bottom, c.bottom]).size).toBe(3);
+  expect(new Set([a.right, b.right, c.right]).size).toBe(3);
   expect(parseFloat(a.bottom)).toBeLessThan(parseFloat(c.bottom));
+  expect(parseFloat(a.right)).toBeLessThan(parseFloat(c.right));
   expect(slotPos(9)).toEqual(c);
 });

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "SessionStart": [{ "type": "command", "bash": "~/.agentrpg/adapters/copilot/hooks/on-session-start.sh" }],
+    "UserPromptSubmit": [{ "type": "command", "bash": "~/.agentrpg/adapters/copilot/hooks/on-prompt.sh" }],
+    "PostToolUse": [{ "type": "command", "bash": "~/.agentrpg/adapters/copilot/hooks/on-tool.sh" }],
+    "PostToolUseFailure": [{ "type": "command", "bash": "~/.agentrpg/adapters/copilot/hooks/on-tool-fail.sh" }],
+    "Stop": [{ "type": "command", "bash": "~/.agentrpg/adapters/copilot/hooks/on-stop.sh" }],
+    "SessionEnd": [{ "type": "command", "bash": "~/.agentrpg/adapters/copilot/hooks/on-session-end.sh" }]
+  }
+}

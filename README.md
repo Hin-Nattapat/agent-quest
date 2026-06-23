@@ -14,7 +14,7 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=NattaP.agent-quest"><img alt="VS Code Marketplace" src="https://img.shields.io/visual-studio-marketplace/v/NattaP.agent-quest?label=Marketplace&color=6b2a7a"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-cdae57"></a>
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-bun%20%2B%20jq-2a2118">
-  <img alt="Agents" src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor-d4a017">
+  <img alt="Agents" src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20Copilot-d4a017">
   <img alt="Powered by leftover tokens" src="https://img.shields.io/badge/powered%20by-leftover%20tokens-b5651d">
 </p>
 
@@ -60,12 +60,12 @@ quietly judging your commit messages.
 - 📊 **Status-bar HUD** — `Lv.N ███░░ %  ·  model  ·  $cost  ·  ctx %` right in the Claude Code status
   line, for when the panel is too much commitment.
 - 🔌 **Genuinely clean architecture** — agent-awareness lives only in adapters (Claude Code, Codex,
-  and Cursor today); the engine is a pure reducer over a normalized event contract. Runtime
+  Cursor, and Copilot today); the engine is a pure reducer over a normalized event contract. Runtime
   dependencies: `bun` + `jq`. No `node_modules` black hole.
 
 ## 📋 Requirements
 
-- [Claude Code](https://claude.com/claude-code) — the thing generating the events (Codex and Cursor
+- [Claude Code](https://claude.com/claude-code) — the thing generating the events (Codex, Cursor, and Copilot
   work too, via their own adapters)
 - [Bun](https://bun.sh) and [`jq`](https://jqlang.github.io/jq/) on your `PATH`
 - [VS Code](https://code.visualstudio.com/) — for the companion panel
@@ -126,7 +126,7 @@ driven by what you actually did.
 agents ──(adapters)──► append-only journal (NDJSON) ──(reducer)──► state.json ──► HUD / companion
 ```
 
-- **Adapters** (`adapters/<agent>/hooks/*.sh` — Claude Code, Codex, Cursor) are the only agent-aware
+- **Adapters** (`adapters/<agent>/hooks/*.sh` — Claude Code, Codex, Cursor, Copilot) are the only agent-aware
   code. They run on the agent's hot path, stay tiny, and append one normalized event per line to a
   per-session journal.
 - The **reducer** (`core/`) folds the journal into `state.json` — a pure function over the event
@@ -148,7 +148,7 @@ the list. We checked twice.
 - Single developer, single machine. Progression is local and meant to be _grinded_ — there's no
   backfill, because instantly jumping to Level 40 would defeat the entire bit.
 - **Multi-agent, but Claude Code is the one that's actually grinded.** Adapters ship for Claude Code,
-  Codex, and Cursor — same journal, same hero. Claude Code is what I daily-drive, so it's the most
+  Codex, Cursor, and Copilot — same journal, same hero. Claude Code is what I daily-drive, so it's the most
   battle-tested; the others are built to the same contract but see less mileage.
 - `--continue` / `--resume` replay recorded hook output and don't re-run hooks, so resumed spans can be
   sparse. We know. It's on the list.

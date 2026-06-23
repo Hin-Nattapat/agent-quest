@@ -33,6 +33,7 @@ const setClass = (profile: IProfile, line: string): string => {
     line,
     level: state.level,
     unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
+    ts: new Date().toISOString(),
   });
   if (!r.ok) {
     fail(r.error ?? "");
@@ -57,6 +58,7 @@ const respec = (profile: IProfile, line: string): string => {
     profile,
     line,
     unlockedSecrets: (state.unlocked_secret_classes ?? []) as string[],
+    ts: new Date().toISOString(),
   });
   if (!r.ok) {
     fail(r.error ?? "");

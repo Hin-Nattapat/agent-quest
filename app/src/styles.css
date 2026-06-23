@@ -336,7 +336,8 @@ body {
 }
 .hero {
   left: 22%;
-  bottom: 18%;
+  /* low on the floor, near the front mob's row, facing the echelon of mobs */
+  bottom: 10%;
   width: 30cqh;
   height: 30cqh;
 }
@@ -365,12 +366,14 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1.6cqh; /* cqh so the nameplate stack scales with the sprite (was a fixed 3px) */
+  /* per-slot depth `scale` (from mob-slots) shrinks toward the feet, so far mobs stay grounded */
+  transform-origin: bottom center;
 }
 /* sprite sits inside the unit, so drop the absolute placement from .sprite */
 .monster-unit .monster {
   position: static;
-  width: 30cqh;
-  height: 30cqh;
+  width: 42cqh;
+  height: 42cqh;
   font-size: 34px;
 }
 .monster-grassland::after {
@@ -789,7 +792,7 @@ body {
   /* lower than the hero's 18%: the sprite's transparent bottom-padding, scaled up to 72cqh, lifts
      the creature off the ground, so drop the box to land its feet on the same ground line. */
   bottom: 8%;
-  /* cqh so the boss scales with the stage; ~2.4x the 30cqh hero/mobs so it reads as a boss, not a
+  /* cqh so the boss scales with the stage; ~2.4x the 30cqh hero so it reads as a boss, not a
      bigger mob. */
   width: 72cqh;
   height: 72cqh;

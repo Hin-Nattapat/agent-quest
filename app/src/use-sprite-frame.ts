@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "./use-reduce-motion";
 
 // Pure: elapsed ms since the cycle started → frame index. count <= 1 (idle / no art) holds 0.
 export const frameAt = (elapsedMs: number, count: number, fps: number): number => {
@@ -6,13 +7,6 @@ export const frameAt = (elapsedMs: number, count: number, fps: number): number =
     return 0;
   }
   return Math.floor(elapsedMs / (1000 / fps)) % count;
-};
-
-const prefersReducedMotion = (): boolean => {
-  if (typeof window === "undefined" || !window.matchMedia) {
-    return false;
-  }
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 };
 
 // Active frame index for an N-frame loop. playing=false, a single frame, or reduced-motion holds 0.
@@ -26,8 +20,9 @@ export const useSpriteIndex = (
 ): number => {
   const [index, setIndex] = useState(0);
   const startRef = useRef<number | null>(null);
+  const reduced = useReducedMotion();
 
-  const active = playing && frameCount > 1 && !prefersReducedMotion();
+  const active = playing && frameCount > 1 && !reduced;
 
   useEffect(() => {
     if (!active) {

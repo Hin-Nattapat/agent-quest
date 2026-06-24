@@ -6,6 +6,14 @@
 #   curl -fsSL https://raw.githubusercontent.com/Hin-Nattapat/agent-quest/main/scripts/bootstrap.sh | bash
 #
 # Env overrides: REPO_URL, SRC_DIR (clone target, default ~/.agent-quest), AGENTRPG_HOME.
+#
+# Flags (forwarded to tools/install.sh):
+#   --agent <id>[,<id>]  wire these agents (claude-code|codex|cursor|copilot); else interactive
+#   --apply              merge into each agent's config (writes a .bak first); else print-only
+#   --hud / --no-hud     include / skip the Claude Code statusline
+#
+# Piped form passes flags after `bash -s --`:
+#   curl -fsSL …/bootstrap.sh | bash -s -- --agent claude-code --apply --hud
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/Hin-Nattapat/agent-quest.git}"
@@ -32,7 +40,7 @@ else
 fi
 
 echo "▸ deploying the engine"
-bash "$SRC_DIR/tools/install.sh"
+bash "$SRC_DIR/tools/install.sh" "$@"
 
 echo ""
 echo "✓ Engine installed. Next:"

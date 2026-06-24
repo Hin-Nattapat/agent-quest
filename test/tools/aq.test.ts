@@ -3,7 +3,7 @@ import { makeHome } from "../helpers";
 import { mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
 
-const RPG = new URL("../../tools/rpg.ts", import.meta.url).pathname;
+const AQ = new URL("../../tools/aq.ts", import.meta.url).pathname;
 
 function seedLevel(home: string, prompts: number) {
   const dir = join(home, "journal");
@@ -12,8 +12,8 @@ function seedLevel(home: string, prompts: number) {
   writeFileSync(join(dir, "s.ndjson"), Array(prompts).fill(line).join("\n") + "\n");
 }
 
-async function rpg(home: string, ...args: string[]) {
-  const proc = Bun.spawn(["bun", RPG, ...args], {
+async function aq(home: string, ...args: string[]) {
+  const proc = Bun.spawn(["bun", AQ, ...args], {
     env: { ...process.env, AGENTRPG_HOME: home },
     stdout: "pipe",
     stderr: "pipe",
@@ -29,7 +29,7 @@ const profile = (home: string) =>
 test("name writes profile.json and exits 0", async () => {
   const home = makeHome();
   seedLevel(home, 1);
-  const r = await rpg(home, "name", "Gandalf");
+  const r = await aq(home, "name", "Gandalf");
   expect(r.code).toBe(0);
   expect(profile(home).name).toBe("Gandalf");
 });
@@ -37,7 +37,7 @@ test("name writes profile.json and exits 0", async () => {
 test("class is rejected below level 5", async () => {
   const home = makeHome();
   seedLevel(home, 1); // ~5 xp -> level 1
-  const r = await rpg(home, "class", "mage");
+  const r = await aq(home, "class", "mage");
   expect(r.code).toBe(1);
   expect(r.stderr).toContain("level 5");
 });
@@ -45,7 +45,7 @@ test("class is rejected below level 5", async () => {
 test("class is accepted at level 5+ and resolves the form", async () => {
   const home = makeHome();
   seedLevel(home, 60); // 300 xp -> level 5
-  const r = await rpg(home, "class", "mage");
+  const r = await aq(home, "class", "mage");
   expect(r.code).toBe(0);
   expect(profile(home).line).toBe("mage");
   const state = JSON.parse(readFileSync(join(home, "state.json"), "utf8"));
@@ -55,8 +55,8 @@ test("class is accepted at level 5+ and resolves the form", async () => {
 test("branch is rejected below level 50", async () => {
   const home = makeHome();
   seedLevel(home, 60);
-  await rpg(home, "class", "mage");
-  const r = await rpg(home, "branch", "a");
+  await aq(home, "class", "mage");
+  const r = await aq(home, "branch", "a");
   expect(r.code).toBe(1);
   expect(r.stderr).toContain("level 50");
 });
@@ -64,7 +64,7 @@ test("branch is rejected below level 50", async () => {
 test("status prints a suggested line", async () => {
   const home = makeHome();
   seedLevel(home, 60);
-  const r = await rpg(home, "status");
+  const r = await aq(home, "status");
   expect(r.code).toBe(0);
   expect(r.stdout).toContain("suggested line");
 });
@@ -72,8 +72,8 @@ test("status prints a suggested line", async () => {
 test("status shows the passive percentage once a class is set", async () => {
   const home = makeHome();
   seedLevel(home, 60); // Lv.5
-  await rpg(home, "class", "mage");
-  const r = await rpg(home, "status");
+  await aq(home, "class", "mage");
+  const r = await aq(home, "status");
   expect(r.code).toBe(0);
   expect(r.stdout).toContain("passive: +20%");
 });
@@ -114,7 +114,7 @@ function seedOneClean(home: string) {
 test("inventory lists owned items after a clean session", async () => {
   const home = makeHome();
   seedOneClean(home);
-  const r = await rpg(home, "inventory");
+  const r = await aq(home, "inventory");
   expect(r.code).toBe(0);
   expect(r.stdout).not.toContain("empty");
 });
@@ -125,30 +125,30 @@ test("equipping an owned item succeeds; an unowned one errors", async () => {
   const droppedId = rollDrop({ trigger: { table: "clean", seed: "clean:s" } })!;
   const kind = LOOT_TABLE[droppedId].kind;
   if (kind !== LootKind.Skin) {
-    const ok = await rpg(home, kind, droppedId);
+    const ok = await aq(home, kind, droppedId);
     expect(ok.code).toBe(0);
   }
   const unowned = Object.keys(LOOT_TABLE).find(
     id => id !== droppedId && LOOT_TABLE[id].kind === LootKind.Title,
   )!;
-  const bad = await rpg(home, "title", unowned);
+  const bad = await aq(home, "title", unowned);
   expect(bad.code).toBe(1);
 });
 
 test("a locked secret class is rejected; xyzzy unlocks the Trickster and lets you equip it", async () => {
   const home = makeHome();
   seedLevel(home, 60); // Lv.5+
-  const locked = await rpg(home, "class", "maestro");
+  const locked = await aq(home, "class", "maestro");
   expect(locked.code).toBe(1); // not unlocked
 
-  const egg = await rpg(home, "xyzzy");
+  const egg = await aq(home, "xyzzy");
   expect(egg.code).toBe(0);
   expect(profile(home).xyzzy).toBe(true);
 
-  const sec = await rpg(home, "secrets");
+  const sec = await aq(home, "secrets");
   expect(sec.stdout).toContain("trickster");
 
-  const equip = await rpg(home, "class", "trickster");
+  const equip = await aq(home, "class", "trickster");
   expect(equip.code).toBe(0);
   expect(profile(home).line).toBe("trickster");
 });
@@ -164,14 +164,28 @@ function seedCmd(home: string, cmd: string) {
 
 test("an earned deed title is listed and equippable; a locked one is rejected", async () => {
   const home = makeHome();
-  const locked = await rpg(home, "title", "undying");
+  const locked = await aq(home, "title", "undying");
   expect(locked.code).toBe(1); // not earned yet
 
   seedCmd(home, "reflog"); // earns `undying` -> "the Undying"
-  const list = await rpg(home, "titles");
+  const list = await aq(home, "titles");
   expect(list.stdout).toContain("undying");
 
-  const equip = await rpg(home, "title", "undying");
+  const equip = await aq(home, "title", "undying");
   expect(equip.code).toBe(0);
   expect(profile(home).title).toBe("undying");
+});
+
+test("aq setup runs the wiring engine (no-tty print fallback)", async () => {
+  const home = makeHome();
+  const proc = Bun.spawn(["bun", AQ, "setup"], {
+    env: { ...process.env, AGENTRPG_HOME: home, HOME: home },
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stdout = await new Response(proc.stdout).text();
+  const code = await proc.exited;
+  expect(code).toBe(0);
+  expect(stdout).toContain("no terminal"); // fell back to print-only
 });

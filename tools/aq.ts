@@ -192,10 +192,20 @@ const secrets = (): string => {
   }).join("\n");
 };
 
+const runSetup = (): never => {
+  const wire = new URL("../scripts/wire.sh", import.meta.url).pathname;
+  const proc = Bun.spawnSync(["bash", wire, "interactive"], {
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  process.exit(proc.exitCode ?? 0);
+};
+
 const xyzzy = (profile: IProfile): string => {
   profile.xyzzy = true;
   persist(profile);
-  return "A hollow voice says 'Fool.'  ✦ The Trickster is yours — `rpg class trickster`.";
+  return "A hollow voice says 'Fool.'  ✦ The Trickster is yours — `aq class trickster`.";
 };
 
 const main = (): void => {
@@ -242,9 +252,12 @@ const main = (): void => {
     case "xyzzy":
       out = xyzzy(profile);
       break;
+    case "setup":
+      runSetup();
+      return;
     default:
       fail(
-        "Usage: rpg <name|class|branch|respec|status|inventory|title|theme|namecolor|titles|namecolors|secrets|xyzzy> …",
+        "Usage: aq <name|class|branch|respec|status|inventory|title|theme|namecolor|titles|namecolors|secrets|xyzzy|setup> …",
       );
   }
   console.log(out);

@@ -1,0 +1,6 @@
+# Agent Quest `aq` completion (zsh). Source after compinit, or drop in $fpath.
+# Keep this subcommand list in sync with the usage line in tools/aq.ts.
+_aq() {
+  compadd name class branch respec status inventory title theme titles secrets xyzzy setup
+}
+compdef _aq aq

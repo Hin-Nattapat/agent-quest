@@ -176,7 +176,7 @@ export const classTree = (line: TLine | null): IClassTree | undefined => {
   };
 };
 
-// A pending advancement the player can claim via the rpg CLI: pick a class at Lv.5, or a T4 branch.
+// A pending advancement the player can claim via the aq CLI: pick a class at Lv.5, or a T4 branch.
 export enum AdvancementKind {
   Class = "class",
   Branch = "branch",

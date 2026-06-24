@@ -1,6 +1,0 @@
-# Agent Quest `rpg` completion (zsh). Source after compinit, or drop in $fpath.
-# Keep this subcommand list in sync with the usage line in tools/rpg.ts.
-_rpg() {
-  compadd name class branch respec status inventory title theme titles secrets xyzzy
-}
-compdef _rpg rpg

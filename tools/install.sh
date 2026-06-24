@@ -7,6 +7,7 @@ MODE="copy"
 AGENTS=""
 APPLY=""
 HUD="ask"   # ask | yes | no
+DEPLOY_ONLY=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --link) MODE="link" ;;
@@ -14,6 +15,7 @@ while [ $# -gt 0 ]; do
     --apply) APPLY="yes" ;;
     --hud) HUD="yes" ;;
     --no-hud) HUD="no" ;;
+    --deploy-only) DEPLOY_ONLY="yes" ;;
     *) ;;
   esac
   shift
@@ -41,6 +43,11 @@ deploy scripts
 # source that lost the bit. Glob all adapters so a new one (codex, …) is covered without edits.
 chmod +x "$SRC"/adapters/*/hooks/*.sh 2>/dev/null || true
 if [ "$MODE" = "copy" ]; then chmod +x "$RPG_HOME"/adapters/*/hooks/*.sh 2>/dev/null || true; fi
+
+if [ "$DEPLOY_ONLY" = "yes" ]; then
+  echo "Deployed engine to $RPG_HOME"
+  exit 0
+fi
 
 # CLI ergonomics: an `aq` wrapper on PATH + shell completions (activation is printed, not auto-wired).
 mkdir -p "$RPG_HOME/bin" "$RPG_HOME/completions"

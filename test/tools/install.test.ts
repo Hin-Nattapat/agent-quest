@@ -121,3 +121,21 @@ test("--agent claude-code --apply --hud also wires the statusline", async () => 
   const settings = JSON.parse(readFileSync(join(home, ".claude/settings.json"), "utf8"));
   expect(settings.statusLine.command).toContain("hud/statusline.ts");
 });
+
+test("--deploy-only deploys the engine but skips the aq wrapper, PATH text, and wiring", async () => {
+  const home = makeHome();
+  const proc = Bun.spawn(["bash", INSTALL, "--deploy-only"], {
+    env: { ...process.env, AGENTRPG_HOME: home, HOME: home },
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stdout = await new Response(proc.stdout).text();
+  const code = await proc.exited;
+  expect(code).toBe(0);
+  expect(existsSync(join(home, "adapters/claude-code/hooks/on-tool.sh"))).toBe(true);
+  expect(existsSync(join(home, "scripts/wire.sh"))).toBe(true);
+  expect(existsSync(join(home, "config.json"))).toBe(true);
+  expect(existsSync(join(home, "bin/aq"))).toBe(false); // no launcher under Homebrew
+  expect(stdout).not.toContain("Merge this"); // no wiring
+  expect(stdout).not.toContain("For the 'aq' command"); // no PATH instructions
+});

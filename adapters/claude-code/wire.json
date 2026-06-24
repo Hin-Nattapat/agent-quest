@@ -1,0 +1,9 @@
+{
+  "id": "claude-code",
+  "detect": ["~/.claude", "claude"],
+  "target": "~/.claude/settings.json",
+  "format": "json-merge",
+  "snippet": "settings.snippet.json",
+  "hud": true,
+  "hud_snippet": "statusline.snippet.json"
+}

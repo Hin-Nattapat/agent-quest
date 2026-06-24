@@ -1,0 +1,7 @@
+{
+  "id": "cursor",
+  "detect": ["~/.cursor"],
+  "target": "~/.cursor/hooks.json",
+  "format": "json-merge",
+  "snippet": "config.snippet.json"
+}

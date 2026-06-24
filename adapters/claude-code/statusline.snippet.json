@@ -1,0 +1,7 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bun ~/.agentrpg/hud/statusline.ts",
+    "padding": 0
+  }
+}

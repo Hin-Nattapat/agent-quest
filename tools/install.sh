@@ -3,7 +3,21 @@
 set -euo pipefail
 RPG_HOME="${AGENTRPG_HOME:-$HOME/.agentrpg}"
 SRC="$(cd "$(dirname "$0")/.." && pwd)"   # repo root (tools/ is one level down)
-MODE="copy"; [ "${1:-}" = "--link" ] && MODE="link"
+MODE="copy"
+AGENTS=""
+APPLY=""
+HUD="ask"   # ask | yes | no
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --link) MODE="link" ;;
+    --agent) shift; AGENTS="$1" ;;
+    --apply) APPLY="yes" ;;
+    --hud) HUD="yes" ;;
+    --no-hud) HUD="no" ;;
+    *) ;;
+  esac
+  shift
+done
 
 mkdir -p "$RPG_HOME/journal"
 
@@ -17,6 +31,7 @@ deploy adapters
 deploy tools
 deploy core
 deploy hud
+deploy scripts
 
 # config: copy default only if absent — never overwrite the user's tuning.
 [ -f "$RPG_HOME/config.json" ] || cp "$SRC/config/default.json" "$RPG_HOME/config.json"
@@ -27,21 +42,39 @@ deploy hud
 chmod +x "$SRC"/adapters/*/hooks/*.sh 2>/dev/null || true
 if [ "$MODE" = "copy" ]; then chmod +x "$RPG_HOME"/adapters/*/hooks/*.sh 2>/dev/null || true; fi
 
-# CLI ergonomics: an `rpg` wrapper on PATH + shell completions (activation is printed, not auto-wired).
+# CLI ergonomics: an `aq` wrapper on PATH + shell completions (activation is printed, not auto-wired).
 mkdir -p "$RPG_HOME/bin" "$RPG_HOME/completions"
-cat > "$RPG_HOME/bin/rpg" <<EOF
+cat > "$RPG_HOME/bin/aq" <<EOF
 #!/usr/bin/env bash
 export AGENTRPG_HOME="\${AGENTRPG_HOME:-$RPG_HOME}"
-exec bun "$RPG_HOME/tools/rpg.ts" "\$@"
+exec bun "$RPG_HOME/tools/aq.ts" "\$@"
 EOF
-chmod +x "$RPG_HOME/bin/rpg"
-cp "$SRC/tools/completions/_rpg" "$SRC/tools/completions/rpg.bash" "$RPG_HOME/completions/"
+chmod +x "$RPG_HOME/bin/aq"
+cp "$SRC/tools/completions/_aq" "$SRC/tools/completions/aq.bash" "$RPG_HOME/completions/"
 
 echo "Installed to $RPG_HOME (mode: $MODE)"
 echo ""
-echo "For the 'rpg' command + tab-completion, add to your shell rc:"
+echo "For the 'aq' command + tab-completion, add to your shell rc:"
 echo "  export PATH=\"$RPG_HOME/bin:\$PATH\""
-echo "  # zsh:  source $RPG_HOME/completions/_rpg     (after compinit)"
-echo "  # bash: source $RPG_HOME/completions/rpg.bash"
-echo "Merge this into ~/.claude/settings.json:"
-cat "$SRC/adapters/claude-code/settings.snippet.json"
+echo "  # zsh:  source $RPG_HOME/completions/_aq     (after compinit)"
+echo "  # bash: source $RPG_HOME/completions/aq.bash"
+WIRE="$SRC/scripts/wire.sh"
+echo ""
+if [ -n "$AGENTS" ]; then
+  IFS=',' read -ra _agents <<< "$AGENTS"
+  for a in "${_agents[@]}"; do
+    if [ "$APPLY" = "yes" ]; then
+      bash "$WIRE" apply "$a"
+      if [ "$HUD" = "yes" ]; then
+        bash "$WIRE" apply-hud "$a"
+      fi
+    else
+      bash "$WIRE" print "$a"
+      if [ "$HUD" = "yes" ]; then
+        bash "$WIRE" print-hud "$a"
+      fi
+    fi
+  done
+else
+  bash "$WIRE" interactive
+fi

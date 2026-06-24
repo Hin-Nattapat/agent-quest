@@ -51,35 +51,36 @@ After `reinstall`, reload the VS Code window (`Developer: Reload Window`) for th
 Then reload VS Code (`Developer: Reload Window`) and open the **Agent Quest** panel. Close any F5
 Extension Development Host first so the panel doesn't collide with the installed copy.
 
-## rpg CLI (character identity · `tools/rpg.ts`)
+## aq CLI (character identity · `tools/aq.ts`)
 
-Run with Bun from the repo (`bun tools/rpg.ts <cmd>`). Writes `~/.agentrpg/profile.json` and
+Run with Bun from the repo (`bun tools/aq.ts <cmd>`). Writes `~/.agentrpg/profile.json` and
 refreshes `state.json`.
 
-After `bash tools/install.sh`, enable the short `rpg` command + tab-completion by adding to your
+After `bash tools/install.sh`, enable the short `aq` command + tab-completion by adding to your
 shell rc (the installer prints these):
 
 - `export PATH="$HOME/.agentrpg/bin:$PATH"`
-- zsh: `source $HOME/.agentrpg/completions/_rpg` (after `compinit`)
-- bash: `source $HOME/.agentrpg/completions/rpg.bash`
+- zsh: `source $HOME/.agentrpg/completions/_aq` (after `compinit`)
+- bash: `source $HOME/.agentrpg/completions/aq.bash`
 
-Then `rpg <cmd>` works from anywhere (and `rpg <Tab>` lists the subcommands); a repo checkout can
-still use `bun tools/rpg.ts <cmd>` directly.
+Then `aq <cmd>` works from anywhere (and `aq <Tab>` lists the subcommands); a repo checkout can
+still use `bun tools/aq.ts <cmd>` directly.
 
 ```bash
-bun tools/rpg.ts status              # show the character sheet
-bun tools/rpg.ts name "Calypso"      # set the display name
-bun tools/rpg.ts class mage          # pick a class line (at Lv.5+)
-bun tools/rpg.ts branch a            # pick a T4 branch (a|b, at Lv.50)
-bun tools/rpg.ts respec              # reset class choice
-bun tools/rpg.ts inventory           # list owned loot
-bun tools/rpg.ts title <id>          # equip a title  ·  rpg titles = list owned
-bun tools/rpg.ts theme <id>          # equip an HUD theme color
-bun tools/rpg.ts secrets             # list unlocked secret classes
+bun tools/aq.ts status              # show the character sheet
+bun tools/aq.ts name "Calypso"      # set the display name
+bun tools/aq.ts class mage          # pick a class line (at Lv.5+)
+bun tools/aq.ts branch a            # pick a T4 branch (a|b, at Lv.50)
+bun tools/aq.ts respec              # reset class choice
+bun tools/aq.ts inventory           # list owned loot
+bun tools/aq.ts title <id>          # equip a title  ·  aq titles = list owned
+bun tools/aq.ts theme <id>          # equip an HUD theme color
+bun tools/aq.ts secrets             # list unlocked secret classes
+bun tools/aq.ts setup               # interactive agent-picker / wiring setup
 ```
 
-Full usage: `bun tools/rpg.ts` (no args) prints
-`name|class|branch|respec|status|inventory|title|theme|titles|secrets`.
+Full usage: `bun tools/aq.ts` (no args) prints
+`name|class|branch|respec|status|inventory|title|theme|namecolor|titles|namecolors|secrets|xyzzy|setup`.
 
 ## Deploy the agent hooks (`tools/install.sh`)
 

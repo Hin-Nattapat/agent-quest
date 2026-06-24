@@ -82,6 +82,22 @@ curl -fsSL https://raw.githubusercontent.com/Hin-Nattapat/agent-quest/main/scrip
 
 This clones the repo, deploys into `~/.agentrpg`, and prints a Claude Code settings snippet.
 
+**Choose your agent(s).** By default the installer wires Claude Code. To pick others (Codex,
+Cursor, Copilot) or to let it merge the config for you automatically:
+
+```bash
+# interactive — detects installed agents and asks
+bash tools/install.sh
+
+# non-interactive (also works piped):
+curl -fsSL …/bootstrap.sh | bash -s -- --agent claude-code,cursor --apply --hud
+```
+
+`--apply` merges the wiring into each agent's config (writing a `.bak` first); without it the
+installer just prints the snippet to paste. `--hud` / `--no-hud` controls the Claude Code
+statusline (other agents render via the companion panel). Re-run the picker any time with
+`aq setup`.
+
 **2 — Wire Claude Code:** merge the printed `hooks` + `statusLine` snippet into
 `~/.claude/settings.json`.
 

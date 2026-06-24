@@ -1,0 +1,7 @@
+{
+  "id": "copilot",
+  "detect": ["~/.copilot"],
+  "target": "~/.copilot/hooks/agent-quest.json",
+  "format": "json-drop",
+  "snippet": "config.snippet.json"
+}

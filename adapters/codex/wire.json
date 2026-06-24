@@ -1,0 +1,7 @@
+{
+  "id": "codex",
+  "detect": ["~/.codex", "codex"],
+  "target": "~/.codex/config.toml",
+  "format": "toml-append",
+  "snippet": "config.snippet.toml"
+}

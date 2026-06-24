@@ -63,22 +63,61 @@ test("--link deploys hud/", async () => {
   expect(existsSync(join(home, "hud/statusline.ts"))).toBe(true);
 });
 
-test("deploys the rpg wrapper + completions, and the wrapper runs", async () => {
+test("deploys the aq wrapper + completions, and the wrapper runs", async () => {
   const home = makeHome();
   const { code, stdout } = await runInstall(home, ["--link"]);
   expect(code).toBe(0);
 
-  const rpg = join(home, "bin/rpg");
-  expect(existsSync(rpg)).toBe(true);
-  expect((lstatSync(rpg).mode & 0o111) !== 0).toBe(true); // executable
-  expect(existsSync(join(home, "completions/_rpg"))).toBe(true);
-  expect(existsSync(join(home, "completions/rpg.bash"))).toBe(true);
-  expect(stdout).toContain("rpg' command");
+  const aq = join(home, "bin/aq");
+  expect(existsSync(aq)).toBe(true);
+  expect((lstatSync(aq).mode & 0o111) !== 0).toBe(true); // executable
+  expect(existsSync(join(home, "completions/_aq"))).toBe(true);
+  expect(existsSync(join(home, "completions/aq.bash"))).toBe(true);
+  expect(stdout).toContain("aq' command");
 
-  const proc = Bun.spawn(["bash", rpg, "status"], {
+  const proc = Bun.spawn(["bash", aq, "status"], {
     env: { ...process.env, AGENTRPG_HOME: home },
     stdout: "pipe",
     stderr: "pipe",
   });
   expect(await proc.exited).toBe(0);
+});
+
+test("--agent claude-code --apply wires the settings file", async () => {
+  const home = makeHome();
+  const proc = Bun.spawn(
+    ["bash", INSTALL, "--link", "--agent", "claude-code", "--apply"],
+    {
+      env: { ...process.env, AGENTRPG_HOME: home, HOME: home },
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+  );
+  const code = await proc.exited;
+  expect(code).toBe(0);
+  expect(existsSync(join(home, ".claude/settings.json"))).toBe(true);
+  const settings = JSON.parse(readFileSync(join(home, ".claude/settings.json"), "utf8"));
+  expect(settings.hooks.SessionStart).toBeDefined();
+  expect(settings.statusLine).toBeUndefined(); // HUD not requested
+});
+
+test("--link deploys scripts/wire.sh", async () => {
+  const home = makeHome();
+  await runInstall(home, ["--link"]);
+  expect(existsSync(join(home, "scripts/wire.sh"))).toBe(true);
+});
+
+test("--agent claude-code --apply --hud also wires the statusline", async () => {
+  const home = makeHome();
+  const proc = Bun.spawn(
+    ["bash", INSTALL, "--link", "--agent", "claude-code", "--apply", "--hud"],
+    {
+      env: { ...process.env, AGENTRPG_HOME: home, HOME: home },
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+  );
+  await proc.exited;
+  const settings = JSON.parse(readFileSync(join(home, ".claude/settings.json"), "utf8"));
+  expect(settings.statusLine.command).toContain("hud/statusline.ts");
 });

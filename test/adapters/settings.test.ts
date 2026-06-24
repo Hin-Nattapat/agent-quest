@@ -2,12 +2,11 @@ import { test, expect } from "bun:test";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-const snippet = JSON.parse(
-  readFileSync(
-    join(import.meta.dir, "../../adapters/claude-code/settings.snippet.json"),
-    "utf8",
-  ),
-);
+const readJson = (p: string) => JSON.parse(readFileSync(p, "utf8"));
+const adapterDir = join(import.meta.dir, "../../adapters/claude-code");
+
+const snippet = readJson(join(adapterDir, "settings.snippet.json"));
+const statuslineSnippet = readJson(join(adapterDir, "statusline.snippet.json"));
 
 test("declares all six hook events", () => {
   const h = snippet.hooks;
@@ -36,6 +35,6 @@ test("commands point at the hooks/ scripts under ~/.agentrpg", () => {
 });
 
 test("declares a statusLine pointing at the deployed statusline.ts", () => {
-  expect(snippet.statusLine.type).toBe("command");
-  expect(snippet.statusLine.command).toBe("bun ~/.agentrpg/hud/statusline.ts");
+  expect(statuslineSnippet.statusLine.type).toBe("command");
+  expect(statuslineSnippet.statusLine.command).toBe("bun ~/.agentrpg/hud/statusline.ts");
 });

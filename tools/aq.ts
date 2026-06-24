@@ -5,6 +5,8 @@ import { reduceToFile } from "../core/reduce";
 import { ClassLine, SecretLine, SECRET_TREE } from "../core/classes";
 import { chooseClass, respecClass, chooseBranch } from "../core/advance";
 import { LOOT_TABLE, LootKind } from "../core/loot";
+import { existsSync } from "fs";
+import { join } from "path";
 
 const HOME = defaultHome();
 const LINES = Object.values(ClassLine) as string[];
@@ -192,7 +194,24 @@ const secrets = (): string => {
   }).join("\n");
 };
 
+const ensureEngineDeployed = (): void => {
+  if (existsSync(join(HOME, "adapters"))) {
+    return;
+  }
+  const installer = new URL("./install.sh", import.meta.url).pathname;
+  const proc = Bun.spawnSync(["bash", installer, "--deploy-only"], {
+    env: { ...process.env, AGENTRPG_HOME: HOME },
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  if ((proc.exitCode ?? 0) !== 0) {
+    fail(`Failed to deploy the Agent Quest engine to ${HOME}`);
+  }
+};
+
 const runSetup = (): never => {
+  ensureEngineDeployed();
   const wire = new URL("../scripts/wire.sh", import.meta.url).pathname;
   const proc = Bun.spawnSync(["bash", wire, "interactive"], {
     stdin: "inherit",

@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test";
 import { makeHome } from "../helpers";
-import { mkdirSync, writeFileSync, readFileSync } from "fs";
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from "fs";
 import { join } from "path";
 
 const AQ = new URL("../../tools/aq.ts", import.meta.url).pathname;
@@ -188,4 +188,33 @@ test("aq setup runs the wiring engine (no-tty print fallback)", async () => {
   const code = await proc.exited;
   expect(code).toBe(0);
   expect(stdout).toContain("no terminal"); // fell back to print-only
+});
+
+test("aq setup bootstraps the engine into AGENTRPG_HOME when it is missing", async () => {
+  const home = makeHome();
+  expect(existsSync(join(home, "adapters"))).toBe(false);
+  const proc = Bun.spawn(["bun", AQ, "setup"], {
+    env: { ...process.env, AGENTRPG_HOME: home, HOME: home },
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stdout = await new Response(proc.stdout).text();
+  expect(await proc.exited).toBe(0);
+  expect(existsSync(join(home, "adapters/claude-code/hooks/on-tool.sh"))).toBe(true); // deployed
+  expect(stdout).toContain("no terminal"); // then reached the wiring step
+});
+
+test("aq setup does not re-deploy when the engine is already present", async () => {
+  const home = makeHome();
+  mkdirSync(join(home, "adapters"), { recursive: true });
+  writeFileSync(join(home, "adapters/MARKER"), "keep");
+  const proc = Bun.spawn(["bun", AQ, "setup"], {
+    env: { ...process.env, AGENTRPG_HOME: home, HOME: home },
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  await proc.exited;
+  expect(existsSync(join(home, "adapters/MARKER"))).toBe(true); // not clobbered → no re-deploy
 });

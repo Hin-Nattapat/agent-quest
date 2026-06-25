@@ -223,16 +223,12 @@ render_select() {  # redraw the checkbox list in place on /dev/tty
   TUI_LINES=$((TUI_N + 4))
 }
 
-render_confirm() {  # $@ = chosen agents → styled confirm summary to /dev/tty
+render_confirm() {  # $@ = chosen agents → styled confirm prompt to /dev/tty (no list)
+  local list
+  list="$(printf '%s, ' "$@")"
+  list="${list%, }"
   {
-    printf '\n\e[2K %s%sWire these agents?%s\n' "$C_BOLD" "$C_CYAN" "$C_RESET"
-    printf '\e[2K\n'
-    local a
-    for a in "$@"; do
-      printf '\e[2K   %s◉%s %s\n' "$C_GREEN" "$C_RESET" "$a"
-    done
-    printf '\e[2K\n'
-    printf '\e[2K %smerges hooks into each config — a .bak backup is saved first%s\n' "$C_DIM" "$C_RESET"
+    printf '\n\e[2K %s%sWire %s?%s %s(.bak backup saved first)%s\n' "$C_BOLD" "$C_CYAN" "$list" "$C_RESET" "$C_DIM" "$C_RESET"
     printf '\e[2K %s[y]%s proceed   %s[n]%s cancel ' "$C_GREEN" "$C_RESET" "$C_DIM" "$C_RESET"
   } > /dev/tty
 }

@@ -284,32 +284,37 @@ cmd_interactive() {
     return 0
   fi
 
-  if [ -z "$detected" ]; then
-    detected="$(list_agents)"
+  local candidates="$detected"
+  if [ -z "$candidates" ]; then
+    candidates="$(list_agents)"
   fi
-  echo "Detected agents: $(echo "$detected" | tr '\n' ' ')" > /dev/tty
-  for id in $detected; do
-    printf 'Wire %s? [y/N] ' "$id" > /dev/tty
-    local ans; read -r ans < /dev/tty || ans=""
-    case "$ans" in
-      y | Y)
-        printf '  Merge into its config now (a .bak backup is written)? [y/N] ' > /dev/tty
-        local doit; read -r doit < /dev/tty || doit=""
-        case "$doit" in
-          y | Y) cmd_apply "$id" ;;
-          *) cmd_print "$id" ;;
-        esac
-        if hud_enabled "$id"; then
-          printf '  Enable the HUD statusline too? [y/N] ' > /dev/tty
-          local hud; read -r hud < /dev/tty || hud=""
-          case "$hud" in
-            y | Y) cmd_apply_hud "$id" ;;
-            *) : ;;
-          esac
-        fi
-        ;;
-      *) : ;;
+
+  local chosen
+  chosen="$(cmd_select_agents $candidates)"
+  if [ -z "$chosen" ]; then
+    return 0
+  fi
+
+  local doit
+  printf 'Merge into their configs now (a .bak backup is written)? [y/N] ' > /dev/tty
+  read -r doit < /dev/tty || doit=""
+  for id in $chosen; do
+    case "$doit" in
+      y | Y) cmd_apply "$id" ;;
+      *) cmd_print "$id" ;;
     esac
+  done
+
+  for id in $chosen; do
+    if hud_enabled "$id"; then
+      printf 'Enable HUD statusline for %s? [y/N] ' "$id" > /dev/tty
+      local hud
+      read -r hud < /dev/tty || hud=""
+      case "$hud" in
+        y | Y) cmd_apply_hud "$id" ;;
+        *) : ;;
+      esac
+    fi
   done
 }
 

@@ -1,10 +1,10 @@
-# Live copy lives in the tap repo Hin-Nattapat/homebrew-agent-quest as Formula/agent-quest.rb.
-# Update `url` + `sha256` to each new release tag. sha256: curl -fsSL <url> | shasum -a 256
+# Mirrors the live formula in the tap repo Hin-Nattapat/homebrew-tap (Formula/agent-quest.rb).
+# Per release: bump `url` to the new tag and `sha256` to: curl -fsSL <url> | shasum -a 256
 class AgentQuest < Formula
   desc "Gamify your AI coding agent usage into an RPG"
   homepage "https://github.com/Hin-Nattapat/agent-quest"
   url "https://github.com/Hin-Nattapat/agent-quest/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "REPLACE_WITH_TARBALL_SHA256"
+  sha256 "169971d6636802ba6922961420a76c09c2fdefa6d9ffd9ea3ac2289c15bc8113"
   license "MIT"
 
   depends_on "bun"
@@ -26,6 +26,6 @@ class AgentQuest < Formula
   end
 
   test do
-    assert_match "Usage: aq", shell_output("#{bin}/aq 2>&1", 1)
+    assert_match "Usage:  aq", shell_output("#{bin}/aq --help")
   end
 end

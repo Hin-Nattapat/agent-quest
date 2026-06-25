@@ -34,10 +34,10 @@ const applyAdvance = (
   return readStateText(home);
 };
 
-// Apply a webview intent, mirroring the rpg CLI's mutations and re-reducing. Returns the fresh
+// Apply a webview intent, mirroring the aq CLI's mutations and re-reducing. Returns the fresh
 // state.json text on success, null on bad input. Equip is INVENTORY cosmetics only (the Items
 // panel's source) — a title is validated against the inventory + loot table, NOT achievement-earned
-// titles (which `rpg title` also accepts but the panel never surfaces).
+// titles (which `aq title` also accepts but the panel never surfaces).
 export const applyAction = (home: string, action: IRawAction): string | null => {
   if (action.name === "setName") {
     const value = (action.value ?? "").trim().slice(0, 24);

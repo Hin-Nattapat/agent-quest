@@ -24,7 +24,7 @@ Works with **Claude Code**, **Codex**, and **Cursor** — one shared hero across
 > Quest hooks write while you work. Install the engine + CLI first (macOS / Linux):
 >
 > ```bash
-> brew tap Hin-Nattapat/tap
+> brew tap Hin-Nattapat/tap && brew trust hin-nattapat/tap   # Homebrew 6+: trust the tap once
 > brew install agent-quest
 > aq setup
 > ```

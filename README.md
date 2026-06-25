@@ -77,7 +77,7 @@ quietly judging your commit messages.
 **1 — Install the engine + CLI** (macOS / Linux, via [Homebrew](https://brew.sh)):
 
 ```bash
-brew tap Hin-Nattapat/tap
+brew tap Hin-Nattapat/tap && brew trust hin-nattapat/tap   # Homebrew 6+: trust the tap once
 brew install agent-quest
 aq setup
 ```

@@ -182,7 +182,9 @@ read_action() {  # sets ACTION from /dev/tty, or from TUI_KEYS when injecting
   local c rest
   IFS= read -rsn1 c < /dev/tty || c=''
   if [ "$c" = $'\e' ]; then
-    IFS= read -rsn2 -t 0.05 rest < /dev/tty || rest=''
+    # Integer timeout only — macOS ships bash 3.2, which rejects fractional -t (e.g. 0.05).
+    # An arrow's "[A"/"[B" is already buffered so this returns instantly; a bare ESC waits 1s.
+    IFS= read -rsn2 -t 1 rest < /dev/tty || rest=''
     case "$rest" in
       '[A') ACTION=UP ;;
       '[B') ACTION=DOWN ;;

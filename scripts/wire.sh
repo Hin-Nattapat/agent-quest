@@ -147,6 +147,124 @@ cmd_apply_hud() {  # $1 = agent
   echo "✓ HUD statusline wired for $1"
 }
 
+ACTION=""
+TUI_AGENTS=()
+TUI_CHECKED=()
+TUI_N=0
+TUI_CURSOR=0
+TUI_INJECT=0
+TUI_KEYS=""
+TUI_POS=0
+TUI_LINES=0
+
+classify_key() {  # $1 = char → sets ACTION
+  case "$1" in
+    j | J) ACTION=DOWN ;;
+    k | K) ACTION=UP ;;
+    ' ') ACTION=TOGGLE ;;
+    '' | $'\n' | $'\r') ACTION=CONFIRM ;;
+    q | Q | $'\e') ACTION=CANCEL ;;
+    *) ACTION=NOP ;;
+  esac
+}
+
+read_action() {  # sets ACTION from /dev/tty, or from TUI_KEYS when injecting
+  if [ "$TUI_INJECT" -eq 1 ]; then
+    if [ "$TUI_POS" -ge "${#TUI_KEYS}" ]; then
+      ACTION=EOF
+      return
+    fi
+    local c="${TUI_KEYS:$TUI_POS:1}"
+    TUI_POS=$((TUI_POS + 1))
+    classify_key "$c"
+    return
+  fi
+  local c rest
+  IFS= read -rsn1 c < /dev/tty || c=''
+  if [ "$c" = $'\e' ]; then
+    IFS= read -rsn2 -t 0.05 rest < /dev/tty || rest=''
+    case "$rest" in
+      '[A') ACTION=UP ;;
+      '[B') ACTION=DOWN ;;
+      *) ACTION=CANCEL ;;
+    esac
+    return
+  fi
+  classify_key "$c"
+}
+
+render_select() {  # redraw the checkbox list in place on /dev/tty
+  if [ "$TUI_LINES" -gt 0 ]; then
+    printf '\e[%dA' "$TUI_LINES" > /dev/tty
+  fi
+  {
+    printf '\e[2K%s\n' "Select agents to wire  (↑/↓ move · space toggle · enter confirm · q cancel)"
+    local i mark ptr
+    for (( i = 0; i < TUI_N; i++ )); do
+      if [ "${TUI_CHECKED[i]}" -eq 1 ]; then mark="x"; else mark=" "; fi
+      if [ "$i" -eq "$TUI_CURSOR" ]; then ptr=">"; else ptr=" "; fi
+      printf '\e[2K%s [%s] %s\n' "$ptr" "$mark" "${TUI_AGENTS[i]}"
+    done
+  } > /dev/tty
+  TUI_LINES=$((TUI_N + 1))
+}
+
+cmd_select_agents() {  # $@ = candidate ids; prints chosen ids (one per line)
+  TUI_AGENTS=("$@")
+  TUI_N=${#TUI_AGENTS[@]}
+  if [ "$TUI_N" -eq 0 ]; then
+    return 0
+  fi
+  TUI_CHECKED=()
+  local i
+  for (( i = 0; i < TUI_N; i++ )); do TUI_CHECKED[i]=1; done
+  TUI_CURSOR=0
+  TUI_POS=0
+  TUI_LINES=0
+  if [ -n "${WIRE_TUI_KEYS+x}" ]; then
+    TUI_INJECT=1
+    TUI_KEYS="$WIRE_TUI_KEYS"
+  else
+    TUI_INJECT=0
+  fi
+
+  local saved=""
+  if [ "$TUI_INJECT" -eq 0 ]; then
+    saved="$(stty -g < /dev/tty)"
+    trap 'stty "$saved" < /dev/tty 2>/dev/null' EXIT INT TERM
+    stty -echo -icanon < /dev/tty
+  fi
+
+  local cancelled=0
+  while true; do
+    if [ "$TUI_INJECT" -eq 0 ]; then render_select; fi
+    read_action
+    case "$ACTION" in
+      UP) TUI_CURSOR=$(( (TUI_CURSOR - 1 + TUI_N) % TUI_N )) ;;
+      DOWN) TUI_CURSOR=$(( (TUI_CURSOR + 1) % TUI_N )) ;;
+      TOGGLE) TUI_CHECKED[TUI_CURSOR]=$(( 1 - TUI_CHECKED[TUI_CURSOR] )) ;;
+      CONFIRM) break ;;
+      CANCEL | EOF) cancelled=1; break ;;
+      *) : ;;
+    esac
+  done
+
+  if [ "$TUI_INJECT" -eq 0 ]; then
+    stty "$saved" < /dev/tty 2>/dev/null || true
+    trap - EXIT INT TERM
+    printf '\n' > /dev/tty
+  fi
+
+  if [ "$cancelled" -eq 1 ]; then
+    return 0
+  fi
+  for (( i = 0; i < TUI_N; i++ )); do
+    if [ "${TUI_CHECKED[i]}" -eq 1 ]; then
+      echo "${TUI_AGENTS[i]}"
+    fi
+  done
+}
+
 # macOS: /dev/tty has rw permission bits even with no controlling terminal, so we
 # must attempt to open it rather than relying on [ -r/-w ] permission checks.
 has_tty() { ( exec 3>/dev/tty ) 2>/dev/null; }
@@ -205,7 +323,8 @@ main() {
     print-hud) cmd_print_hud "$1" ;;
     apply-hud) cmd_apply_hud "$1" ;;
     interactive) cmd_interactive ;;
-    *) echo "usage: wire.sh detect|print|apply|print-hud|apply-hud|interactive [agent]" >&2; exit 2 ;;
+    select) cmd_select_agents "$@" ;;
+    *) echo "usage: wire.sh detect|print|apply|print-hud|apply-hud|interactive|select [agent...]" >&2; exit 2 ;;
   esac
 }
 

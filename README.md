@@ -74,6 +74,17 @@ quietly judging your commit messages.
 
 *(This is the part with no jokes. We take installation seriously.)*
 
+**Homebrew** (macOS / Linux):
+
+```bash
+brew install Hin-Nattapat/agent-quest/agent-quest
+aq setup
+```
+
+`brew install` puts the `aq` command on your `PATH`; `aq setup` deploys the engine to
+`~/.agentrpg` on first run and then wires your coding agent(s). Re-run `aq setup` after a
+`brew upgrade` to refresh the deployed engine.
+
 **1 — Install the engine** (hooks + reducer + CLI):
 
 ```bash

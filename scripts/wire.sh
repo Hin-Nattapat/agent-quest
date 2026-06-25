@@ -157,6 +157,12 @@ TUI_KEYS=""
 TUI_POS=0
 TUI_LINES=0
 
+C_RESET=$'\e[0m'
+C_BOLD=$'\e[1m'
+C_DIM=$'\e[2m'
+C_CYAN=$'\e[36m'
+C_GREEN=$'\e[32m'
+
 classify_key() {  # $1 = char → sets ACTION
   case "$1" in
     j | J) ACTION=DOWN ;;
@@ -200,15 +206,35 @@ render_select() {  # redraw the checkbox list in place on /dev/tty
     printf '\e[%dA' "$TUI_LINES" > /dev/tty
   fi
   {
-    printf '\e[2K%s\n' "Select agents to wire  (↑/↓ move · space toggle · enter confirm · q cancel)"
-    local i mark ptr
+    printf '\e[2K %s%sAgent Quest%s %s· wire your agents%s\n' "$C_BOLD" "$C_CYAN" "$C_RESET" "$C_DIM" "$C_RESET"
+    printf '\e[2K\n'
+    local i mark
     for (( i = 0; i < TUI_N; i++ )); do
-      if [ "${TUI_CHECKED[i]}" -eq 1 ]; then mark="x"; else mark=" "; fi
-      if [ "$i" -eq "$TUI_CURSOR" ]; then ptr=">"; else ptr=" "; fi
-      printf '\e[2K%s [%s] %s\n' "$ptr" "$mark" "${TUI_AGENTS[i]}"
+      if [ "${TUI_CHECKED[i]}" -eq 1 ]; then mark="${C_GREEN}◉${C_RESET}"; else mark="${C_DIM}○${C_RESET}"; fi
+      if [ "$i" -eq "$TUI_CURSOR" ]; then
+        printf '\e[2K %s›%s %s %s%s%s\n' "$C_CYAN" "$C_RESET" "$mark" "$C_BOLD" "${TUI_AGENTS[i]}" "$C_RESET"
+      else
+        printf '\e[2K   %s %s\n' "$mark" "${TUI_AGENTS[i]}"
+      fi
     done
+    printf '\e[2K\n'
+    printf '\e[2K %s↑/↓ move · space toggle · enter confirm · q cancel%s\n' "$C_DIM" "$C_RESET"
   } > /dev/tty
-  TUI_LINES=$((TUI_N + 1))
+  TUI_LINES=$((TUI_N + 4))
+}
+
+render_confirm() {  # $@ = chosen agents → styled confirm summary to /dev/tty
+  {
+    printf '\n\e[2K %s%sWire these agents?%s\n' "$C_BOLD" "$C_CYAN" "$C_RESET"
+    printf '\e[2K\n'
+    local a
+    for a in "$@"; do
+      printf '\e[2K   %s◉%s %s\n' "$C_GREEN" "$C_RESET" "$a"
+    done
+    printf '\e[2K\n'
+    printf '\e[2K %smerges hooks into each config — a .bak backup is saved first%s\n' "$C_DIM" "$C_RESET"
+    printf '\e[2K %s[y]%s proceed   %s[n]%s cancel ' "$C_GREEN" "$C_RESET" "$C_DIM" "$C_RESET"
+  } > /dev/tty
 }
 
 cmd_select_agents() {  # $@ = candidate ids; prints chosen ids (one per line)
@@ -297,14 +323,15 @@ cmd_interactive() {
     return 0
   fi
 
-  local doit
-  printf 'Merge into their configs now (a .bak backup is written)? [y/N] ' > /dev/tty
-  read -r doit < /dev/tty || doit=""
+  render_confirm $chosen
+  local ok
+  read -r ok < /dev/tty || ok=""
+  case "$ok" in
+    y | Y | "") : ;;
+    *) return 0 ;;
+  esac
   for id in $chosen; do
-    case "$doit" in
-      y | Y) cmd_apply "$id" ;;
-      *) cmd_print "$id" ;;
-    esac
+    cmd_apply "$id"
   done
 
   for id in $chosen; do

@@ -227,8 +227,35 @@ const xyzzy = (profile: IProfile): string => {
   return "A hollow voice says 'Fool.'  ✦ The Trickster is yours — `aq class trickster`.";
 };
 
+const HELP = `Agent Quest — gamify your AI coding agent usage into an RPG
+
+Usage:  aq <command> [args]
+
+Setup
+  setup                wire your coding agent(s) (checkbox picker)
+
+Character
+  status               show your character
+  name <name>          set your name
+  class <line>         choose/advance a line (mage|ranger|rogue|sage)
+  branch <a|b>         choose your tier-4 branch
+  respec <line>        switch main line
+
+Cosmetics & deeds
+  inventory            list your loot
+  title <id>           equip a title        titles       list owned titles
+  theme <id>           equip a theme
+  namecolor <id>       equip a name color   namecolors   list owned colors
+  secrets              list unlocked secret classes
+
+  aq --help            show this help`;
+
 const main = (): void => {
   const [cmd, ...args] = process.argv.slice(2);
+  if (cmd === undefined || cmd === "--help" || cmd === "-h") {
+    console.log(HELP);
+    return;
+  }
   const profile = loadProfile(HOME);
   let out: string;
   switch (cmd) {
@@ -275,9 +302,7 @@ const main = (): void => {
       runSetup();
       return;
     default:
-      fail(
-        "Usage: aq <name|class|branch|respec|status|inventory|title|theme|namecolor|titles|namecolors|secrets|xyzzy|setup> …",
-      );
+      fail(`unknown command: ${cmd}\nRun 'aq --help' for usage.`);
   }
   console.log(out);
 };

@@ -171,3 +171,70 @@ test("interactive with no TTY and nothing detected falls back to claude-code", a
   const { stdout } = await runWire(["interactive"], home);
   expect(stdout).toContain(".claude/settings.json");
 });
+
+async function runWireKeys(args: string[], keys: string, home: string) {
+  const proc = Bun.spawn(["bash", WIRE, ...args], {
+    env: {
+      ...process.env,
+      HOME: home,
+      PATH: process.env.PATH ?? "",
+      WIRE_TUI_KEYS: keys,
+    },
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stdout = await new Response(proc.stdout).text();
+  const stderr = await new Response(proc.stderr).text();
+  const code = await proc.exited;
+  return { stdout, stderr, code };
+}
+
+test("select returns all candidates when confirmed immediately (default = all checked)", async () => {
+  const home = fakeHome();
+  const { stdout, code } = await runWireKeys(
+    ["select", "claude-code", "codex", "cursor"],
+    "\n",
+    home,
+  );
+  expect(code).toBe(0);
+  expect(stdout.trim().split("\n")).toEqual(["claude-code", "codex", "cursor"]);
+});
+
+test("select toggles off the agent under the cursor (down, space, enter)", async () => {
+  const home = fakeHome();
+  const { stdout } = await runWireKeys(
+    ["select", "claude-code", "codex", "cursor"],
+    "j \n",
+    home,
+  );
+  expect(stdout.trim().split("\n")).toEqual(["claude-code", "cursor"]);
+});
+
+test("select toggles the first agent off (space, enter)", async () => {
+  const home = fakeHome();
+  const { stdout } = await runWireKeys(
+    ["select", "claude-code", "codex", "cursor"],
+    " \n",
+    home,
+  );
+  expect(stdout.trim().split("\n")).toEqual(["codex", "cursor"]);
+});
+
+test("select cancelled with q returns nothing", async () => {
+  const home = fakeHome();
+  const { stdout, code } = await runWireKeys(
+    ["select", "claude-code", "codex"],
+    "q",
+    home,
+  );
+  expect(code).toBe(0);
+  expect(stdout.trim()).toBe("");
+});
+
+test("select with no candidates prints nothing", async () => {
+  const home = fakeHome();
+  const { stdout, code } = await runWireKeys(["select"], "\n", home);
+  expect(code).toBe(0);
+  expect(stdout.trim()).toBe("");
+});

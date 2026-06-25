@@ -218,3 +218,34 @@ test("aq setup does not re-deploy when the engine is already present", async () 
   await proc.exited;
   expect(existsSync(join(home, "adapters/MARKER"))).toBe(true); // not clobbered → no re-deploy
 });
+
+test("aq --help prints grouped help and exits 0", async () => {
+  const home = makeHome();
+  const r = await aq(home, "--help");
+  expect(r.code).toBe(0);
+  expect(r.stdout).toContain("Usage:  aq <command>");
+  expect(r.stdout).toContain("setup");
+  expect(r.stdout).toContain("status");
+  expect(r.stdout).not.toContain("xyzzy"); // easter egg stays hidden
+});
+
+test("aq -h is an alias for --help", async () => {
+  const home = makeHome();
+  const r = await aq(home, "-h");
+  expect(r.code).toBe(0);
+  expect(r.stdout).toContain("Usage:  aq <command>");
+});
+
+test("aq with no args shows help and exits 0", async () => {
+  const home = makeHome();
+  const r = await aq(home);
+  expect(r.code).toBe(0);
+  expect(r.stdout).toContain("Usage:  aq <command>");
+});
+
+test("aq with an unknown command errors and exits 1", async () => {
+  const home = makeHome();
+  const r = await aq(home, "bogus");
+  expect(r.code).toBe(1);
+  expect(r.stderr).toContain("unknown command: bogus");
+});

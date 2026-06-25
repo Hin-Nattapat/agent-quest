@@ -147,6 +147,148 @@ cmd_apply_hud() {  # $1 = agent
   echo "✓ HUD statusline wired for $1"
 }
 
+ACTION=""
+TUI_AGENTS=()
+TUI_CHECKED=()
+TUI_N=0
+TUI_CURSOR=0
+TUI_INJECT=0
+TUI_KEYS=""
+TUI_POS=0
+TUI_LINES=0
+
+C_RESET=$'\e[0m'
+C_BOLD=$'\e[1m'
+C_DIM=$'\e[2m'
+C_CYAN=$'\e[36m'
+C_GREEN=$'\e[32m'
+
+classify_key() {  # $1 = char → sets ACTION
+  case "$1" in
+    j | J) ACTION=DOWN ;;
+    k | K) ACTION=UP ;;
+    ' ') ACTION=TOGGLE ;;
+    '' | $'\n' | $'\r') ACTION=CONFIRM ;;
+    q | Q | $'\e') ACTION=CANCEL ;;
+    *) ACTION=NOP ;;
+  esac
+}
+
+read_action() {  # sets ACTION from /dev/tty, or from TUI_KEYS when injecting
+  if [ "$TUI_INJECT" -eq 1 ]; then
+    if [ "$TUI_POS" -ge "${#TUI_KEYS}" ]; then
+      ACTION=EOF
+      return
+    fi
+    local c="${TUI_KEYS:$TUI_POS:1}"
+    TUI_POS=$((TUI_POS + 1))
+    classify_key "$c"
+    return
+  fi
+  local c rest
+  IFS= read -rsn1 c < /dev/tty || c=''
+  if [ "$c" = $'\e' ]; then
+    # Integer timeout only — macOS ships bash 3.2, which rejects fractional -t (e.g. 0.05).
+    # An arrow's "[A"/"[B" is already buffered so this returns instantly; a bare ESC waits 1s.
+    IFS= read -rsn2 -t 1 rest < /dev/tty || rest=''
+    case "$rest" in
+      '[A') ACTION=UP ;;
+      '[B') ACTION=DOWN ;;
+      *) ACTION=CANCEL ;;
+    esac
+    return
+  fi
+  classify_key "$c"
+}
+
+render_select() {  # redraw the checkbox list in place on /dev/tty
+  if [ "$TUI_LINES" -gt 0 ]; then
+    printf '\e[%dA' "$TUI_LINES" > /dev/tty
+  fi
+  {
+    printf '\e[2K %s%sAgent Quest%s %s· wire your agents%s\n' "$C_BOLD" "$C_CYAN" "$C_RESET" "$C_DIM" "$C_RESET"
+    printf '\e[2K\n'
+    local i mark
+    for (( i = 0; i < TUI_N; i++ )); do
+      if [ "${TUI_CHECKED[i]}" -eq 1 ]; then mark="${C_GREEN}◉${C_RESET}"; else mark="${C_DIM}○${C_RESET}"; fi
+      if [ "$i" -eq "$TUI_CURSOR" ]; then
+        printf '\e[2K %s›%s %s %s%s%s\n' "$C_CYAN" "$C_RESET" "$mark" "$C_BOLD" "${TUI_AGENTS[i]}" "$C_RESET"
+      else
+        printf '\e[2K   %s %s\n' "$mark" "${TUI_AGENTS[i]}"
+      fi
+    done
+    printf '\e[2K\n'
+    printf '\e[2K %s↑/↓ move · space toggle · enter confirm · q cancel%s\n' "$C_DIM" "$C_RESET"
+  } > /dev/tty
+  TUI_LINES=$((TUI_N + 4))
+}
+
+render_confirm() {  # $@ = chosen agents → styled confirm prompt to /dev/tty (no list)
+  local list
+  list="$(printf '%s, ' "$@")"
+  list="${list%, }"
+  {
+    printf '\n\e[2K %s%sWire %s?%s %s(.bak backup saved first)%s\n' "$C_BOLD" "$C_CYAN" "$list" "$C_RESET" "$C_DIM" "$C_RESET"
+    printf '\e[2K %s[y]%s proceed   %s[n]%s cancel ' "$C_GREEN" "$C_RESET" "$C_DIM" "$C_RESET"
+  } > /dev/tty
+}
+
+cmd_select_agents() {  # $@ = candidate ids; prints chosen ids (one per line)
+  TUI_AGENTS=("$@")
+  TUI_N=${#TUI_AGENTS[@]}
+  if [ "$TUI_N" -eq 0 ]; then
+    return 0
+  fi
+  TUI_CHECKED=()
+  local i
+  for (( i = 0; i < TUI_N; i++ )); do TUI_CHECKED[i]=1; done
+  TUI_CURSOR=0
+  TUI_POS=0
+  TUI_LINES=0
+  if [ -n "${WIRE_TUI_KEYS+x}" ]; then
+    TUI_INJECT=1
+    TUI_KEYS="$WIRE_TUI_KEYS"
+  else
+    TUI_INJECT=0
+  fi
+
+  local saved=""
+  if [ "$TUI_INJECT" -eq 0 ]; then
+    saved="$(stty -g < /dev/tty)"
+    trap 'stty "$saved" < /dev/tty 2>/dev/null' EXIT INT TERM
+    stty -echo -icanon < /dev/tty
+  fi
+
+  local cancelled=0
+  while true; do
+    if [ "$TUI_INJECT" -eq 0 ]; then render_select; fi
+    read_action
+    case "$ACTION" in
+      UP) TUI_CURSOR=$(( (TUI_CURSOR - 1 + TUI_N) % TUI_N )) ;;
+      DOWN) TUI_CURSOR=$(( (TUI_CURSOR + 1) % TUI_N )) ;;
+      TOGGLE) TUI_CHECKED[TUI_CURSOR]=$(( 1 - TUI_CHECKED[TUI_CURSOR] )) ;;
+      CONFIRM) break ;;
+      CANCEL | EOF) cancelled=1; break ;;
+      *) : ;;
+    esac
+  done
+
+  if [ "$TUI_INJECT" -eq 0 ]; then
+    stty "$saved" < /dev/tty 2>/dev/null || true
+    trap - EXIT INT TERM
+    printf '\n' > /dev/tty
+  fi
+
+  if [ "$cancelled" -eq 1 ]; then
+    return 0
+  fi
+  for (( i = 0; i < TUI_N; i++ )); do
+    if [ "${TUI_CHECKED[i]}" -eq 1 ]; then
+      echo "${TUI_AGENTS[i]}"
+    fi
+  done
+}
+
 # macOS: /dev/tty has rw permission bits even with no controlling terminal, so we
 # must attempt to open it rather than relying on [ -r/-w ] permission checks.
 has_tty() { ( exec 3>/dev/tty ) 2>/dev/null; }
@@ -166,32 +308,38 @@ cmd_interactive() {
     return 0
   fi
 
-  if [ -z "$detected" ]; then
-    detected="$(list_agents)"
+  local candidates="$detected"
+  if [ -z "$candidates" ]; then
+    candidates="$(list_agents)"
   fi
-  echo "Detected agents: $(echo "$detected" | tr '\n' ' ')" > /dev/tty
-  for id in $detected; do
-    printf 'Wire %s? [y/N] ' "$id" > /dev/tty
-    local ans; read -r ans < /dev/tty || ans=""
-    case "$ans" in
-      y | Y)
-        printf '  Merge into its config now (a .bak backup is written)? [y/N] ' > /dev/tty
-        local doit; read -r doit < /dev/tty || doit=""
-        case "$doit" in
-          y | Y) cmd_apply "$id" ;;
-          *) cmd_print "$id" ;;
-        esac
-        if hud_enabled "$id"; then
-          printf '  Enable the HUD statusline too? [y/N] ' > /dev/tty
-          local hud; read -r hud < /dev/tty || hud=""
-          case "$hud" in
-            y | Y) cmd_apply_hud "$id" ;;
-            *) : ;;
-          esac
-        fi
-        ;;
-      *) : ;;
-    esac
+
+  local chosen
+  chosen="$(cmd_select_agents $candidates)"
+  if [ -z "$chosen" ]; then
+    return 0
+  fi
+
+  render_confirm $chosen
+  local ok
+  read -r ok < /dev/tty || ok=""
+  case "$ok" in
+    y | Y | "") : ;;
+    *) return 0 ;;
+  esac
+  for id in $chosen; do
+    cmd_apply "$id"
+  done
+
+  for id in $chosen; do
+    if hud_enabled "$id"; then
+      printf 'Enable HUD statusline for %s? [y/N] ' "$id" > /dev/tty
+      local hud
+      read -r hud < /dev/tty || hud=""
+      case "$hud" in
+        y | Y) cmd_apply_hud "$id" ;;
+        *) : ;;
+      esac
+    fi
   done
 }
 
@@ -205,7 +353,8 @@ main() {
     print-hud) cmd_print_hud "$1" ;;
     apply-hud) cmd_apply_hud "$1" ;;
     interactive) cmd_interactive ;;
-    *) echo "usage: wire.sh detect|print|apply|print-hud|apply-hud|interactive [agent]" >&2; exit 2 ;;
+    select) cmd_select_agents "$@" ;;
+    *) echo "usage: wire.sh detect|print|apply|print-hud|apply-hud|interactive|select [agent...]" >&2; exit 2 ;;
   esac
 }
 

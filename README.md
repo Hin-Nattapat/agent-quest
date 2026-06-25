@@ -74,45 +74,21 @@ quietly judging your commit messages.
 
 *(This is the part with no jokes. We take installation seriously.)*
 
-**Homebrew** (macOS / Linux):
+**1 — Install the engine + CLI** (macOS / Linux, via [Homebrew](https://brew.sh)):
 
 ```bash
-brew install Hin-Nattapat/agent-quest/agent-quest
+brew tap Hin-Nattapat/tap
+brew install agent-quest
 aq setup
 ```
 
-`brew install` puts the `aq` command on your `PATH`; `aq setup` deploys the engine to
-`~/.agentrpg` on first run and then wires your coding agent(s). Re-run `aq setup` after a
-`brew upgrade` to refresh the deployed engine.
+`brew install` puts the `aq` command on your `PATH` (and pulls in `bun` + `jq`). `aq setup`
+deploys the engine to `~/.agentrpg` on first run, then shows a checkbox picker to wire your
+coding agent(s) — Claude Code, Codex, Cursor, or Copilot — merging the hooks into each agent's
+config (a `.bak` backup is written first) with an opt-in Claude Code statusline. Re-run
+`aq setup` any time (e.g. after a `brew upgrade`) to refresh the engine or wire more agents.
 
-**1 — Install the engine** (hooks + reducer + CLI):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Hin-Nattapat/agent-quest/main/scripts/bootstrap.sh | bash
-```
-
-This clones the repo, deploys into `~/.agentrpg`, and prints a Claude Code settings snippet.
-
-**Choose your agent(s).** By default the installer wires Claude Code. To pick others (Codex,
-Cursor, Copilot) or to let it merge the config for you automatically:
-
-```bash
-# interactive — detects installed agents and asks
-bash tools/install.sh
-
-# non-interactive (also works piped):
-curl -fsSL …/bootstrap.sh | bash -s -- --agent claude-code,cursor --apply --hud
-```
-
-`--apply` merges the wiring into each agent's config (writing a `.bak` first); without it the
-installer just prints the snippet to paste. `--hud` / `--no-hud` controls the Claude Code
-statusline (other agents render via the companion panel). Re-run the picker any time with
-`aq setup`.
-
-**2 — Wire Claude Code:** merge the printed `hooks` + `statusLine` snippet into
-`~/.claude/settings.json`.
-
-**3 — Install the companion panel:** search **"Agent Quest"** in the VS Code Extensions view, or:
+**2 — Install the companion panel:** search **"Agent Quest"** in the VS Code Extensions view, or:
 
 ```bash
 code --install-extension NattaP.agent-quest
@@ -122,11 +98,12 @@ Reload the window, start a Claude Code session, and open the **Agent Quest** pan
 Output). It updates live as you work. That's the whole setup.
 
 <details>
-<summary>Prefer to install from source / build the extension yourself?</summary>
+<summary>Prefer to install from source (for development)?</summary>
 
 ```bash
 git clone https://github.com/Hin-Nattapat/agent-quest && cd agent-quest
-bash tools/install.sh            # deploy engine to ~/.agentrpg (then merge the printed snippet)
+bash tools/install.sh --link     # symlink the engine into ~/.agentrpg; add ~/.agentrpg/bin to PATH
+aq setup                         # wire your agent(s)
 cd app/extension && npm install && npm run reinstall   # build + install the .vsix locally
 ```
 

@@ -20,15 +20,17 @@ Works with **Claude Code**, **Codex**, and **Cursor** — one shared hero across
   <img src="https://raw.githubusercontent.com/Hin-Nattapat/agent-quest/main/docs/assets/screenshot.png" alt="The Agent Quest companion panel in VS Code" width="820">
 </p>
 
-> **🧩 Needs the Agent Quest engine (one line).** This panel renders `~/.agentrpg/state.json`, which
-> the Agent Quest hooks write while you work. Install the engine first:
+> **🧩 Needs the Agent Quest engine.** This panel renders `~/.agentrpg/state.json`, which the Agent
+> Quest hooks write while you work. Install the engine + CLI first (macOS / Linux):
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/Hin-Nattapat/agent-quest/main/scripts/bootstrap.sh | bash
+> brew tap Hin-Nattapat/tap
+> brew install agent-quest
+> aq setup
 > ```
 >
-> Then wire your agent (merge the printed snippet into `~/.claude/settings.json` for Claude Code; see
-> the adapters for Codex/Cursor). Full setup: <https://github.com/Hin-Nattapat/agent-quest#-install>
+> `aq setup` deploys the engine and wires your coding agent(s) — Claude Code, Codex, Cursor, or
+> Copilot. Full setup: <https://github.com/Hin-Nattapat/agent-quest#-install>
 
 ## Getting started
 

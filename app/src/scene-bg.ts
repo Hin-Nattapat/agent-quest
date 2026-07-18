@@ -16,6 +16,9 @@ export const SCENE_BGS = new Set<SceneTheme>([
   SceneTheme.ConductorsNexus,
   SceneTheme.GrandConcertVault,
   SceneTheme.MidnightRoost,
+  SceneTheme.SilentSummit,
+  SceneTheme.FoolsMirage,
+  SceneTheme.GlitchPit,
 ]);
 
 export const hasSceneBg = (theme: SceneTheme): boolean => SCENE_BGS.has(theme);

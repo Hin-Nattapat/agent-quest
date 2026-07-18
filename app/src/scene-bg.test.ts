@@ -16,7 +16,9 @@ test("hasSceneBg is true for a wired theme, false otherwise", () => {
   expect(hasSceneBg(SceneTheme.ConductorsNexus)).toBe(true);
   expect(hasSceneBg(SceneTheme.GrandConcertVault)).toBe(true);
   expect(hasSceneBg(SceneTheme.MidnightRoost)).toBe(true);
+  expect(hasSceneBg(SceneTheme.SilentSummit)).toBe(true);
+  expect(hasSceneBg(SceneTheme.FoolsMirage)).toBe(true);
+  expect(hasSceneBg(SceneTheme.GlitchPit)).toBe(true);
   expect(hasSceneBg(SceneTheme.Guild)).toBe(false);
   expect(hasSceneBg(SceneTheme.Ascendant)).toBe(false);
-  expect(hasSceneBg(SceneTheme.SilentSummit)).toBe(false); // secret realm, scene not imported yet
 });

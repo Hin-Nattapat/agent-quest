@@ -18,6 +18,7 @@ export interface IProfile {
   title?: string;
   theme?: string;
   name_color?: string;
+  companion?: string;
   xyzzy?: boolean;
 }
 

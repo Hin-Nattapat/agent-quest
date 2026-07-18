@@ -6,6 +6,7 @@ import {
   LOOT_TABLE,
   LootKind,
   Rarity,
+  TDropTable,
 } from "../../core/loot";
 
 test("rollDrop is deterministic per seed and not null for a known table", () => {
@@ -170,4 +171,37 @@ test("themes use refreshed truecolor values (no two the same)", () => {
   expect(LOOT_TABLE.golden_theme.value).toBe("38;2;255;205;20");
   expect(LOOT_TABLE.sunset_theme.value).toBe("38;2;255;106;30");
   expect(new Set(themeVals).size).toBe(themeVals.length); // all distinct
+});
+
+test("resolveCosmetics carries the companion id only when owned and equipped", () => {
+  const inv = [{ id: "sir_quacks", rarity: Rarity.Legendary, count: 1 }];
+  const on = resolveCosmetics({ profile: { companion: "sir_quacks" }, inventory: inv });
+  expect(on.companion).toBe("sir_quacks");
+  const unowned = resolveCosmetics({
+    profile: { companion: "sir_quacks" },
+    inventory: [],
+  });
+  expect(unowned.companion).toBeNull();
+  const unequipped = resolveCosmetics({ profile: {}, inventory: inv });
+  expect(unequipped.companion).toBeNull();
+  const wrongKind = resolveCosmetics({
+    profile: { companion: "rookie_title" },
+    inventory: [{ id: "rookie_title", rarity: Rarity.Common, count: 1 }],
+  });
+  expect(wrongKind.companion).toBeNull();
+});
+
+test("sir_quacks is a legendary companion and never random-drops", () => {
+  const item = LOOT_TABLE["sir_quacks"];
+  expect(item.kind).toBe(LootKind.Companion);
+  expect(item.rarity).toBe(Rarity.Legendary);
+  // Force legendary rarity every roll: a table with only legendary entries.
+  const always: TDropTable = [{ rarity: Rarity.Legendary, weight: 1 }];
+  for (let i = 0; i < 50; i++) {
+    const id = rollDrop({
+      trigger: { table: "t", seed: `s${i}` },
+      dropTables: { t: always },
+    });
+    expect(id).not.toBe("sir_quacks");
+  }
 });

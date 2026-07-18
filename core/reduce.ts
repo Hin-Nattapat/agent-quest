@@ -214,6 +214,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   const bossTriggers: ITrigger[] = [];
   const bossRate = config.boss_rate ?? DEFAULT_BOSS_RATE;
   const bossFleeRate = config.boss_flee_rate ?? DEFAULT_BOSS_FLEE_RATE;
+  let quacksEarnedTs: string | null = null;
 
   const line = profile?.line ?? null;
   const branch = profile?.branch ?? null;
@@ -330,6 +331,25 @@ export const reduce = (props: IReduceArgs): TReducedState => {
       for (const entry of boss.timeline) {
         recent = pushTimeline(recent, entry);
       }
+      // Sir Quacks-a-lot: a boss defeat inside Fool's Mirage (Trickster form at T4) tames the
+      // duck — deterministic, not a rarity roll, so the legendary is earned, never lucked into.
+      if (
+        boss.defeated === 1 &&
+        quacksEarnedTs === null &&
+        lineAt(e.ts) === SecretLine.Trickster &&
+        tierForLevel(newLevel) >= 4
+      ) {
+        quacksEarnedTs = e.ts;
+        const duck = lootTable["sir_quacks"];
+        if (duck) {
+          recent = pushTimeline(recent, {
+            kind: TimelineKind.Loot,
+            detail: duck.name,
+            rarity: duck.rarity,
+            ts: e.ts,
+          });
+        }
+      }
     }
     // newLevel is this event's post-gain level (computed above) — reuse it instead of recomputing.
     if (
@@ -381,6 +401,17 @@ export const reduce = (props: IReduceArgs): TReducedState => {
   }
   triggers.push(...bossTriggers);
   const inventoryRaw = rollInventory({ triggers, lootTable, dropTables });
+  if (quacksEarnedTs !== null && lootTable["sir_quacks"]) {
+    const already = inventoryRaw.some(i => i.id === "sir_quacks");
+    if (!already) {
+      inventoryRaw.push({
+        id: "sir_quacks",
+        rarity: lootTable["sir_quacks"].rarity,
+        count: 1,
+      });
+      inventoryRaw.sort((a, b) => a.id.localeCompare(b.id));
+    }
+  }
   const inventory = inventoryRaw.map(item => ({
     ...item,
     name: lootTable[item.id]?.name,
@@ -388,7 +419,8 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     equipped:
       item.id === profile?.title ||
       item.id === profile?.theme ||
-      item.id === profile?.name_color,
+      item.id === profile?.name_color ||
+      item.id === profile?.companion,
   }));
 
   const prelim: TReducedState = {

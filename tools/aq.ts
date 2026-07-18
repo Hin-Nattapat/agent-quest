@@ -164,6 +164,11 @@ const equip = (props: IEquipArgs): string => {
   if (!owned.has(id)) {
     fail(`You don't own "${id}".`);
   }
+  if (kind === LootKind.Companion) {
+    profile.companion = id;
+    persist(profile);
+    return `Equipped companion: ${item.name}.`;
+  }
   if (kind === LootKind.NameColor) {
     profile.name_color = id;
   } else {
@@ -179,7 +184,7 @@ const secrets = (): string => {
   );
   const registry = loadConfig(HOME).achievements ?? {};
   const hint: Record<string, string> = {
-    [SecretLine.Trickster]: "whispered, not earned",
+    [SecretLine.Trickster]: "an old magic word, first whispered in a colossal cave",
   };
   for (const def of Object.values(registry)) {
     if (def.reward?.unlocks_class) {
@@ -246,6 +251,7 @@ Cosmetics & deeds
   title <id>           equip a title        titles       list owned titles
   theme <id>           equip a theme
   namecolor <id>       equip a name color   namecolors   list owned colors
+  companion <id|none>  equip a companion
   secrets              list unlocked secret classes
 
   aq --help            show this help`;
@@ -288,6 +294,15 @@ const main = (): void => {
       break;
     case "namecolors":
       out = nameColors();
+      break;
+    case "companion":
+      if ((args[0] ?? "") === "none") {
+        delete profile.companion;
+        persist(profile);
+        out = "Companion unequipped.";
+      } else {
+        out = equip({ profile, kind: LootKind.Companion, id: args[0] ?? "" });
+      }
       break;
     case "titles":
       out = titles();

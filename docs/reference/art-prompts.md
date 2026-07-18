@@ -737,6 +737,74 @@ The Chaos Gremlin King: a cackling gremlin king on a throne of broken hardware, 
 The Jester Mirage:      a mischievous illusion jester splitting into mirror-image duplicates, harlequin pattern, playing-card confetti, whimsical (จับคู่กับ Sir Quacks-a-lot §4.5 — จะให้เป็ดยักษ์ลวงตาก็ได้) — rainbow harlequin
 ```
 
+**มอน/บอสแดนลับ — copy-paste พร้อม import** (ต่างจาก §7.2: แดนลับ**แยกดีไซน์ mob กับ boss คนละตัว** — mob **56×56** ด้านล่าง = **gen ครบแล้ว ✅ (2026-07-18) ห้ามแก้ prompt** import `--as monster:<key>` · boss **64×64** = theme ใหม่คนละตัวกับ mob ในหัวข้อถัดไป import `--as boss:<key>` · Mode **Humanoid** ทุกตัว · หันซ้าย · Add Animation: Start Frame = idle + "Keep first frame" ✓ · ~9 เฟรม)
+
+> ⚠️ **บรรยายโครงร่างกายก่อนลาย/เอฟเฟกต์** — prompt ที่มีแต่ costume/effect (pattern, confetti, shimmer) ได้หัวลอย+หมวกไม่มีตัว (Jester Mirage โดนมาแล้ว 2026-07). เปิดประโยคแรกด้วย body plan ตรง ๆ: `standing upright on two thin legs, a slender full-body figure ...` แล้วค่อยตามด้วยชุด/ของถือ · เอฟเฟกต์ฝูง (mirror duplicates) เก็บไว้ให้ attack anim ไม่ใส่ใน base
+
+`grand_concert_vault` · Conductor Spirit (mob ✅)
+
+- 🎼 monster: `a grand conductor spirit formed from a swirling orchestra of golden instruments and glowing music notes, an elegant ghostly tailcoat silhouette with a raised glowing baton, a radiant gold aura, majestic, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `hovering in place with its orchestra of golden instruments drifting in a slow circling rhythm around it, the baton held high and the glowing music notes pulsing softly, facing left, keeping its conductor form and radiant gold colors unchanged`
+- attack: `sweeping the baton forward to the left in a grand crescendo, sending its golden instruments and a burst of glowing music notes surging leftward, the body facing left the whole time, keeping its form and radiant gold colors unchanged`
+
+`midnight_roost` · Spectral Owl (mob ✅)
+
+- 🦉 monster: `a giant spectral owl with glowing crescent-moon eyes, deep-indigo feathers trailing silver stardust, a great ringed eclipse-moon glow behind it, perched and watchful, majestic, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `perched almost motionless with its indigo feathers rippling faintly and shedding silver stardust, the crescent-moon eyes blinking slowly, facing left, keeping its owl form and deep-indigo and moonlight-silver colors unchanged`
+- attack: `spreading its great wings and lunging forward to the left with talons outstretched, loosing a crescent of silver moonlight, the body facing left the whole time, keeping its form and deep-indigo and moonlight-silver colors unchanged`
+
+`silent_summit` · Stone Meditator (mob ✅)
+
+- 🗿 monster: `a serene giant stone meditation guardian, a weathered monk-like rock statue body sitting cross-legged, moss-flecked pale stone etched with softly glowing white glyph carvings, a faint calm white aura, minimalist and calm, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `sitting perfectly still in meditation, only the white glyph carvings glowing and dimming in a slow breathing pulse and faint dust drifting from its stone shoulders, facing left, keeping its seated stone form and pale stone-white colors unchanged`
+- attack: `without rising, thrusting one great stone palm forward to the left and releasing a clean expanding ring of white light, the body facing left the whole time, keeping its seated stone form and pale stone-white colors unchanged`
+
+`glitch_pit` · Gremlin Throne (mob ✅)
+
+- 👺 monster: `a cackling gremlin king lounging on a small throne of broken hardware and tangled cables, a crown of bent circuit boards, an oversized toothy grin, electric sparks and glitch artifacts crackling around it, chaotic, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `slouching on its broken-hardware throne, drumming its claws and snickering with its oversized grin, electric sparks and glitch artifacts flickering around it, facing left, keeping its gremlin form and glitch-green colors unchanged`
+- attack: `springing up from the throne and hurling a crackling ball of green glitch-lightning forward to the left with both claws, sparks bursting everywhere, the body facing left the whole time, keeping its form and glitch-green colors unchanged`
+
+`fools_mirage` · Jester Imp (mob ✅ ตัวม่วงหม่น 2026-07-18)
+
+- ✦ monster: `a mischievous illusion jester imp standing upright on two thin legs, a slender full-body figure in diamond-pattern harlequin motley, a belled two-pointed jester hat, a wide sly grin, holding a fanned hand of glowing playing cards in one hand, a faint prismatic shimmer around it, whimsical, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `swaying playfully in place juggling a few glowing playing cards, its faint mirror duplicates flickering in and out at its sides, facing left, keeping its harlequin form and rainbow colors unchanged`
+- attack: `spinning once then flinging a fanned spread of glowing playing cards forward to the left, its mirror duplicates striking in unison, the body facing left the whole time, keeping its form and rainbow colors unchanged`
+
+#### บอสแดนลับ 64×64 — theme ใหม่คนละตัวกับ mob (สร้าง character ใหม่ต่อตัว อย่าต่อยอดจาก mob)
+
+`grand_concert_vault` · **The Living Symphony** (boss — phantom virtuoso หน้ากากอุปรากร · กิมมิค: คันชักไวโอลิน = ดาบ)
+
+- 🎻 boss: `a phantom virtuoso maestro standing tall, a slender full-body figure in a flowing black-and-gold tailcoat with a white opera half-mask, playing a blazing golden violin, ribbons of glowing sheet-music swirling around it, elegant and haunting, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `swaying slowly while playing its blazing golden violin, ribbons of glowing sheet-music drifting around it, facing left, keeping its masked virtuoso form and black-and-gold colors unchanged`
+- attack: `drawing the violin bow back like a blade then slashing it forward to the left, sending a crescent shockwave of golden sheet-music ribbons, the body facing left the whole time, keeping its form and black-and-gold colors unchanged`
+
+`midnight_roost` · **The Eclipse Owl** (boss — moon warden หน้ากากนกฮูกเงิน · กิมมิค: เคียวหัวจันทรุปราคา)
+
+- 🌌 boss: `a tall slender moon warden phantom, a full-body flowing deep-indigo cloak of living night sky with silver stardust falling from its hem, a silver owl mask with glowing crescent-moon eyes, holding a long scythe-staff crowned with a glowing ringed eclipse moon, regal and silent, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `standing still as its night-sky cloak drifts like slow smoke and stardust falls from the hem, the eclipse moon on its scythe-staff glowing steadily, facing left, keeping its owl-masked warden form and indigo-silver colors unchanged`
+- attack: `sweeping the eclipse scythe-staff in a wide arc forward to the left, loosing a great crescent of silver eclipse light, the body facing left the whole time, keeping its form and indigo-silver colors unchanged`
+
+`silent_summit` · **The Stone Guardian** (boss — อสูรหินสี่กร นักรบ-พระ · กิมมิค: มือพนมนิ่ง อีกคู่ขว้างจักรรูน)
+
+- 🛕 boss: `a serene stone asura guardian standing upright with four arms, a weathered pale-stone warrior-monk body draped in flowing white robes, two inner hands pressed together in prayer and two outer hands each holding a glowing white glyph ring, a cracked stone halo floating behind its head, calm and imposing, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `standing perfectly still with its two inner hands in prayer, the glyph rings in its outer hands and the cracked halo glowing and dimming in a slow breathing pulse, facing left, keeping its four-armed stone form and pale stone-white colors unchanged`
+- attack: `hurling one glowing glyph ring forward to the left like a chakram while the inner prayer hands stay pressed together, a ring of white light rippling out, the body facing left the whole time, keeping its four-armed stone form and pale stone-white colors unchanged`
+
+`glitch_pit` · **The Chaos Gremlin King** (boss — daemon ฮู้ดสลายเป็น glitch · กิมมิค: มงกุฎลอย + แส้สายเคเบิล · ล้อฟอร์ม T4 ChaosDaemon ของ Gremlin hero)
+
+- 👿 boss: `a lean corrupted chaos daemon king, a full-body ragged hooded cloak dissolving into toxic-green glitch pixels at its edges, a bent circuit-board crown floating above the hood, glowing green eyes and a jagged grin in the darkness of the hood, one arm ending in a whip of sparking cables, menacing and chaotic, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `standing hunched as its ragged cloak flickers and dissolves into glitch pixels at the edges, the floating crown sparking and its green eyes glowing inside the hood, facing left, keeping its daemon form and glitch-green colors unchanged`
+- attack: `lashing its whip of sparking cables forward to the left in a crackling arc of green glitch-lightning, the body facing left the whole time, keeping its form and glitch-green colors unchanged`
+
+`fools_mirage` · **The Jester Mirage** (boss — ราชันเป็ดลวงตา (มุก Sir Quacks-a-lot §4.5) · กิมมิค: พัดการ์ดยักษ์กางหลังตัวแบบหางนกยูง)
+
+- 🦆 boss: `a majestic giant phantom rubber-duck monarch floating regally, a glossy mother-of-pearl duck body shimmering with prismatic light, a grand golden jester crown with bells and a long flowing harlequin royal mantle, a huge fan of glowing playing cards spread behind it like a peacock tail, calm half-lidded knowing eyes, absurd yet regal, not human, full body, centered, slightly stylized, clean 1px black outline`
+- idle: `floating regally in place as if on invisible water, the prismatic shimmer rippling across its glossy body and the fan of glowing cards behind it slowly spreading and closing, facing left, keeping its crowned duck form and pearl-rainbow colors unchanged`
+- attack: `rearing up as the card fan snaps fully open, then launching a volley of glowing playing cards forward to the left with a flick of its wing, the body facing left the whole time, keeping its form and pearl-rainbow colors unchanged`
+
+> import แต่ละแดน: `--as monster:<key>` (mob 56×56) + `--as boss:<key>` (boss 64×64) → wire: เพิ่ม theme ลง `ART_THEMES` ใน `app/src/monsters.ts` (ตารางเดียว feed ทั้ง `MONSTER_SPRITES` และ `BOSS_SPRITES`)
+
 **scene background ต่อแดน (เติม §7.B แล้ว · copy วางได้เลย)** — create-image · Sidescroller · ~400×128 (3:1) · remove-bg OFF · import `bun tools/import-art.ts <export> --as bg:<theme>` → `scenes/<theme>.png` (theme key map ใน `app/src/scene.ts` แล้ว · CSS gradient/letterbox มีอยู่)
 
 > ⚠️ **interior ที่สื่อ furniture** (concert hall, library, throne room) AI ชอบปูเฟอร์นิเจอร์เต็มพื้น → กิน "ที่ยืน". เฟรมพื้นเป็น **open/bare stage/floor**, ดันของไป **background behind / edges**, และเลี่ยงคำที่สื่อ furniture ในพื้น (เช่น "concert hall" → ใช้ "performance stage of an opera hall"). Maestro โดนมาแล้ว — prompt ด้านล่างแก้แล้ว.

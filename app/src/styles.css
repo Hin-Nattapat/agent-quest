@@ -311,13 +311,13 @@ body {
   background: linear-gradient(180deg, #0a0e24, #1a2048 60%, #2a3060);
 }
 .scene-silent_summit .sky {
-  background: linear-gradient(180deg, #2a2e34, #4a525c 55%, #6b7480);
+  background: linear-gradient(180deg, #55573f, #8a8c6e 55%, #c2c4a4);
 }
 .scene-glitch_pit .sky {
   background: linear-gradient(180deg, #0a1f0e, #143a1c 60%, #1a5a28);
 }
 .scene-fools_mirage .sky {
-  background: linear-gradient(180deg, #2a0a2a, #4a144a 50%, #6a1a5a);
+  background: linear-gradient(180deg, #a3d3dc, #ecd9c4 50%, #e8cfc4);
 }
 
 /* sprite seam: emoji via ::after today; swap to a 56×56 PixelLab sheet by setting

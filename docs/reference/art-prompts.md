@@ -435,6 +435,7 @@ dressed as an archfool, the grand mirage: a resplendent harlequin regalia with a
 ```
 a heroic rubber duck (not human) wearing tiny knight armor and a small cape, holding a toothpick sword, standing proud, full body head-to-toe, centered, clean 1px black outline, legendary joke cosmetic
 ```
+gen ที่ **32×32** · animation เดียว **idle** เท่านั้น (~9 เฟรม, ลอยยวบเบาๆ/gentle floating bob) · ทิศ **east + south** เท่านั้น · import: `bun tools/import-art.ts <export> --as companion:sir_quacks`
 
 ### 4.5.1 หมายเหตุ gen สายลับ
 

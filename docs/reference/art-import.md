@@ -25,6 +25,7 @@ own target first).
 | bg | `--as bg:<theme>` | `app/public/scenes/<theme>.png` |
 | map | `--as map:<name>` | `app/public/overworld/<name>.png` |
 | item | `--as item:<id>` | `app/public/items/<id>.png` |
+| companion | `--as companion:<name>` | `app/public/sprites/companion/<name>/{east,south}/<N>.png` (idle only) |
 
 Examples:
 

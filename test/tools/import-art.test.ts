@@ -52,6 +52,13 @@ test("parseTarget reads npc name", () => {
   expect(parseTarget("npc:elder")).toEqual({ type: AssetType.Npc, name: "elder" });
 });
 
+test("parseTarget reads companion name", () => {
+  expect(parseTarget("companion:sir_quacks")).toEqual({
+    type: AssetType.Companion,
+    name: "sir_quacks",
+  });
+});
+
 test("pickAnimDir finds monster idle/attack folders", () => {
   const names = ["idle_breathing_loop", "attack_lunge_forward"];
   expect(pickAnimDir(names, "dle")).toBe("idle_breathing_loop");

@@ -547,3 +547,73 @@ test("reduce enriches inventory items with name/kind", () => {
     expect(typeof item.kind).toBe("string");
   }
 });
+
+// curve_k 0.0034 (vs. the 7 default) puts xpForLevel(50) at 57 raw xp; 60 "read" actions (1 xp
+// each — Trickster's passive signal is always false, so no multiplier) cross tier 4 at action 57,
+// leaving a handful of later boss defeats to prove the grant doesn't repeat, while staying inside
+// the 12-entry timeline window so the Loot entry itself is still visible in `recent`.
+const t4Difficulty = { ...DEFAULT_DIFFICULTY, curve_k: 0.0034 };
+
+test("defeating a boss as Trickster T4 grants Sir Quacks-a-lot exactly once", () => {
+  const home = makeHome();
+  const acts = Array.from(
+    { length: 60 },
+    (_, i) =>
+      ({
+        ts: `2026-06-11T12:${String(i).padStart(2, "0")}:00Z`,
+        source: "claude-code",
+        session_id: "s",
+        type: "action",
+        action: "read",
+        repo: "cq",
+      }) as any,
+  );
+  const trickster = reduce({
+    events: acts,
+    config: {
+      ...loadConfig(home),
+      boss_rate: 1,
+      boss_flee_rate: 0,
+      difficulty: t4Difficulty,
+    },
+    today: "2026-06-11",
+    profile: { line: "trickster", xyzzy: true } as any,
+  });
+  expect(trickster.class?.tier).toBe(4);
+  const quacks = (trickster.inventory ?? []).filter(i => i.id === "sir_quacks");
+  expect(quacks.length).toBe(1);
+  expect(quacks[0].count).toBe(1); // many defeats, still one duck
+  expect(
+    (trickster.recent ?? []).some(
+      t => t.kind === TimelineKind.Loot && t.detail === "Sir Quacks-a-lot",
+    ),
+  ).toBe(true);
+});
+
+test("boss defeats outside Fool's Mirage never grant the duck", () => {
+  const home = makeHome();
+  const acts = Array.from(
+    { length: 60 },
+    (_, i) =>
+      ({
+        ts: `2026-06-11T12:${String(i).padStart(2, "0")}:00Z`,
+        source: "claude-code",
+        session_id: "s",
+        type: "action",
+        action: "read",
+        repo: "cq",
+      }) as any,
+  );
+  const mage = reduce({
+    events: acts,
+    config: {
+      ...loadConfig(home),
+      boss_rate: 1,
+      boss_flee_rate: 0,
+      difficulty: t4Difficulty,
+    },
+    today: "2026-06-11",
+    profile: { line: "mage", branch: "a" } as any,
+  });
+  expect((mage.inventory ?? []).some(i => i.id === "sir_quacks")).toBe(false);
+});

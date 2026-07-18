@@ -4,8 +4,10 @@ import { hasOverworldBg } from "../overworld-bg";
 import { assetUrl } from "../assets-base";
 import { useWander } from "../use-wander";
 import { useMeasuredSize } from "../use-measured-size";
+import { CompanionFacing } from "../companion";
 import OverworldHero from "./overworld-hero";
 import GuildNpc from "./guild-npc";
+import CompanionSprite from "./companion-sprite";
 
 // Decorative guild NPCs standing on the open floor in % of the locked stage. Each shows its imported
 // south-facing idle loop when present, else the emoji placeholder behind the same seam.
@@ -22,10 +24,11 @@ interface IProps {
   branch: string | null;
   activity: ActivityState;
   icon: string;
+  companion: string | null;
 }
 
 const OverworldRoom = (props: IProps) => {
-  const { line, tier, branch, activity, icon } = props;
+  const { line, tier, branch, activity, icon, companion } = props;
   const roaming = activity !== ActivityState.Rest;
   const resting = !roaming;
   const pose = useWander(roaming);
@@ -53,6 +56,14 @@ const OverworldRoom = (props: IProps) => {
       icon={icon}
     />
   );
+  const companionSprite = companion && (
+    <CompanionSprite
+      id={companion}
+      facing={CompanionFacing.South}
+      className="companion-actor companion-overworld"
+      style={{ transform: `translate(${xPx - 20}px, ${yPx + 6}px)` }}
+    />
+  );
   const zzz = resting ? (
     <div className="guild-zzz" style={{ left: `${pose.xPct}%`, top: `${pose.yPct}%` }}>
       💤
@@ -78,6 +89,7 @@ const OverworldRoom = (props: IProps) => {
             />
           ))}
           {hero}
+          {companionSprite}
           {zzz}
         </div>
       </div>
@@ -99,6 +111,7 @@ const OverworldRoom = (props: IProps) => {
         🧰
       </div>
       {hero}
+      {companionSprite}
       {zzz}
     </div>
   );

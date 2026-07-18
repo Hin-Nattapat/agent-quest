@@ -53,7 +53,11 @@ const levelFraction = (state: IState): number => {
 // "Name the Title", tinted with the player's chosen name color.
 const heroName = (state: IState): string => {
   const title = state.cosmetics?.title ? ` the ${state.cosmetics.title}` : "";
-  return colored(`${state.name || "Adventurer"}${title}`, state.cosmetics?.name_color);
+  const duck = state.cosmetics?.companion ? " 🦆" : "";
+  return colored(
+    `${state.name || "Adventurer"}${title}${duck}`,
+    state.cosmetics?.name_color,
+  );
 };
 
 // "🎼 Maestro" (or "Novice"), with a ✨ when an advancement is available.

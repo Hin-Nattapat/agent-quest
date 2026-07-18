@@ -16,6 +16,7 @@ export enum AssetType {
   Boss = "boss",
   Map = "map",
   Npc = "npc",
+  Companion = "companion",
 }
 
 export interface ITarget {
@@ -180,6 +181,34 @@ const importNpc = (rawDir: string, target: ITarget): void => {
   console.log(`npc ${target.name} -> ${out}  (idle: ${n})`);
 };
 
+// Companion export: one idle animation, east + south directions ->
+// sprites/companion/<name>/{east,south}/N.png (battle uses east, overworld south).
+const importCompanion = (rawDir: string, target: ITarget): void => {
+  const animDir = join(rawDir, "animations");
+  if (!existsSync(animDir)) {
+    throw new Error(`companion export missing animations/ in ${rawDir}`);
+  }
+  const animNames = readdirSync(animDir);
+  const stationary = /still|almost|in[_ ]?place|motionless|resting|bob/i;
+  const idle =
+    pickAnimDir(animNames, "dle") ?? animNames.find(n => stationary.test(n)) ?? null;
+  if (!idle) {
+    throw new Error(`companion export has no idle animation in ${animDir}`);
+  }
+  const out = join(PUBLIC, "sprites", "companion", target.name ?? "");
+  rmSync(out, { recursive: true, force: true });
+  for (const dir of ["east", "south"]) {
+    const src = join(animDir, idle, dir);
+    if (!existsSync(src)) {
+      throw new Error(
+        `companion export missing ${dir}/ frames in ${join(animDir, idle)}`,
+      );
+    }
+    const n = copyFrames(src, join(out, dir));
+    console.log(`companion ${target.name} ${dir} -> ${n} frames`);
+  }
+};
+
 // Monster anims may be single-direction (frames directly in the anim folder) or multi-direction
 // (frames under west/south/…). The battle mob faces the hero on the left, so prefer the west view.
 const animFrameDir = (animPath: string): string => {
@@ -238,6 +267,7 @@ const TYPES: Record<AssetType, (raw: string, target: ITarget) => void> = {
   [AssetType.Boss]: importBoss,
   [AssetType.Map]: importMap,
   [AssetType.Npc]: importNpc,
+  [AssetType.Companion]: importCompanion,
 };
 
 const USAGE = "usage: bun tools/import-art.ts <raw-folder> --as <type>:<args> [--rm]";

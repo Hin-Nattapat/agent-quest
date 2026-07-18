@@ -5,12 +5,14 @@ import { useEncounter } from "../use-encounter";
 import { useSceneDirector } from "../use-scene-director";
 import { useBossFight } from "../use-boss-fight";
 import { HeroAnim } from "../combat";
+import { CompanionFacing } from "../companion";
 import Hero from "./hero";
 import Monster from "./monster";
 import HitEffects from "./hit-effect";
 import HeroHits from "./hero-hit";
 import BossEncounter from "./boss-encounter";
 import FloatingText from "./floating-text";
+import CompanionSprite from "./companion-sprite";
 
 interface IProps {
   state: IState;
@@ -48,6 +50,13 @@ const BattleScene = (props: IProps) => {
       {!encounter && <HitEffects effects={scene.effects} />}
       <HeroHits hits={encounter ? fight.heroHits : scene.heroHits} />
       <Hero line={line} tier={tier} branch={branch} anim={heroAnim} icon={icon} />
+      {state.cosmetics?.companion && (
+        <CompanionSprite
+          id={state.cosmetics.companion}
+          facing={CompanionFacing.East}
+          className="companion-actor companion-battle"
+        />
+      )}
       <FloatingText floaters={scene.floaters} />
       {encounter && (
         <BossEncounter encounter={encounter} theme={sceneInfo.theme} fight={fight} />

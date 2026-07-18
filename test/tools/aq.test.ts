@@ -219,6 +219,57 @@ test("aq setup does not re-deploy when the engine is already present", async () 
   expect(existsSync(join(home, "adapters/MARKER"))).toBe(true); // not clobbered → no re-deploy
 });
 
+// Sir Quacks-a-lot is only granted by a deterministic boss defeat as Trickster T4 (see
+// core/reduce.ts) — it never rolls from the ordinary loot pool. Mirrors the recipe in
+// test/core/reduce.test.ts: curve_k 0.0034 puts tier 4 at ~57 raw xp, so 60 "read" actions
+// (1 xp each) cross it with boss_rate 1 guaranteeing a defeat on every action.
+function seedQuacksOwner(home: string) {
+  writeFileSync(
+    join(home, "config.json"),
+    JSON.stringify({
+      boss_rate: 1,
+      boss_flee_rate: 0,
+      difficulty: { curve_k: 0.0034 },
+    }),
+  );
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  const lines = Array.from(
+    { length: 60 },
+    (_, i) =>
+      `{"ts":"2026-06-11T12:${String(i).padStart(2, "0")}:00Z","source":"claude-code","session_id":"s","type":"action","action":"read","repo":"cq"}`,
+  );
+  writeFileSync(join(dir, "s.ndjson"), lines.join("\n") + "\n");
+  writeFileSync(
+    join(home, "profile.json"),
+    JSON.stringify({ line: "trickster", xyzzy: true }),
+  );
+}
+
+test("aq companion equips an owned duck, rejects unowned, and unequips with none", async () => {
+  const owned = makeHome();
+  seedQuacksOwner(owned);
+  const ok = await aq(owned, "companion", "sir_quacks");
+  expect(ok.code).toBe(0);
+  expect(ok.stdout).toContain("Equipped companion: Sir Quacks-a-lot.");
+  expect(profile(owned).companion).toBe("sir_quacks");
+
+  const off = await aq(owned, "companion", "none");
+  expect(off.code).toBe(0);
+  expect(off.stdout).toContain("Companion unequipped.");
+  expect(profile(owned).companion).toBeUndefined();
+
+  const unowned = makeHome();
+  const bad = await aq(unowned, "companion", "sir_quacks");
+  expect(bad.code).toBe(1);
+});
+
+test("aq secrets hints the colossal cave riddle for the trickster row", async () => {
+  const home = makeHome();
+  const r = await aq(home, "secrets");
+  expect(r.stdout).toContain("an old magic word, first whispered in a colossal cave");
+});
+
 test("aq --help prints grouped help and exits 0", async () => {
   const home = makeHome();
   const r = await aq(home, "--help");

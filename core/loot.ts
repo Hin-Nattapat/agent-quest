@@ -12,6 +12,7 @@ export enum LootKind {
   Theme = "theme",
   Skin = "skin",
   NameColor = "name_color",
+  Companion = "companion",
 }
 
 export interface ILootItem {
@@ -35,6 +36,7 @@ export interface ICosmetics {
   title: string | null;
   theme_color: string | null;
   name_color: string | null;
+  companion: string | null;
 }
 
 export const LOOT_TABLE: Record<string, ILootItem> = {
@@ -194,6 +196,12 @@ export const LOOT_TABLE: Record<string, ILootItem> = {
     kind: LootKind.NameColor,
     value: "1;38;2;255;54;255",
   },
+  sir_quacks: {
+    id: "sir_quacks",
+    name: "Sir Quacks-a-lot",
+    rarity: Rarity.Legendary,
+    kind: LootKind.Companion,
+  },
 };
 
 export type TDropTable = Array<{ rarity: Rarity; weight: number }>;
@@ -270,9 +278,13 @@ export const rollDrop = (props: IRollDropArgs): string | null => {
   const rng = seededRng(trigger.seed);
   const rarity = rollRarity(rng, dropTable);
   // Skins have no equip path yet (see ILootItem), so they never drop — keep the pool to
-  // title/theme until skin equipping exists, or they'd be dead, unusable loot.
+  // title/theme until skin equipping exists, or they'd be dead, unusable loot. Companions are
+  // grant-only, earned via deterministic grant, never random drops.
   const pool = Object.values(lootTable).filter(
-    item => item.rarity === rarity && item.kind !== LootKind.Skin,
+    item =>
+      item.rarity === rarity &&
+      item.kind !== LootKind.Skin &&
+      item.kind !== LootKind.Companion,
   );
   const item = pickItem(rng, pool);
   return item ? item.id : null;
@@ -292,6 +304,7 @@ const OWN_ONCE_KINDS: ReadonlySet<LootKind> = new Set([
   LootKind.Theme,
   LootKind.Skin,
   LootKind.NameColor,
+  LootKind.Companion,
 ]);
 
 export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
@@ -313,7 +326,7 @@ export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
 };
 
 interface IResolveCosmeticsArgs {
-  profile: { title?: string; theme?: string; name_color?: string };
+  profile: { title?: string; theme?: string; name_color?: string; companion?: string };
   inventory: IInventoryItem[];
   earnedTitles?: Record<string, string>;
   lootTable?: Record<string, ILootItem>;
@@ -336,9 +349,16 @@ export const resolveCosmetics = (props: IResolveCosmeticsArgs): ICosmetics => {
     profile.name_color && owned.has(profile.name_color)
       ? lootTable[profile.name_color]
       : null;
+  const companionId =
+    profile.companion &&
+    owned.has(profile.companion) &&
+    lootTable[profile.companion]?.kind === LootKind.Companion
+      ? profile.companion
+      : null;
   return {
     title: lootTitle ?? earnedTitle,
     theme_color: themeItem?.kind === LootKind.Theme ? (themeItem.value ?? null) : null,
     name_color: nameItem?.kind === LootKind.NameColor ? (nameItem.value ?? null) : null,
+    companion: companionId,
   };
 };

@@ -29,6 +29,7 @@ import {
   DEFAULT_BOSS_FLEE_RATE,
   type ITrigger,
   type ILootItem,
+  type IInventoryItem,
   type TDropTable,
 } from "./loot";
 import { TimelineKind, pushTimeline, type ITimelineEntry } from "./timeline";
@@ -191,31 +192,23 @@ interface IReduceArgs {
   profile?: IProfile;
 }
 
-export const reduce = (props: IReduceArgs): TReducedState => {
-  const { events, config, today, profile } = props;
-  let prompts = 0;
-  const actions: Record<string, number> = {};
-  const sessions = new Set<string>();
-  const bySource: Record<string, IGroupAcc> = {};
-  const byRepo: Record<string, IGroupAcc> = {};
-  const dates = new Set<string>();
-  const sessionInfo: Record<string, { hasFail: boolean; hasEnd: boolean }> = {};
-  let nightActions = 0;
-  let actionFails = 0;
-  let failuresRecovered = 0;
-  let asceticSeal = 0;
-  let runningRuns = 0;
-  let runningActions = 0;
-  const pendingFail = new Set<string>();
-  const cmds: Record<string, number> = {};
-  let bossOrdinal = 0;
-  let bossDefeated = 0;
-  let bossFled = 0;
-  const bossTriggers: ITrigger[] = [];
-  const bossRate = config.boss_rate ?? DEFAULT_BOSS_RATE;
-  const bossFleeRate = config.boss_flee_rate ?? DEFAULT_BOSS_FLEE_RATE;
-  let quacksEarnedTs: string | null = null;
+// Inputs every reduce phase shares, resolved once up front: config defaults, the class-epoch
+// timeline, the loot tables (config may override both), and the chronologically sorted journal.
+interface IReduceContext {
+  config: IConfig;
+  profile?: IProfile;
+  line: TLine | null;
+  branch: "a" | "b" | null;
+  lineAt: (ts: string) => TLine | null;
+  lootTable: Record<string, ILootItem>;
+  dropTables: Record<string, TDropTable>;
+  bossRate: number;
+  bossFleeRate: number;
+  sorted: INormalizedEvent[];
+}
 
+const buildContext = (props: IReduceArgs): IReduceContext => {
+  const { events, config, profile } = props;
   const line = profile?.line ?? null;
   const branch = profile?.branch ?? null;
   const classEpochs = [...(profile?.history ?? [])].sort(
@@ -237,182 +230,338 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     }
     return active;
   };
-  const lootTable = config.loot ?? LOOT_TABLE;
-  const dropTables = config.drops ?? DROP_TABLES;
-  const sorted = [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts));
-  let running = 0;
-  let recent: ITimelineEntry[] = [];
-  let prevLevel = levelFor(0, config.difficulty);
-  let prevTier = 0;
-  for (const e of sorted) {
-    const base = xpFor(e, config.weights);
-    const level = levelFor(running, config.difficulty); // from XP accrued so far (causal)
-    // tierForLevel already floors to 0 below level 5, so no explicit level guard is needed.
-    const activeLine = lineAt(e.ts);
-    const tier = activeLine != null ? tierForLevel(level) : 0;
-    const isSignal = activeLine != null && isPassiveSignal(activeLine, e);
-    const mult = isSignal && tier >= 1 ? 1 + basePct(tier, config.passive) : 1;
-    const gained = base * mult;
-    running += gained;
+  return {
+    config,
+    profile,
+    line,
+    branch,
+    lineAt,
+    lootTable: config.loot ?? LOOT_TABLE,
+    dropTables: config.drops ?? DROP_TABLES,
+    bossRate: config.boss_rate ?? DEFAULT_BOSS_RATE,
+    bossFleeRate: config.boss_flee_rate ?? DEFAULT_BOSS_FLEE_RATE,
+    sorted: [...events].sort((a, b) => tsOrder(a.ts) - tsOrder(b.ts)),
+  };
+};
 
-    // `level`/`tier` above are pre-gain (causal for this event's passive mult); the milestones below
-    // reflect the post-gain level/tier this event pushed us to.
-    const newLevel = levelFor(running, config.difficulty);
-    const newTier = line != null ? tierForLevel(newLevel) : 0;
-    for (const entry of levelMilestones({
-      prevLevel,
-      newLevel,
-      prevTier,
-      newTier,
-      line,
-      branch,
-      ts: e.ts,
-    })) {
-      recent = pushTimeline(recent, entry);
-    }
-    prevLevel = newLevel;
-    prevTier = newTier;
+interface ISessionFlags {
+  hasFail: boolean;
+  hasEnd: boolean;
+}
 
-    sessions.add(e.session_id);
-    dates.add(eventLocalDate(e.ts));
-    if (!sessionInfo[e.session_id]) {
-      sessionInfo[e.session_id] = { hasFail: false, hasEnd: false };
-    }
-    if (e.type === EventType.ActionFail) {
-      sessionInfo[e.session_id].hasFail = true;
-      actionFails++;
-    }
-    if (e.type === EventType.SessionEnd) {
-      sessionInfo[e.session_id].hasEnd = true;
-    }
-    if (e.type === EventType.Prompt) {
-      prompts++;
-    }
-    if (e.type === EventType.Action && e.action) {
-      actions[e.action] = (actions[e.action] ?? 0) + 1;
-    }
-    if (e.type === EventType.Action || e.type === EventType.ActionFail) {
-      if (isNight(e.ts)) {
-        nightActions++;
-      }
-    }
-    if (e.type === EventType.Action && e.action) {
-      runningActions++;
-      if (e.action === AgentAction.Run) {
-        runningRuns++;
-      }
-      const key = `${e.session_id}:${e.action}`;
-      if (pendingFail.has(key)) {
-        failuresRecovered++;
-        pendingFail.delete(key);
-      }
-    }
-    if (e.type === EventType.ActionFail && e.action) {
-      pendingFail.add(`${e.session_id}:${e.action}`);
-    }
-    if (e.cmd) {
-      cmds[e.cmd] = (cmds[e.cmd] ?? 0) + 1;
-    }
-    if (e.type === EventType.Action) {
-      bossOrdinal++;
-      const boss = rollBossForEvent({
-        ordinal: bossOrdinal,
-        bossRate,
-        bossFleeRate,
-        lootTable,
-        dropTables,
-        ts: e.ts,
-      });
-      bossDefeated += boss.defeated;
-      bossFled += boss.fled;
-      if (boss.trigger) {
-        bossTriggers.push(boss.trigger);
-      }
-      for (const entry of boss.timeline) {
-        recent = pushTimeline(recent, entry);
-      }
-      // Sir Quacks-a-lot: a boss defeat inside Fool's Mirage (Trickster form at T4) tames the
-      // duck — deterministic, not a rarity roll, so the legendary is earned, never lucked into.
-      if (
-        boss.defeated === 1 &&
-        quacksEarnedTs === null &&
-        lineAt(e.ts) === SecretLine.Trickster &&
-        tierForLevel(newLevel) >= 4
-      ) {
-        quacksEarnedTs = e.ts;
-        const duck = lootTable["sir_quacks"];
-        if (duck) {
-          recent = pushTimeline(recent, {
-            kind: TimelineKind.Loot,
-            detail: duck.name,
-            rarity: duck.rarity,
-            ts: e.ts,
-          });
-        }
-      }
-    }
-    // newLevel is this event's post-gain level (computed above) — reuse it instead of recomputing.
-    if (
-      asceticSeal === 0 &&
-      qualifiesAsAscetic({ level: newLevel, runningRuns, runningActions })
-    ) {
-      asceticSeal = 1;
-    }
-    tally({ groups: bySource, key: e.source, xp: gained, sessionId: e.session_id });
-    if (e.repo) {
-      tally({ groups: byRepo, key: e.repo, xp: gained, sessionId: e.session_id });
+// Everything one chronological pass over the journal yields: raw XP, the recent timeline, every
+// stats counter, and the boss/duck outcomes the later phases consume.
+interface IEventScan {
+  xpRaw: number;
+  recent: ITimelineEntry[];
+  prompts: number;
+  actionFails: number;
+  nightActions: number;
+  failuresRecovered: number;
+  asceticSeal: number;
+  bossDefeated: number;
+  bossFled: number;
+  actions: Record<string, number>;
+  cmds: Record<string, number>;
+  sessions: Set<string>;
+  dates: Set<string>;
+  sessionInfo: Record<string, ISessionFlags>;
+  bySource: Record<string, IGroupAcc>;
+  byRepo: Record<string, IGroupAcc>;
+  bossTriggers: ITrigger[];
+  quacksEarnedTs: string | null;
+}
+
+// Scan-internal bookkeeping no later phase needs: level/tier watermarks for milestone detection,
+// the open-failure ledger, the ascetic run ratio, and the boss ordinal.
+interface IScanState extends IEventScan {
+  prevLevel: number;
+  prevTier: number;
+  pendingFail: Set<string>;
+  runningRuns: number;
+  runningActions: number;
+  bossOrdinal: number;
+}
+
+interface IScanStepArgs {
+  state: IScanState;
+  ctx: IReduceContext;
+  event: INormalizedEvent;
+}
+
+interface IXpGain {
+  gained: number;
+  newLevel: number;
+}
+
+// XP for one event plus any LevelUp/Advance milestones it crossed. The pre-gain level drives the
+// passive multiplier (causal: an event cannot benefit from the level it creates); the milestones
+// report the post-gain level this event pushed us to.
+const applyXpAndMilestones = (props: IScanStepArgs): IXpGain => {
+  const { state, ctx, event } = props;
+  const base = xpFor(event, ctx.config.weights);
+  const level = levelFor(state.xpRaw, ctx.config.difficulty);
+  // tierForLevel already floors to 0 below level 5, so no explicit level guard is needed.
+  const activeLine = ctx.lineAt(event.ts);
+  const tier = activeLine != null ? tierForLevel(level) : 0;
+  const isSignal = activeLine != null && isPassiveSignal(activeLine, event);
+  const mult = isSignal && tier >= 1 ? 1 + basePct(tier, ctx.config.passive) : 1;
+  const gained = base * mult;
+  state.xpRaw += gained;
+
+  const newLevel = levelFor(state.xpRaw, ctx.config.difficulty);
+  const newTier = ctx.line != null ? tierForLevel(newLevel) : 0;
+  for (const entry of levelMilestones({
+    prevLevel: state.prevLevel,
+    newLevel,
+    prevTier: state.prevTier,
+    newTier,
+    line: ctx.line,
+    branch: ctx.branch,
+    ts: event.ts,
+  })) {
+    state.recent = pushTimeline(state.recent, entry);
+  }
+  state.prevLevel = newLevel;
+  state.prevTier = newTier;
+  return { gained, newLevel };
+};
+
+// Session membership, per-day activity, and every simple counter a single event can bump.
+const recordEventStats = (state: IScanState, e: INormalizedEvent): void => {
+  state.sessions.add(e.session_id);
+  state.dates.add(eventLocalDate(e.ts));
+  if (!state.sessionInfo[e.session_id]) {
+    state.sessionInfo[e.session_id] = { hasFail: false, hasEnd: false };
+  }
+  if (e.type === EventType.ActionFail) {
+    state.sessionInfo[e.session_id].hasFail = true;
+    state.actionFails++;
+  }
+  if (e.type === EventType.SessionEnd) {
+    state.sessionInfo[e.session_id].hasEnd = true;
+  }
+  if (e.type === EventType.Prompt) {
+    state.prompts++;
+  }
+  if (e.type === EventType.Action && e.action) {
+    state.actions[e.action] = (state.actions[e.action] ?? 0) + 1;
+  }
+  if (e.type === EventType.Action || e.type === EventType.ActionFail) {
+    if (isNight(e.ts)) {
+      state.nightActions++;
     }
   }
+  if (e.type === EventType.Action && e.action) {
+    state.runningActions++;
+    if (e.action === AgentAction.Run) {
+      state.runningRuns++;
+    }
+    const key = `${e.session_id}:${e.action}`;
+    if (state.pendingFail.has(key)) {
+      state.failuresRecovered++;
+      state.pendingFail.delete(key);
+    }
+  }
+  if (e.type === EventType.ActionFail && e.action) {
+    state.pendingFail.add(`${e.session_id}:${e.action}`);
+  }
+  if (e.cmd) {
+    state.cmds[e.cmd] = (state.cmds[e.cmd] ?? 0) + 1;
+  }
+};
 
-  const xp_total = Math.round(running);
-  const prog = levelProgress(xp_total, config.difficulty);
-  const streak = computeStreak([...dates], today);
+interface IBossStepArgs extends IScanStepArgs {
+  newLevel: number;
+}
 
-  const classTier = line ? tierForLevel(prog.level) : 0;
-  const classState: IClassState = {
+// A boss may spawn on any Action. A defeat queues its loot trigger, and a defeat won inside
+// Fool's Mirage (Trickster form at T4) tames Sir Quacks-a-lot — deterministic, not a rarity roll,
+// so the legendary is earned, never lucked into.
+const rollBossAndDuck = (props: IBossStepArgs): void => {
+  const { state, ctx, event, newLevel } = props;
+  if (event.type !== EventType.Action) {
+    return;
+  }
+  state.bossOrdinal++;
+  const boss = rollBossForEvent({
+    ordinal: state.bossOrdinal,
+    bossRate: ctx.bossRate,
+    bossFleeRate: ctx.bossFleeRate,
+    lootTable: ctx.lootTable,
+    dropTables: ctx.dropTables,
+    ts: event.ts,
+  });
+  state.bossDefeated += boss.defeated;
+  state.bossFled += boss.fled;
+  if (boss.trigger) {
+    state.bossTriggers.push(boss.trigger);
+  }
+  for (const entry of boss.timeline) {
+    state.recent = pushTimeline(state.recent, entry);
+  }
+  if (
+    boss.defeated === 1 &&
+    state.quacksEarnedTs === null &&
+    ctx.lineAt(event.ts) === SecretLine.Trickster &&
+    tierForLevel(newLevel) >= 4
+  ) {
+    state.quacksEarnedTs = event.ts;
+    const duck = ctx.lootTable["sir_quacks"];
+    if (duck) {
+      state.recent = pushTimeline(state.recent, {
+        kind: TimelineKind.Loot,
+        detail: duck.name,
+        rarity: duck.rarity,
+        ts: event.ts,
+      });
+    }
+  }
+};
+
+const sealAsceticIfEarned = (state: IScanState, newLevel: number): void => {
+  const qualifies = qualifiesAsAscetic({
+    level: newLevel,
+    runningRuns: state.runningRuns,
+    runningActions: state.runningActions,
+  });
+  if (state.asceticSeal === 0 && qualifies) {
+    state.asceticSeal = 1;
+  }
+};
+
+// The single chronological pass over the journal. Per event, in order: XP and its milestones,
+// the stat counters, the boss roll (which needs this event's post-gain level), the ascetic seal
+// check (which needs the counters this event just bumped), then the per-source/repo XP tallies.
+const scanEvents = (ctx: IReduceContext): IEventScan => {
+  const state: IScanState = {
+    xpRaw: 0,
+    recent: [],
+    prompts: 0,
+    actionFails: 0,
+    nightActions: 0,
+    failuresRecovered: 0,
+    asceticSeal: 0,
+    bossDefeated: 0,
+    bossFled: 0,
+    actions: {},
+    cmds: {},
+    sessions: new Set(),
+    dates: new Set(),
+    sessionInfo: {},
+    bySource: {},
+    byRepo: {},
+    bossTriggers: [],
+    quacksEarnedTs: null,
+    prevLevel: levelFor(0, ctx.config.difficulty),
+    prevTier: 0,
+    pendingFail: new Set(),
+    runningRuns: 0,
+    runningActions: 0,
+    bossOrdinal: 0,
+  };
+  for (const event of ctx.sorted) {
+    const { gained, newLevel } = applyXpAndMilestones({ state, ctx, event });
+    recordEventStats(state, event);
+    rollBossAndDuck({ state, ctx, event, newLevel });
+    sealAsceticIfEarned(state, newLevel);
+    tally({
+      groups: state.bySource,
+      key: event.source,
+      xp: gained,
+      sessionId: event.session_id,
+    });
+    if (event.repo) {
+      tally({
+        groups: state.byRepo,
+        key: event.repo,
+        xp: gained,
+        sessionId: event.session_id,
+      });
+    }
+  }
+  return state;
+};
+
+interface IClassStateArgs {
+  ctx: IReduceContext;
+  level: number;
+  events: INormalizedEvent[];
+}
+
+const buildClassState = (props: IClassStateArgs): IClassState => {
+  const { ctx, level, events } = props;
+  const { line, branch, config } = ctx;
+  const tier = line ? tierForLevel(level) : 0;
+  return {
     line,
-    tier: classTier,
-    form: formFor({ line, tier: classTier, branch }),
+    tier,
+    form: formFor({ line, tier, branch }),
     icon: iconFor(line),
     branch,
     affinity: computeAffinity(events),
-    advancement_pending: advancementPending({ line, level: prog.level, branch }),
-    base_passive_pct: basePct(classTier, config.passive),
+    advancement_pending: advancementPending({ line, level, branch }),
+    base_passive_pct: basePct(tier, config.passive),
     tree: classTree(line),
   };
+};
 
+interface ILootTriggersArgs {
+  scan: IEventScan;
+  level: number;
+  bestStreakDays: number;
+}
+
+// Every seeded loot roll the journal has earned: one per clean session close, one per level-up,
+// one per streak milestone, plus each boss defeat's queued trigger.
+const collectLootTriggers = (props: ILootTriggersArgs): ITrigger[] => {
+  const { scan, level, bestStreakDays } = props;
   const triggers: ITrigger[] = [];
-  for (const [sid, info] of Object.entries(sessionInfo)) {
+  for (const [sid, info] of Object.entries(scan.sessionInfo)) {
     if (info.hasEnd && !info.hasFail) {
       triggers.push({ table: "clean", seed: `clean:${sid}` });
     }
   }
-  for (let lvl = 2; lvl <= prog.level; lvl++) {
+  for (let lvl = 2; lvl <= level; lvl++) {
     triggers.push({ table: "levelup", seed: `level:${lvl}` });
   }
-  if (streak.best_days >= 7) {
+  if (bestStreakDays >= 7) {
     triggers.push({ table: "streak7", seed: "streak:7" });
   }
-  if (streak.best_days >= 30) {
+  if (bestStreakDays >= 30) {
     triggers.push({ table: "streak30", seed: "streak:30" });
   }
-  if (streak.best_days >= 100) {
+  if (bestStreakDays >= 100) {
     triggers.push({ table: "streak100", seed: "streak:100" });
   }
-  triggers.push(...bossTriggers);
-  const inventoryRaw = rollInventory({ triggers, lootTable, dropTables });
+  triggers.push(...scan.bossTriggers);
+  return triggers;
+};
+
+interface IInventoryArgs {
+  ctx: IReduceContext;
+  triggers: ITrigger[];
+  quacksEarnedTs: string | null;
+}
+
+// Rolled loot plus the deterministic duck grant, decorated with display name/kind and whether the
+// profile has each piece equipped.
+const buildInventory = (props: IInventoryArgs): IInventoryItem[] => {
+  const { ctx, triggers, quacksEarnedTs } = props;
+  const { lootTable, dropTables, profile } = ctx;
+  const rolled = rollInventory({ triggers, lootTable, dropTables });
   if (quacksEarnedTs !== null && lootTable["sir_quacks"]) {
-    const already = inventoryRaw.some(i => i.id === "sir_quacks");
+    const already = rolled.some(i => i.id === "sir_quacks");
     if (!already) {
-      inventoryRaw.push({
+      rolled.push({
         id: "sir_quacks",
         rarity: lootTable["sir_quacks"].rarity,
         count: 1,
       });
-      inventoryRaw.sort((a, b) => a.id.localeCompare(b.id));
+      rolled.sort((a, b) => a.id.localeCompare(b.id));
     }
   }
-  const inventory = inventoryRaw.map(item => ({
+  return rolled.map(item => ({
     ...item,
     name: lootTable[item.id]?.name,
     kind: lootTable[item.id]?.kind,
@@ -422,6 +571,78 @@ export const reduce = (props: IReduceArgs): TReducedState => {
       item.id === profile?.name_color ||
       item.id === profile?.companion,
   }));
+};
+
+const collectEarnedTitles = (
+  registry: Record<string, IAchievementDef>,
+  earned: string[],
+): Record<string, string> => {
+  const titles: Record<string, string> = {};
+  for (const id of earned) {
+    const title = registry[id]?.reward?.title;
+    if (title) {
+      titles[id] = title;
+    }
+  }
+  return titles;
+};
+
+interface IDeedSummary {
+  id: string;
+  name: string;
+  desc: string;
+  points: number;
+}
+
+interface ICodex {
+  earned_detail: IDeedSummary[];
+  locked: IDeedSummary[];
+  secret: number;
+}
+
+interface ICodexArgs {
+  registry: Record<string, IAchievementDef>;
+  earned: string[];
+}
+
+// Split the not-yet-earned deeds: visible ones become "locked goals" (with criteria), hidden ones
+// stay an opaque "??? secret" count so the codex shows what to chase without spoiling easter eggs.
+const buildCodex = (props: ICodexArgs): ICodex => {
+  const { registry, earned } = props;
+  const earned_detail = earned.map(id => ({
+    id,
+    name: registry[id]?.name ?? id,
+    desc: registry[id]?.desc ?? "",
+    points: registry[id]?.points ?? 0,
+  }));
+  const earnedSet = new Set(earned);
+  const unearned = Object.entries(registry).filter(([id]) => !earnedSet.has(id));
+  const locked = unearned
+    .filter(([, def]) => !def.hidden)
+    .map(([id, def]) => ({ id, name: def.name, desc: def.desc, points: def.points }));
+  const secret = unearned.filter(([, def]) => def.hidden).length;
+  return { earned_detail, locked, secret };
+};
+
+export const reduce = (props: IReduceArgs): TReducedState => {
+  const { events, config, today, profile } = props;
+  const ctx = buildContext(props);
+  const scan = scanEvents(ctx);
+
+  const xp_total = Math.round(scan.xpRaw);
+  const prog = levelProgress(xp_total, config.difficulty);
+  const streak = computeStreak([...scan.dates], today);
+  const classState = buildClassState({ ctx, level: prog.level, events });
+  const triggers = collectLootTriggers({
+    scan,
+    level: prog.level,
+    bestStreakDays: streak.best_days,
+  });
+  const inventory = buildInventory({
+    ctx,
+    triggers,
+    quacksEarnedTs: scan.quacksEarnedTs,
+  });
 
   const prelim: TReducedState = {
     version: 1,
@@ -430,78 +651,59 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     xp_in_level: prog.xp_in_level,
     xp_to_next: prog.xp_to_next,
     stats: {
-      prompts,
-      actions,
-      sessions: sessions.size,
-      by_source: toGroupStats(bySource),
-      by_repo: toGroupStats(byRepo),
-      night_actions: nightActions,
-      failures_recovered: failuresRecovered,
-      ascetic_seal: asceticSeal,
-      cmds,
-      boss_defeated: bossDefeated,
-      boss_fled: bossFled,
-      action_fails: actionFails,
+      prompts: scan.prompts,
+      actions: scan.actions,
+      sessions: scan.sessions.size,
+      by_source: toGroupStats(scan.bySource),
+      by_repo: toGroupStats(scan.byRepo),
+      night_actions: scan.nightActions,
+      failures_recovered: scan.failuresRecovered,
+      ascetic_seal: scan.asceticSeal,
+      cmds: scan.cmds,
+      boss_defeated: scan.bossDefeated,
+      boss_fled: scan.bossFled,
+      action_fails: scan.actionFails,
     },
     streak,
     class: classState,
     inventory,
-    recent,
+    recent: scan.recent,
   };
   if (profile?.name) {
     prelim.name = profile.name;
   }
-  const lastEv = sorted[sorted.length - 1];
-  if (lastEv) {
-    prelim.last_event = { ts: lastEv.ts, type: lastEv.type, source: lastEv.source };
+  const lastEvent = ctx.sorted[ctx.sorted.length - 1];
+  if (lastEvent) {
+    prelim.last_event = {
+      ts: lastEvent.ts,
+      type: lastEvent.type,
+      source: lastEvent.source,
+    };
   }
+
+  // Achievements are judged against the prelim state; the advance option is resolved after them so
+  // it can offer any secret line those achievements just unlocked.
+  const registry = config.achievements ?? {};
   const achievements = evaluateAchievements(prelim, config.achievements);
-  const unlocked = collectUnlocks({
-    earned: achievements.earned,
-    registry: config.achievements ?? {},
-    profile,
-  });
+  const unlocked = collectUnlocks({ earned: achievements.earned, registry, profile });
   classState.advance = advanceOption({
-    line,
+    line: ctx.line,
     level: prog.level,
-    branch,
+    branch: ctx.branch,
     unlockedSecrets: unlocked as string[],
   });
-  const registry = config.achievements ?? {};
-  const earnedTitles: Record<string, string> = {};
-  for (const id of achievements.earned) {
-    const title = registry[id]?.reward?.title;
-    if (title) {
-      earnedTitles[id] = title;
-    }
-  }
   const cosmetics = resolveCosmetics({
     profile: profile ?? {},
     inventory,
-    earnedTitles,
-    lootTable,
+    earnedTitles: collectEarnedTitles(registry, achievements.earned),
+    lootTable: ctx.lootTable,
   });
-  const earned_detail = achievements.earned.map(id => ({
-    id,
-    name: registry[id]?.name ?? id,
-    desc: registry[id]?.desc ?? "",
-    points: registry[id]?.points ?? 0,
-  }));
-  // Split the not-yet-earned deeds: visible ones become "locked goals" (with criteria), hidden ones
-  // stay an opaque "??? secret" count so the codex shows what to chase without spoiling easter eggs.
-  const earnedSet = new Set(achievements.earned);
-  const unearned = Object.entries(registry).filter(([id]) => !earnedSet.has(id));
-  const locked = unearned
-    .filter(([, def]) => !def.hidden)
-    .map(([id, def]) => ({ id, name: def.name, desc: def.desc, points: def.points }));
-  const secret = unearned.filter(([, def]) => def.hidden).length;
+  const codex = buildCodex({ registry, earned: achievements.earned });
   return {
     ...prelim,
     achievements: {
       ...achievements,
-      earned_detail,
-      locked,
-      secret,
+      ...codex,
       total: Object.keys(registry).length,
     },
     cosmetics,

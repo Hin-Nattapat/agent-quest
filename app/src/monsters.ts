@@ -45,6 +45,11 @@ const ART_THEMES: SceneTheme[] = [
   SceneTheme.NoirCrimeScene,
   SceneTheme.OraclesAthenaeum,
   SceneTheme.ConductorsNexus,
+  SceneTheme.GrandConcertVault,
+  SceneTheme.MidnightRoost,
+  SceneTheme.SilentSummit,
+  SceneTheme.GlitchPit,
+  SceneTheme.FoolsMirage,
 ];
 const ART_FRAMES = 9;
 

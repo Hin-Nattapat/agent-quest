@@ -43,3 +43,17 @@ test("starter themes (T1-T3) resolve to 9+9 frame sets", () => {
     "/sprites/monsters/grassland/idle/0.png",
   );
 });
+
+test("secret-realm themes resolve to 9+9 frame sets", () => {
+  const secret = [
+    SceneTheme.GrandConcertVault,
+    SceneTheme.MidnightRoost,
+    SceneTheme.SilentSummit,
+    SceneTheme.GlitchPit,
+    SceneTheme.FoolsMirage,
+  ];
+  for (const theme of secret) {
+    expect(monsterSet(theme)?.idle.length).toBe(9);
+    expect(monsterSet(theme)?.attack.length).toBe(9);
+  }
+});

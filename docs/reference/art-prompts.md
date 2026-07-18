@@ -16,7 +16,7 @@
 | 6 | ลำดับทำจริง |
 | 7 | ฉาก + มอนสเตอร์ + บอส + กิลด์/NPC |
 
-> **สถานะ pipeline (อัปเดต):** importer รองรับ `hero` · `monster` · `boss` · `bg` · `map` · `npc` · `item` ครบแล้ว (ดู `art-import.md`). ของที่ยังเป็น emoji/gradient placeholder = **Novice (ตัวเริ่มต้น)** + **5 แดนลับ secret-class** (hero/monster/boss/scene). สายหลัก mage/ranger/rogue/sage + 11 ฉาก/มอน/บอส (starter + T4 สายหลัก) + guild map + NPC = **ทำแล้ว**.
+> **สถานะ pipeline (อัปเดต 2026-07-18):** importer รองรับ `hero` · `monster` · `boss` · `bg` · `map` · `npc` · `item` ครบแล้ว (ดู `art-import.md`). **art ครบ 100% ทุกหมวด** — hero ทุกคลาสทุก tier (รวมสายลับ 5 สาย), scene bg + mob + boss ดีไซน์แยกครบ 16 แดน, guild map + NPC. ไม่เหลือ emoji/gradient placeholder (ยกเว้น Guild/Ascendant ที่เป็นไปตามดีไซน์). เหลือ optional: Sir Quacks-a-lot cosmetic (§4.5).
 
 ---
 

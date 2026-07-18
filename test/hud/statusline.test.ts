@@ -154,16 +154,41 @@ test("name + title are wrapped in the name-color ANSI when equipped", () => {
   const tail: ITail = { model: "M", cost: 0, ctx: 0 };
   const tinted = state({
     name: "Calypso",
-    cosmetics: { title: "Archmage", theme_color: null, name_color: "1;38;2;255;54;255" },
+    cosmetics: {
+      title: "Archmage",
+      theme_color: null,
+      name_color: "1;38;2;255;54;255",
+      companion: null,
+    },
   });
   const out = renderHud({ state: tinted, tail });
   expect(out).toContain("\x1b[1;38;2;255;54;255mCalypso the Archmage\x1b[0m");
 
   const plain = state({
     name: "Calypso",
-    cosmetics: { title: "Archmage", theme_color: null, name_color: null },
+    cosmetics: {
+      title: "Archmage",
+      theme_color: null,
+      name_color: null,
+      companion: null,
+    },
   });
   const plainOut = renderHud({ state: plain, tail });
   expect(plainOut).toContain("Calypso the Archmage");
   expect(plainOut).not.toContain("\x1b[1;38;2"); // no stray ANSI on the name
+});
+
+test("statusline appends the duck when a companion is equipped", () => {
+  const tail: ITail = { model: "M", cost: 0, ctx: 0 };
+  const withCompanion = state({
+    name: "Calypso",
+    cosmetics: {
+      title: "Archmage",
+      theme_color: null,
+      name_color: null,
+      companion: "sir_quacks",
+    },
+  });
+  const out = renderHud({ state: withCompanion, tail });
+  expect(out).toContain("🦆");
 });

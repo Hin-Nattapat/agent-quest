@@ -78,6 +78,7 @@ const SceneView = (props: IProps) => {
             branch={branch}
             activity={activity}
             icon={icon}
+            companion={state.cosmetics?.companion ?? null}
           />
         )}
         <PortraitFrame state={state} />

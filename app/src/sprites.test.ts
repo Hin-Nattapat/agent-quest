@@ -26,7 +26,6 @@ test("heroSpriteSet resolves every Mage form (T1-T3 + both T4 branches)", () => 
 
 test("heroSpriteSet returns undefined for forms with no art", () => {
   expect(heroSpriteSet("mage", 4, null)).toBeUndefined(); // tier 4 before a branch is chosen
-  expect(heroSpriteSet("ascetic", 1)).toBeUndefined(); // secret line, no art yet
 });
 
 test("heroSpriteSet resolves every Maestro secret form (T1-T4, branchless)", () => {
@@ -59,6 +58,28 @@ test("heroSpriteSet resolves every Gremlin secret form (T1-T4, branchless)", () 
   expect(heroSpriteSet("gremlin", 3)?.attack?.length).toBe(9);
   expect(heroSpriteSet("gremlin", 4)?.idle[Facing.West]).toBe(
     "/sprites/gremlin/t4/idle/west.png",
+  );
+});
+
+test("heroSpriteSet resolves every Ascetic secret form (T1-T4, branchless)", () => {
+  expect(heroSpriteSet("ascetic", 1)?.idle[Facing.East]).toBe(
+    "/sprites/ascetic/t1/idle/east.png",
+  );
+  expect(heroSpriteSet("ascetic", 2)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("ascetic", 3)?.attack?.length).toBe(9);
+  expect(heroSpriteSet("ascetic", 4)?.idle[Facing.West]).toBe(
+    "/sprites/ascetic/t4/idle/west.png",
+  );
+});
+
+test("heroSpriteSet resolves every Trickster secret form (T1-T4, branchless)", () => {
+  expect(heroSpriteSet("trickster", 1)?.idle[Facing.East]).toBe(
+    "/sprites/trickster/t1/idle/east.png",
+  );
+  expect(heroSpriteSet("trickster", 2)?.walk[Facing.South].length).toBe(9);
+  expect(heroSpriteSet("trickster", 3)?.attack?.length).toBe(9);
+  expect(heroSpriteSet("trickster", 4)?.idle[Facing.West]).toBe(
+    "/sprites/trickster/t4/idle/west.png",
   );
 });
 

@@ -71,6 +71,14 @@ export const HERO_SPRITES: Partial<Record<string, ISpriteSet>> = {
   "gremlin-t2": buildSet("gremlin/t2", 9, 9),
   "gremlin-t3": buildSet("gremlin/t3", 9, 9),
   "gremlin-t4": buildSet("gremlin/t4", 9, 9),
+  "ascetic-t1": buildSet("ascetic/t1", 9, 9),
+  "ascetic-t2": buildSet("ascetic/t2", 9, 9),
+  "ascetic-t3": buildSet("ascetic/t3", 9, 9),
+  "ascetic-t4": buildSet("ascetic/t4", 9, 9),
+  "trickster-t1": buildSet("trickster/t1", 9, 9),
+  "trickster-t2": buildSet("trickster/t2", 9, 9),
+  "trickster-t3": buildSet("trickster/t3", 9, 9),
+  "trickster-t4": buildSet("trickster/t4", 9, 9),
 };
 
 // At tier 4 the form branches (a/b) so the key carries it; below tier 4 the branch is ignored.

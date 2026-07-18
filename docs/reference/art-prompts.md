@@ -113,6 +113,10 @@ CSS keyframes (`styles.css` `.hero-*` / `.m-*`).
 - idle: `standing in deep stillness, eyes closed, almost perfectly motionless, only the faintest slow breath, one palm turned up with a single glyph hovering above it, facing east, keeping the plain undyed robes and stone-white colors unchanged`
 - walk: `gliding forward in slow deliberate barefoot steps, hands together in a calm prayer, the prayer beads swaying gently, keeping the plain undyed robes and stone-white colors unchanged`
 - attack: `a single calm unhurried forward palm-strike releasing a clean ring of light, facing east, keeping the plain undyed robes and stone-white colors unchanged`
+- **T4 (Enlightened) ใช้ชุดนี้แทน** — base เป็นท่านั่งขัดสมาธิลอย เดินไม่ได้ ให้ "ลอยเคลื่อนที่" ทั้งท่านั่ง:
+  - idle T4: `levitating in place in the cross-legged lotus meditation pose, almost perfectly motionless, a slow gentle bobbing float, the orbiting crystals drifting slowly, facing east, keeping the golden mandala halo and white-and-gold robes unchanged`
+  - walk T4: `gliding smoothly forward while levitating in the cross-legged lotus meditation pose, the robes and orbiting crystals trailing gently, keeping the golden mandala halo and white-and-gold colors unchanged`
+  - attack T4: `calmly extending one open palm forward from the lotus meditation pose to release a clean expanding ring of golden light, facing east, keeping the golden mandala halo and white-and-gold colors unchanged`
 
 **The Gremlin 👺 — patched gear + sparks (ซนกระตุก hyperactive)**
 - idle: `unable to keep still, twitching and fidgeting in place with a wide snickering grin, hopping foot to foot as electric sparks flicker around it, facing east, keeping the patched-up gear and glitch-green colors unchanged`
@@ -366,22 +370,22 @@ dressed as an eclipse night owl: a cosmic dark-indigo cloak swirling with a star
 T1 · Initiate
 ```
 a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as an ascetic initiate: plain undyed off-white robes, barefoot, simple wooden prayer beads, a single softly glowing glyph hovering above one open palm, off-white and stone palette
+dressed as an ascetic initiate: plain undyed off-white robes, barefoot, simple wooden prayer beads around the neck, a single softly glowing glyph hovering above one open palm, muted off-white and stone palette
 ```
 T2 · Ascetic
 ```
 a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as an ascetic: plain undyed off-white robes with a faint serene white aura, barefoot, prayer beads, two glowing glyphs floating around an open palm, calm off-white and stone palette
+dressed as an ascetic: off-white robes with a rune-inscribed sash draped over one shoulder, barefoot, the prayer beads now glowing softly white, two glowing glyphs orbiting one open palm, calm off-white and stone palette
 ```
 T3 · Hermit
 ```
 a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a hermit sage: flowing pale-stone robes with a calm glowing halo behind the head, barefoot and serene, several glowing glyphs slowly orbiting the body, gentle white light, off-white and luminous stone palette
+dressed as a hermit sage: flowing pale-stone robes with a glowing rune-sash, a calm luminous halo ring behind the head, several small stones levitating and slowly orbiting the body alongside glowing glyphs, barefoot and serene, off-white and luminous stone palette
 ```
 T4 · Enlightened
 ```
 a serene minimalist coder, adult, calm meditative expression, lean build, medium skin, shaved head, slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as an enlightened master: radiant white robes wrapped in a brilliant enlightenment aura, levitating slightly off the ground in a meditative cross-legged pose, a full ring of glowing glyphs orbiting the body, transcendent white-and-stone glow
+dressed as an enlightened master: seated levitating in a serene cross-legged lotus meditation pose, an ornate glowing golden mandala halo disc behind the head and shoulders like a Buddha statue, white monk robes with gold trim draped over one shoulder, hands resting in a calm meditation mudra, several small glowing crystals slowly orbiting the body, a soft gentle golden radiance (calm sacred light, no flames), serene white-and-gold palette
 ```
 **The Gremlin** 👺 (glitch-green) — identity: `a mischievous tiny imp-like coder (not human), wide grin, small chaotic build, green-tinted skin, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —`
 
@@ -410,12 +414,12 @@ dressed as a chaos-daemon gremlin: a larger, more monstrous corrupted form wreat
 T1 · Prankster
 ```
 a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a prankster jester: a harlequin outfit of diamond-pattern motley with a soft belled collar, fanning a small hand of glowing playing cards, a faint mirror-illusion shimmer, iridescent mother-of-pearl palette
+dressed as a prankster jester: a simple two-tone diamond-pattern motley, holding up a single glowing playing card with a sly grin, muted mother-of-pearl palette
 ```
 T2 · Trickster
 ```
 a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as a trickster jester: a shimmering harlequin motley with a belled collar, fanning glowing playing cards, a brighter iridescent shimmer and a few playing cards drifting around, mother-of-pearl rainbow palette
+dressed as a trickster jester: a shimmering harlequin motley with a belled collar and a two-pointed jester hood, fanning a full hand of glowing playing cards, short cape-tails, iridescent mother-of-pearl palette
 ```
 T3 · Illusionist
 ```
@@ -425,7 +429,7 @@ dressed as an illusionist jester: harlequin motley with faint mirror-image dupli
 T4 · Archfool
 ```
 a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
-dressed as an archfool, the grand mirage: a dazzling carnival of mirror-illusion duplicates, a storm of swirling playing-card confetti and prismatic shimmer all around, mesmerizing iridescent mother-of-pearl rainbow palette
+dressed as an archfool, the grand mirage: a resplendent harlequin regalia with a golden jester-crown and a card-topped scepter, a dazzling carnival of mirror-illusion duplicates and a storm of swirling playing-card confetti, mesmerizing iridescent rainbow palette
 ```
 **??? — Sir Quacks-a-lot** (easter egg)
 ```
@@ -436,6 +440,8 @@ a heroic rubber duck (not human) wearing tiny knight armor and a small cape, hol
 
 - **คนละ character ต่อสาย** — อย่า clone Mage (description ค้างเป็น Mage → ดู §7.C.1). สร้างใหม่ วาง T1 เต็ม
 - **ทุก tier = prompt เต็ม** (identity ครึ่งหน้าเดิม + `dressed as...` ของ tier นั้น). ถ้าใช้ Create State ก็**วางเต็ม** ไม่ใช่ delta สั้น — ไม่งั้น T2/T3 ออกมาเหมือนกัน
+- **ทุก tier ต้องมี "ของชิ้นใหม่" ที่นับ/มองเห็นได้** (item, silhouette, ตัวประกอบ) — แค่ขยับ adjective ความแรงแสง (faint→brighter) โมเดลมักเมิน และที่ 56×56 มองไม่ออก. ตัวอย่างบันได Trickster: การ์ด 1 ใบ → พัดการ์ด+collar+hood+cape-tails → duplicates+confetti → crown+scepter+storm (เทียบ Maestro: orbs → note-orbs → light-ribbons → full orchestra)
+- **เอฟเฟกต์ที่ลอยแยกจากตัว (วงแหวน/mandala หลังหัว, ของโคจรไกลตัว) มัก track ไม่ครบทุกเฟรมตอน gen anim** (เจอจริงกับ Ascetic T4 mandala 2026-07). ทางเลี่ยงคือเอฟเฟกต์**ติดตัว** (aura แนบ silhouette, ลายบนผ้า, mark บนหน้า) — แต่ระวังคำแนว "blazing/flame aura" จะออกมาเป็นซุปเปอร์ไซย่า. ถ้าจงใจเก็บของลอย (เช่น Ascetic T4 เลือก mandala แบบพุทธ + นั่งขัดสมาธิลอย) ให้บรรยายว่าอยู่ **behind the head and shoulders** ชิดตัว, ใส่ `keeping the ... halo unchanged` ในทุก anim prompt, และเผื่อ regen anim หลายรอบ. อีกทางที่อ่านง่ายที่ 56×56 คือ**เปลี่ยนโทนสีทั้งตัว** (T3 ขาวหิน → T4 ขาว-ทอง)
 - **import เหมือนสายหลัก:** `bun tools/import-art.ts <export>/T<N>_<Class> --as hero:<line>:t<N>` → wire `"<line>-t<N>": buildSet("<line>/t<N>", 9, 9)` (branchless — T4 ไม่มี a/b)
 - **"Use color palette from reference"**: ติ๊กได้ถ้า tier นั้นคุมโทนเดิม · ไม่ติ๊กถ้าเพิ่มสีใหม่ (eclipse คราม-เงิน · glitch toxic-green · prismatic rainbow)
 - **Trickster/Sir Quacks** แดน = §7.3 (Fool's Mirage). **Sir Quacks-a-lot** = cosmetic ตัวเดียว ไม่มี tier (gen ครั้งเดียวจบ)

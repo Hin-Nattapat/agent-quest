@@ -2,6 +2,7 @@ import type { IState } from "../../../core/state";
 import { displayName, passiveMultiplier, xpPercent, spriteStyle } from "../view";
 import { sourceLabel } from "../../../core/events";
 import { heroPortrait } from "../sprites";
+import { paragonBar } from "../paragon/paragon-view";
 
 interface IProps {
   state: IState;
@@ -19,6 +20,7 @@ const PortraitFrame = (props: IProps) => {
   // Real class sprite (south/front-facing) instead of the mage emoji, matching the Hero panel.
   const face = heroPortrait(klass);
   const frame = state.cosmetics?.frame ?? null;
+  const pBar = paragonBar(state.xp_to_next, state.paragon);
 
   return (
     <div className={`portrait-frame${frame ? ` frame-${frame}` : ""}`}>
@@ -40,12 +42,13 @@ const PortraitFrame = (props: IProps) => {
         </div>
         {title ? <div className="pf-title">the {title}</div> : null}
         <div className="xp-row">
-          <span className="lvl-tag">Lv.{state.level}</span>
+          <span className="lvl-tag">
+            Lv.{state.level}
+            {pBar ? <b className="pf-paragon"> {pBar.badge}</b> : null}
+          </span>
           <div className="xpbar">
-            <i style={{ width: `${xpPercent(state)}%` }} />
-            <span>
-              {state.xp_in_level} / {total}
-            </span>
+            <i style={{ width: `${pBar ? pBar.pct : xpPercent(state)}%` }} />
+            <span>{pBar ? pBar.label : `${state.xp_in_level} / ${total}`}</span>
           </div>
         </div>
         <div className="pf-chips">

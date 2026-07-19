@@ -12,12 +12,13 @@ interface IProps {
   xPx: number;
   yPx: number;
   icon: string;
+  aura: string | null;
 }
 
 const WALK_FPS = 6;
 
 const OverworldHero = (props: IProps) => {
-  const { line, tier, branch, facing, moving, xPx, yPx, icon } = props;
+  const { line, tier, branch, facing, moving, xPx, yPx, icon, aura } = props;
   const set = heroSpriteSet(line, tier, branch);
   usePreload(set);
   const frames = set ? directionalFrames(set, facing, moving) : [];
@@ -27,7 +28,7 @@ const OverworldHero = (props: IProps) => {
   };
   return (
     <div
-      className={`sprite ow-hero hero-${line}${artClass}`}
+      className={`sprite ow-hero hero-${line}${artClass}${aura ? ` aura-${aura}` : ""}`}
       style={style}
       data-emoji={icon}
       aria-label="hero"

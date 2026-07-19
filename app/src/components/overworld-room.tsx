@@ -27,11 +27,12 @@ interface IProps {
   activity: ActivityState;
   icon: string;
   companion: string | null;
+  aura: string | null;
   bestiary: IBestiaryState | undefined;
 }
 
 const OverworldRoom = (props: IProps) => {
-  const { line, tier, branch, activity, icon, companion, bestiary } = props;
+  const { line, tier, branch, activity, icon, companion, aura, bestiary } = props;
   const roaming = activity !== ActivityState.Rest;
   const resting = !roaming;
   const pose = useWander(roaming);
@@ -57,6 +58,7 @@ const OverworldRoom = (props: IProps) => {
       xPx={xPx}
       yPx={yPx}
       icon={icon}
+      aura={aura}
     />
   );
   const companionSprite = companion && (

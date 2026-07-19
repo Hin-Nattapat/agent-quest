@@ -10,12 +10,13 @@ interface IProps {
   branch: string | null;
   anim: HeroAnim;
   icon: string;
+  aura: string | null;
 }
 
 const ATTACK_FPS = 15; // ~9 attack frames over the ranged pulse (CAST_MS 600ms in the director)
 
 const Hero = (props: IProps) => {
-  const { line, tier, branch, anim, icon } = props;
+  const { line, tier, branch, anim, icon, aura } = props;
   const set = heroSpriteSet(line, tier, branch);
   usePreload(set);
   const attacking = anim === HeroAnim.Attack && Boolean(set?.attack);
@@ -30,7 +31,7 @@ const Hero = (props: IProps) => {
   const animClass = attacking && ranged ? "cast" : anim;
   return (
     <div
-      className={`sprite hero hero-${line} hero-${animClass}${artClass}`}
+      className={`sprite hero hero-${line} hero-${animClass}${artClass}${aura ? ` aura-${aura}` : ""}`}
       data-emoji={icon}
       aria-label="hero"
     >

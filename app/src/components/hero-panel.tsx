@@ -2,6 +2,7 @@ import type { IState } from "../../../core/state";
 import { displayName, spriteStyle, sourceBreakdown } from "../view";
 import { sourceLabel } from "../../../core/events";
 import { heroPortrait } from "../sprites";
+import { paragonBar } from "../paragon/paragon-view";
 
 interface IProps {
   state: IState;
@@ -17,6 +18,7 @@ const HeroPanel = (props: IProps) => {
   const totalActions = Object.values(stats.actions).reduce((a, b) => a + b, 0);
   // Real class sprite instead of a fixed mage emoji; south (front-facing) reads best as a portrait.
   const portrait = heroPortrait(klass);
+  const pBar = paragonBar(state.xp_to_next, state.paragon);
 
   return (
     <div className="panel-body hero-panel">
@@ -37,8 +39,9 @@ const HeroPanel = (props: IProps) => {
             {klass && klass.tier > 0 ? ` · T${klass.tier}` : ""}
           </div>
           <div className="hp-lvl">
-            Lv.{state.level} · +{Math.round((klass?.base_passive_pct ?? 0) * 100)}%
-            passive
+            Lv.{state.level}
+            {pBar ? <b className="pf-paragon"> {pBar.badge}</b> : null} · +
+            {Math.round((klass?.base_passive_pct ?? 0) * 100)}% passive
           </div>
         </div>
       </div>

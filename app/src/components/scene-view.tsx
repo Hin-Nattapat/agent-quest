@@ -79,6 +79,7 @@ const SceneView = (props: IProps) => {
             activity={activity}
             icon={icon}
             companion={state.cosmetics?.companion ?? null}
+            aura={state.cosmetics?.aura ?? null}
             bestiary={state.bestiary}
           />
         )}

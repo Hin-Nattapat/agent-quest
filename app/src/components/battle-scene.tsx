@@ -49,7 +49,14 @@ const BattleScene = (props: IProps) => {
         })}
       {!encounter && <HitEffects effects={scene.effects} />}
       <HeroHits hits={encounter ? fight.heroHits : scene.heroHits} />
-      <Hero line={line} tier={tier} branch={branch} anim={heroAnim} icon={icon} />
+      <Hero
+        line={line}
+        tier={tier}
+        branch={branch}
+        anim={heroAnim}
+        icon={icon}
+        aura={state.cosmetics?.aura ?? null}
+      />
       {state.cosmetics?.companion && (
         <CompanionSprite
           id={state.cosmetics.companion}

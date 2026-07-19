@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { IState } from "../../core/state";
 import { TimelineKind } from "../../core/events";
 import type { ITimelineEntry } from "../../core/timeline";
+import type { IInventoryItem } from "../../core/loot";
 import { assetUrl } from "./assets-base";
 
 // A background-image style for a sprite frame (resolved under the webview asset base), or undefined
@@ -117,4 +118,57 @@ export const sourceBreakdown = (
       pct: total === 0 ? 0 : Math.round((group.xp / total) * 100),
     }))
     .sort((a, b) => b.xp - a.xp || a.source.localeCompare(b.source));
+};
+
+// Wire kind keys, not the LootKind enum: the app may not import core game logic at runtime, and
+// these strings are already the shared contract via state.json (same precedent as realm themes).
+const KIND_ORDER: { kind: string; label: string; icon: string }[] = [
+  { kind: "title", label: "Titles", icon: "👑" },
+  { kind: "theme", label: "Themes", icon: "🎨" },
+  { kind: "name_color", label: "Name Colors", icon: "✒️" },
+  { kind: "companion", label: "Companions", icon: "🦆" },
+  { kind: "skin", label: "Skins", icon: "👕" },
+];
+
+export interface IInventoryGroup {
+  kind: string;
+  label: string;
+  icon: string;
+  items: IInventoryItem[];
+}
+
+// The inventory reads as a wardrobe instead of a flat heap: one section per cosmetic kind in a
+// fixed order, the equipped piece floated to the front, empty kinds hidden, unknown kinds folded
+// into a trailing Other section.
+export const groupInventory = (inv: IInventoryItem[]): IInventoryGroup[] => {
+  const byKind = new Map<string, IInventoryItem[]>();
+  for (const item of inv) {
+    const kind = item.kind ?? "other";
+    const known = KIND_ORDER.some(k => k.kind === kind) ? kind : "other";
+    const list = byKind.get(known) ?? [];
+    list.push(item);
+    byKind.set(known, list);
+  }
+  const equippedFirst = (items: IInventoryItem[]): IInventoryItem[] => {
+    const equipped = items.filter(i => i.equipped);
+    const rest = items.filter(i => !i.equipped);
+    return [...equipped, ...rest];
+  };
+  const groups: IInventoryGroup[] = [];
+  for (const def of KIND_ORDER) {
+    const items = byKind.get(def.kind);
+    if (items && items.length > 0) {
+      groups.push({ ...def, items: equippedFirst(items) });
+    }
+  }
+  const other = byKind.get("other");
+  if (other && other.length > 0) {
+    groups.push({
+      kind: "other",
+      label: "Other",
+      icon: "❔",
+      items: equippedFirst(other),
+    });
+  }
+  return groups;
 };

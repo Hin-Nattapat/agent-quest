@@ -8,6 +8,7 @@ import {
   cmdLabel,
   byCountDesc,
   sourceBreakdown,
+  groupInventory,
 } from "./view";
 import { TimelineKind } from "../../core/events";
 import type { IState } from "../../core/state";
@@ -98,4 +99,40 @@ test("sourceBreakdown: shares sorted desc by xp, integer pct, 0 when no xp", () 
     { source: "a", xp: 0, pct: 0 },
     { source: "b", xp: 0, pct: 0 },
   ]);
+});
+
+test("groupInventory buckets by kind in fixed order with equipped first", () => {
+  const inv = [
+    { id: "azure", rarity: "rare", count: 1, name: "Azure", kind: "name_color" },
+    { id: "rookie_title", rarity: "common", count: 1, name: "Rookie", kind: "title" },
+    {
+      id: "matrix",
+      rarity: "epic",
+      count: 1,
+      name: "Matrix",
+      kind: "theme",
+      equipped: true,
+    },
+    { id: "forest_theme", rarity: "common", count: 1, name: "Forest", kind: "theme" },
+    {
+      id: "sir_quacks",
+      rarity: "legendary",
+      count: 1,
+      name: "Sir Quacks-a-lot",
+      kind: "companion",
+    },
+  ] as any;
+  const groups = groupInventory(inv);
+  expect(groups.map(g => g.kind)).toEqual(["title", "theme", "name_color", "companion"]);
+  expect(groups[0].label).toBe("Titles");
+  expect(groups[1].items.map(i => i.id)).toEqual(["matrix", "forest_theme"]);
+});
+
+test("groupInventory hides empty kinds and folds unknown kinds into Other", () => {
+  const groups = groupInventory([
+    { id: "x", rarity: "common", count: 1, kind: "mystery" },
+  ] as any);
+  expect(groups.length).toBe(1);
+  expect(groups[0].label).toBe("Other");
+  expect(groups[0].icon).toBe("❔");
 });

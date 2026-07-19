@@ -65,3 +65,15 @@ Comment **why**, not what. No section-divider/ceremony comments. Delete a commen
 ## 7. Commits
 
 Conventional Commits, simplified prefixes: `init` · `feat` · `fix` · `refactor` · `chore` · `docs` · `style` · `test`. Imperative present tense; subject ≤ 90 chars; one logical change per commit.
+
+## 8. Feature modules
+
+A new gameplay feature lives in its own module — never spread through existing files:
+
+- **Core logic**: one file, `core/<feature>.ts` — the feature's types, constants, per-event
+  accumulator, and final state-building all live there. `core/reduce.ts` only wires it in
+  (create → record per event → build into state) and stays a thin orchestrator. Tests mirror it
+  at `test/core/<feature>.test.ts`.
+- **App UI**: a folder, `app/src/<feature>/` — the feature's components and hooks together.
+- If adding a feature would mean growing a shared file with feature-specific logic, extract the
+  module first. (Reference example: the Bestiary module.)

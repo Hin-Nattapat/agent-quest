@@ -21,6 +21,7 @@ export interface IProfile {
   name_color?: string;
   companion?: string;
   frame?: string;
+  aura?: string;
   xyzzy?: boolean;
 }
 

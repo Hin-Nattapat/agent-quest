@@ -67,8 +67,20 @@ const heroClass = (state: IState): string => {
   return cls?.advancement_pending ? `${label} ✨` : label;
 };
 
-// "Lv.5 ██████░░░░ 60%" — themed 10-cell bar, " MAX" at the level cap.
+// "Lv.5 ██████░░░░ 60%" — themed 10-cell bar; at the cap the bar tracks paragon progress as
+// "Lv.50 ✦P7 ███░░░░░░░ 30%" (or " MAX" for old states with no paragon slice).
 const xpMeter = (state: IState): string => {
+  const paragon = state.paragon;
+  if (state.xp_to_next === 0 && paragon) {
+    const span = paragon.xp_in_paragon + paragon.xp_to_next;
+    const fraction = span === 0 ? 1 : paragon.xp_in_paragon / span;
+    const filled = Math.round(fraction * 10);
+    const bar = colored(
+      "█".repeat(filled) + "░".repeat(10 - filled),
+      state.cosmetics?.theme_color,
+    );
+    return `Lv.${state.level} ✦P${paragon.level} ${bar} ${Math.round(fraction * 100)}%`;
+  }
   const fraction = levelFraction(state);
   const filled = Math.round(fraction * 10);
   const bar = colored(

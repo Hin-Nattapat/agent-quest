@@ -6,6 +6,7 @@ import { ClassLine, SecretLine, SECRET_TREE } from "../core/classes";
 import { chooseClass, respecClass, chooseBranch } from "../core/advance";
 import { LOOT_TABLE, LootKind } from "../core/loot";
 import { REALM_LABELS, CONQUEST_THRESHOLDS, REALM_TOTAL } from "../core/bestiary";
+import { AURA_MILESTONES } from "../core/paragon";
 import { existsSync } from "fs";
 import { join } from "path";
 
@@ -250,6 +251,22 @@ const equipFrame = (profile: IProfile, id: string): string => {
   return `Equipped frame: ${REALM_LABELS[id] ?? id}.`;
 };
 
+const equipAura = (profile: IProfile, id: string): string => {
+  if (id === "none") {
+    delete profile.aura;
+    persist(profile);
+    return "Aura unequipped.";
+  }
+  const unlocked = new Set(reduceToFile(HOME).paragon?.auras ?? []);
+  if (!unlocked.has(id)) {
+    fail(`Aura "${id}" is locked.`);
+  }
+  const label = AURA_MILESTONES.find(m => m.id === id)?.label ?? id;
+  profile.aura = id;
+  persist(profile);
+  return `Equipped aura: ${label}.`;
+};
+
 const ensureEngineDeployed = (): void => {
   if (existsSync(join(HOME, "adapters"))) {
     return;
@@ -306,6 +323,7 @@ Cosmetics & deeds
   secrets              list unlocked secret classes
   codex                realm conquest progress
   frame <realm|none>   equip a conquered realm's frame
+  aura <id|none>       equip a paragon aura
 
   aq --help            show this help`;
 
@@ -368,6 +386,9 @@ const main = (): void => {
       break;
     case "frame":
       out = equipFrame(profile, args[0] ?? "");
+      break;
+    case "aura":
+      out = equipAura(profile, args[0] ?? "");
       break;
     case "xyzzy":
       out = xyzzy(profile);

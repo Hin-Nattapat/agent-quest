@@ -372,6 +372,19 @@ body {
   content: attr(data-emoji);
   filter: grayscale(0.4);
 }
+/* Paragon auras: drop-shadow tracks the sprite's alpha, so the glow hugs the pixel art. */
+.aura-ember {
+  filter: drop-shadow(0 0 3px #ff7a3c) drop-shadow(0 0 7px #ff7a3c88);
+}
+.aura-azure {
+  filter: drop-shadow(0 0 3px #58c7f0) drop-shadow(0 0 7px #58c7f088);
+}
+.aura-royal {
+  filter: drop-shadow(0 0 3px #a06bf0) drop-shadow(0 0 7px #d4af3766);
+}
+.aura-radiant {
+  filter: drop-shadow(0 0 4px #ffe9a8) drop-shadow(0 0 10px #ffd75f99);
+}
 .companion-actor {
   position: absolute;
   image-rendering: pixelated;
@@ -572,6 +585,9 @@ body {
   color: var(--gold-soft);
   text-shadow: 1px 1px 0 #000;
   white-space: nowrap;
+}
+.pf-paragon {
+  color: #d4af37;
 }
 .xpbar {
   position: relative;

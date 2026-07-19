@@ -361,3 +361,40 @@ test("aq with an unknown command errors and exits 1", async () => {
   expect(r.code).toBe(1);
   expect(r.stderr).toContain("unknown command: bogus");
 });
+
+// curve_k 0.00005 makes every level's xp threshold round to ~1, so the level-50 cap is
+// reached almost immediately and 30 read actions (1 xp each, default weights) overflow deep
+// into paragon levels. Verified against the real reducer (core/reduce.ts): this fixture lands
+// at paragon level 29, unlocking ["ember", "azure"] (milestones at 10 and 25) while leaving
+// royal (50) and radiant (100) locked — so "ember" is a safe unlocked id for this test.
+function seedParagonSave(home: string) {
+  writeFileSync(
+    join(home, "config.json"),
+    JSON.stringify({ difficulty: { curve_k: 0.00005 } }),
+  );
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  const lines = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(Date.UTC(2026, 5, 1) + i * 60_000).toISOString();
+    return `{"ts":"${d}","source":"claude-code","session_id":"s","type":"action","action":"read","repo":"cq"}`;
+  });
+  writeFileSync(join(dir, "s.ndjson"), lines.join("\n") + "\n");
+}
+
+test("aq aura equips an unlocked aura, rejects locked, unequips with none", async () => {
+  const home = makeHome();
+  seedParagonSave(home);
+  const ok = await aq(home, "aura", "ember");
+  expect(ok.code).toBe(0);
+  expect(ok.stdout).toContain("Equipped aura: Ember.");
+  expect(profile(home).aura).toBe("ember");
+
+  const off = await aq(home, "aura", "none");
+  expect(off.code).toBe(0);
+  expect(off.stdout).toContain("Aura unequipped.");
+  expect(profile(home).aura).toBeUndefined();
+
+  const fresh = makeHome(); // no journal -> paragon level 0 -> everything locked
+  const bad = await aq(fresh, "aura", "ember");
+  expect(bad.code).toBe(1);
+});

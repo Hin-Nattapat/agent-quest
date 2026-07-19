@@ -2,7 +2,7 @@
   "name": "agent-quest",
   "displayName": "Agent Quest",
   "description": "Your AI coding sessions, gamified into a pixel-art RPG — a live companion panel for Claude Code, Codex, Cursor & Copilot.",
-  "version": "0.0.2",
+  "version": "0.2.0",
   "publisher": "NattaP",
   "license": "MIT",
   "icon": "media/icon.png",

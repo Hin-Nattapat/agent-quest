@@ -228,3 +228,26 @@ test("resolveCosmetics grants the frame only for a conquered realm", () => {
   const noList = resolveCosmetics({ profile: { frame: "grassland" }, inventory: [] });
   expect(noList.frame).toBeNull();
 });
+
+test("resolveCosmetics grants the aura only when its milestone is unlocked", () => {
+  const on = resolveCosmetics({
+    profile: { aura: "ember" },
+    inventory: [],
+    unlockedAuras: ["ember"],
+  });
+  expect(on.aura).toBe("ember");
+  const locked = resolveCosmetics({
+    profile: { aura: "radiant" },
+    inventory: [],
+    unlockedAuras: ["ember"],
+  });
+  expect(locked.aura).toBeNull();
+  const unset = resolveCosmetics({
+    profile: {},
+    inventory: [],
+    unlockedAuras: ["ember"],
+  });
+  expect(unset.aura).toBeNull();
+  const noList = resolveCosmetics({ profile: { aura: "ember" }, inventory: [] });
+  expect(noList.aura).toBeNull();
+});

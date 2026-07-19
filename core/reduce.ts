@@ -42,6 +42,7 @@ import {
   realmFor,
   type IBestiaryScan,
 } from "./bestiary";
+import { paragonFor } from "./paragon";
 
 export type TReducedState = Omit<IState, "updated_at">;
 
@@ -720,6 +721,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     class: classState,
     inventory,
     bestiary: buildBestiary(scan.bestiary),
+    paragon: paragonFor({ xpTotal: xp_total, difficulty: config.difficulty }),
     recent: scan.recent,
   };
   if (profile?.name) {
@@ -751,6 +753,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     earnedTitles: collectEarnedTitles(registry, achievements.earned),
     lootTable: ctx.lootTable,
     conqueredRealms: scan.bestiary.conqueredOrder,
+    unlockedAuras: prelim.paragon?.auras ?? [],
   });
   const codex = buildCodex({ registry, earned: achievements.earned });
   return {

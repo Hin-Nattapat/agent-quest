@@ -717,3 +717,40 @@ test("legacy histories without branch epochs fall back to the current branch", (
   expect(state.bestiary?.realms["skyforge_aether"]?.encounters).toBeGreaterThan(0);
   expect(state.bestiary?.realms["circuit_catacombs"]).toBeUndefined();
 });
+
+test("paragon interprets overflow XP past the level cap", () => {
+  const home = makeHome();
+  const acts = Array.from(
+    { length: 30 },
+    (_, i) =>
+      ({
+        ts: `2026-06-11T12:${String(i).padStart(2, "0")}:00Z`,
+        source: "claude-code",
+        session_id: "s",
+        type: "action",
+        action: "read",
+        repo: "cq",
+      }) as any,
+  );
+  const below = reduce({
+    events: acts,
+    config: loadConfig(home),
+    today: "2026-06-11",
+  });
+  expect(below.paragon?.level).toBe(0);
+  expect(below.paragon?.auras).toEqual([]);
+
+  // The 0.00005 curve pins level 50 from the first action (established in the branch-epoch
+  // tests) — every later action's XP is pure overflow.
+  const capped = reduce({
+    events: acts,
+    config: {
+      ...loadConfig(home),
+      difficulty: { ...DEFAULT_DIFFICULTY, curve_k: 0.00005 },
+    },
+    today: "2026-06-11",
+  });
+  expect(capped.level).toBe(50);
+  expect(capped.paragon).toBeDefined();
+  expect(capped.paragon!.level).toBeGreaterThan(0); // step is tiny under this curve
+});

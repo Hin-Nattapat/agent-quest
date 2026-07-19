@@ -264,6 +264,67 @@ test("aq companion equips an owned duck, rejects unowned, and unequips with none
   expect(bad.code).toBe(1);
 });
 
+// grassland's conquest threshold (50 encounters, 1 boss — core/bestiary.ts) needs the
+// character to spend 50+ actions at tier 1. seedQuacksOwner's curve_k (0.0034) is tuned for
+// a fast trickster T4 unlock and blows past tier 1 in ~1 action, so it never conquers
+// grassland. This fixture uses a much larger curve_k (slower leveling) so the tier-1 window
+// (levels 5-14, xpForLevel diff ≈ curve_k*701.4) covers >=50 actions, while still running
+// long enough to reach trickster tier 4 (fools_mirage) so `codex` has a discovered realm to
+// show alongside undiscovered ones. Verified against the real reducer: at curve_k 0.075 with
+// 1300 "read" actions (boss_rate 1 guarantees a boss kill on every action), grassland lands
+// at 50+/50 encounters and 50+/1 bosses -> conquered; fools_mirage is discovered (~tier 4
+// reached) but far short of its own 300-encounter threshold, so it stays unconquered — a
+// realistic "discovered but not conquered" row for the codex test.
+function seedGrasslandConqueror(home: string) {
+  writeFileSync(
+    join(home, "config.json"),
+    JSON.stringify({
+      boss_rate: 1,
+      boss_flee_rate: 0,
+      difficulty: { curve_k: 0.075 },
+    }),
+  );
+  const dir = join(home, "journal");
+  mkdirSync(dir, { recursive: true });
+  const lines = Array.from({ length: 1300 }, (_, i) => {
+    const d = new Date(Date.UTC(2026, 5, 1) + i * 60_000).toISOString();
+    return `{"ts":"${d}","source":"claude-code","session_id":"s","type":"action","action":"read","repo":"cq"}`;
+  });
+  writeFileSync(join(dir, "s.ndjson"), lines.join("\n") + "\n");
+  writeFileSync(
+    join(home, "profile.json"),
+    JSON.stringify({ line: "trickster", xyzzy: true }),
+  );
+}
+
+test("aq codex lists conquest progress with undiscovered realms hidden as ???", async () => {
+  const home = makeHome();
+  seedGrasslandConqueror(home);
+  const r = await aq(home, "codex");
+  expect(r.code).toBe(0);
+  expect(r.stdout).toContain("Realm Conquest");
+  expect(r.stdout).toContain("Fool's Mirage");
+  expect(r.stdout).toContain("???");
+});
+
+test("aq frame equips only conquered realms and unequips with none", async () => {
+  const home = makeHome();
+  seedGrasslandConqueror(home);
+  // grassland was swept while leveling (>=50 encounters + >=1 boss at boss_rate 1) -> conquered.
+  const ok = await aq(home, "frame", "grassland");
+  expect(ok.code).toBe(0);
+  expect(ok.stdout).toContain("Equipped frame: Grassland.");
+  expect(profile(home).frame).toBe("grassland");
+
+  const bad = await aq(home, "frame", "skyforge_aether");
+  expect(bad.code).toBe(1);
+
+  const off = await aq(home, "frame", "none");
+  expect(off.code).toBe(0);
+  expect(off.stdout).toContain("Frame unequipped.");
+  expect(profile(home).frame).toBeUndefined();
+});
+
 test("aq secrets hints the colossal cave riddle for the trickster row", async () => {
   const home = makeHome();
   const r = await aq(home, "secrets");

@@ -8,6 +8,7 @@ import type { TLine } from "./classes";
 export interface IClassEpoch {
   ts: string; // UTC ISO8601, when this class became active
   line: TLine;
+  branch?: "a" | "b";
 }
 
 export interface IProfile {
@@ -19,6 +20,7 @@ export interface IProfile {
   theme?: string;
   name_color?: string;
   companion?: string;
+  frame?: string;
   xyzzy?: boolean;
 }
 

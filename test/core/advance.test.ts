@@ -144,3 +144,16 @@ test("chooseBranch: a|b, Lv.50, main, not locked", () => {
   expect(chooseBranch({ profile: p, branch: "b", level: 50 }).ok).toBe(true);
   expect(p.branch).toBe("b");
 });
+
+test("chooseBranch records a branch epoch on the history", () => {
+  const profile: IProfile = { line: "mage" } as any; // match file's fixture style
+  const r = chooseBranch({ profile, branch: "a", level: 50, ts: "2026-01-02T00:00:00Z" });
+  expect(r.ok).toBe(true);
+  const hist = profile.history ?? [];
+  expect(hist.length).toBe(2); // HISTORY_START backfill + branch epoch
+  expect(hist[1]).toEqual({
+    ts: "2026-01-02T00:00:00Z",
+    line: ClassLine.Mage,
+    branch: "a",
+  });
+});

@@ -617,3 +617,103 @@ test("boss defeats outside Fool's Mirage never grant the duck", () => {
   });
   expect((mage.inventory ?? []).some(i => i.id === "sir_quacks")).toBe(false);
 });
+
+test("bestiary tracks realms crossed while leveling and counts fools_mirage bosses", () => {
+  const home = makeHome();
+  const acts = Array.from(
+    { length: 60 },
+    (_, i) =>
+      ({
+        ts: `2026-06-11T12:${String(i).padStart(2, "0")}:00Z`,
+        source: "claude-code",
+        session_id: "s",
+        type: "action",
+        action: "read",
+        repo: "cq",
+      }) as any,
+  );
+  const state = reduce({
+    events: acts,
+    config: {
+      ...loadConfig(home),
+      boss_rate: 1,
+      boss_flee_rate: 0,
+      difficulty: { ...DEFAULT_DIFFICULTY, curve_k: 0.0034 },
+    },
+    today: "2026-06-11",
+    profile: { line: "trickster", xyzzy: true } as any,
+  });
+  const b = state.bestiary;
+  expect(b).toBeDefined();
+  expect(b?.total).toBe(16);
+  // Leveling 0->50 sweeps grassland (T1), forest (T2), dungeon (T3), then fools_mirage (T4).
+  expect(b?.realms["grassland"]?.discovered).toBe(true);
+  expect(b?.realms["fools_mirage"]?.discovered).toBe(true);
+  expect(b?.realms["fools_mirage"]?.boss_defeated).toBeGreaterThan(0);
+  // grassland: passed quickly at this curve — encounters counted but conquest not guaranteed.
+  const totalEncounters = Object.values(b?.realms ?? {}).reduce(
+    (s, r) => s + r.encounters,
+    0,
+  );
+  expect(totalEncounters).toBe(60);
+});
+
+// curve_k 0.00005 -> xpForLevel(50) rounds to 1 raw xp, so the very first "read" action (1 xp,
+// no passive multiplier at pre-gain tier 0) already crosses level 50 / tier 4, and every action
+// after it stays there (level is monotonic, capped at 50). That keeps both the branch-a and
+// branch-b halves of the 80-action fixture pinned at tier 4, so realm attribution is decided
+// purely by branchAt(ts) rather than by how much of the curve each half happens to climb.
+const t4FromFirstAction = { ...DEFAULT_DIFFICULTY, curve_k: 0.00005 };
+
+const branchEpochActs = Array.from({ length: 80 }, (_, i) => ({
+  ts: `2026-06-11T${String(10 + Math.floor(i / 60)).padStart(2, "0")}:${String(i % 60).padStart(2, "0")}:00Z`,
+  source: "claude-code",
+  session_id: "s",
+  type: "action",
+  action: "read",
+  repo: "cq",
+})) as any[];
+
+test("bestiary keeps both branches' realms across a branch history", () => {
+  const state = reduce({
+    events: branchEpochActs,
+    config: {
+      ...loadConfig(makeHome()),
+      boss_rate: 0,
+      difficulty: t4FromFirstAction,
+    },
+    today: "2026-06-11",
+    profile: {
+      line: "mage",
+      branch: "b",
+      history: [
+        { ts: "1970-01-01T00:00:00.000Z", line: "mage" },
+        { ts: "2026-06-11T09:00:00Z", line: "mage", branch: "a" },
+        { ts: "2026-06-11T10:40:00Z", line: "mage", branch: "b" },
+      ],
+    } as any,
+  });
+  expect(state.class?.tier).toBe(4);
+  expect(state.bestiary?.realms["skyforge_aether"]?.encounters).toBeGreaterThan(0);
+  expect(state.bestiary?.realms["circuit_catacombs"]?.encounters).toBeGreaterThan(0);
+});
+
+test("legacy histories without branch epochs fall back to the current branch", () => {
+  const state = reduce({
+    events: branchEpochActs,
+    config: {
+      ...loadConfig(makeHome()),
+      boss_rate: 0,
+      difficulty: t4FromFirstAction,
+    },
+    today: "2026-06-11",
+    profile: {
+      line: "mage",
+      branch: "a",
+      history: [{ ts: "1970-01-01T00:00:00.000Z", line: "mage" }],
+    } as any,
+  });
+  expect(state.class?.tier).toBe(4);
+  expect(state.bestiary?.realms["skyforge_aether"]?.encounters).toBeGreaterThan(0);
+  expect(state.bestiary?.realms["circuit_catacombs"]).toBeUndefined();
+});

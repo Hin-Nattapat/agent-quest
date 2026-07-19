@@ -205,3 +205,26 @@ test("sir_quacks is a legendary companion and never random-drops", () => {
     expect(id).not.toBe("sir_quacks");
   }
 });
+
+test("resolveCosmetics grants the frame only for a conquered realm", () => {
+  const on = resolveCosmetics({
+    profile: { frame: "grassland" },
+    inventory: [],
+    conqueredRealms: ["grassland"],
+  });
+  expect(on.frame).toBe("grassland");
+  const unconquered = resolveCosmetics({
+    profile: { frame: "fools_mirage" },
+    inventory: [],
+    conqueredRealms: ["grassland"],
+  });
+  expect(unconquered.frame).toBeNull();
+  const unset = resolveCosmetics({
+    profile: {},
+    inventory: [],
+    conqueredRealms: ["grassland"],
+  });
+  expect(unset.frame).toBeNull();
+  const noList = resolveCosmetics({ profile: { frame: "grassland" }, inventory: [] });
+  expect(noList.frame).toBeNull();
+});

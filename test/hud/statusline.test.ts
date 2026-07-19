@@ -101,6 +101,7 @@ test("loot cosmetics + rate limits render; null rates are omitted", () => {
       name_color: null,
       companion: null,
       frame: null,
+      aura: null,
     },
     inventory: [{ id: "x", rarity: "rare", count: 3 }],
   } as any;
@@ -166,6 +167,7 @@ test("name + title are wrapped in the name-color ANSI when equipped", () => {
       name_color: "1;38;2;255;54;255",
       companion: null,
       frame: null,
+      aura: null,
     },
   });
   const out = renderHud({ state: tinted, tail });
@@ -179,6 +181,7 @@ test("name + title are wrapped in the name-color ANSI when equipped", () => {
       name_color: null,
       companion: null,
       frame: null,
+      aura: null,
     },
   });
   const plainOut = renderHud({ state: plain, tail });
@@ -196,8 +199,32 @@ test("statusline appends the duck when a companion is equipped", () => {
       name_color: null,
       companion: "sir_quacks",
       frame: null,
+      aura: null,
     },
   });
   const out = renderHud({ state: withCompanion, tail });
   expect(out).toContain("🦆");
+});
+
+test("statusline shows paragon level and bar at the cap", () => {
+  const line = renderHud({
+    state: state({
+      level: 50,
+      xp_in_level: 300,
+      xp_to_next: 0,
+      paragon: { level: 7, xp_in_paragon: 300, xp_to_next: 700, auras: [] },
+    }),
+    tail: { model: "M", cost: 0, ctx: 0 },
+  });
+  expect(line).toContain("Lv.50 ✦P7");
+  expect(line).not.toContain("MAX");
+  expect(line).toContain("███░░░░░░░ 30%");
+});
+
+test("statusline keeps the MAX bar for old states without paragon", () => {
+  const line = renderHud({
+    state: state({ level: 50, xp_in_level: 300, xp_to_next: 0 }),
+    tail: { model: "M", cost: 0, ctx: 0 },
+  });
+  expect(line).toContain("MAX");
 });

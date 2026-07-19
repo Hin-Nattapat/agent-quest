@@ -7,7 +7,7 @@ import { loadEvents } from "./journal";
 import { eventLocalDate, computeStreak, localTodayKey, isNight } from "./streak";
 import { evaluateAchievements, type IAchievementDef } from "./achievements";
 import { computeAffinity, isPassiveSignal } from "./affinity";
-import { loadProfile, type IProfile } from "./profile";
+import { loadProfile, type IProfile, type IClassEpoch } from "./profile";
 import {
   tierForLevel,
   formFor,
@@ -35,6 +35,13 @@ import {
 import { TimelineKind, pushTimeline, type ITimelineEntry } from "./timeline";
 import { seededRng } from "./rng";
 import { type IState, type IGroupStat } from "./state";
+import {
+  createBestiaryScan,
+  recordBestiaryEvent,
+  buildBestiary,
+  realmFor,
+  type IBestiaryScan,
+} from "./bestiary";
 
 export type TReducedState = Omit<IState, "updated_at">;
 
@@ -200,6 +207,7 @@ interface IReduceContext {
   line: TLine | null;
   branch: "a" | "b" | null;
   lineAt: (ts: string) => TLine | null;
+  branchAt: (ts: string) => "a" | "b" | null;
   lootTable: Record<string, ILootItem>;
   dropTables: Record<string, TDropTable>;
   bossRate: number;
@@ -230,12 +238,41 @@ const buildContext = (props: IReduceArgs): IReduceContext => {
     }
     return active;
   };
+  // The branch active when an event was earned, from the same epoch history as lineAt. Epochs
+  // written before this feature carry no branch — for those pure-legacy saves, events priced on
+  // the CURRENT line inherit the current branch (matching the old behavior); anything else is
+  // pre-branch (no realm).
+  const anyBranchEpochs = classEpochs.some(e => e.branch != null);
+  const branchAt = (ts: string): "a" | "b" | null => {
+    if (classEpochs.length === 0) {
+      return branch;
+    }
+    const at = tsOrder(ts);
+    let active: IClassEpoch | null = null;
+    for (const epoch of classEpochs) {
+      if (tsOrder(epoch.ts) > at) {
+        break;
+      }
+      active = epoch;
+    }
+    if (active == null) {
+      return null;
+    }
+    if (active.branch != null) {
+      return active.branch;
+    }
+    if (!anyBranchEpochs && active.line === line) {
+      return branch;
+    }
+    return null;
+  };
   return {
     config,
     profile,
     line,
     branch,
     lineAt,
+    branchAt,
     lootTable: config.loot ?? LOOT_TABLE,
     dropTables: config.drops ?? DROP_TABLES,
     bossRate: config.boss_rate ?? DEFAULT_BOSS_RATE,
@@ -270,6 +307,7 @@ interface IEventScan {
   byRepo: Record<string, IGroupAcc>;
   bossTriggers: ITrigger[];
   quacksEarnedTs: string | null;
+  bestiary: IBestiaryScan;
 }
 
 // Scan-internal bookkeeping no later phase needs: level/tier watermarks for milestone detection,
@@ -431,8 +469,8 @@ const sealAsceticIfEarned = (state: IScanState, newLevel: number): void => {
 };
 
 // The single chronological pass over the journal. Per event, in order: XP and its milestones,
-// the stat counters, the boss roll (which needs this event's post-gain level), the ascetic seal
-// check (which needs the counters this event just bumped), then the per-source/repo XP tallies.
+// the stat counters, the boss roll (which needs this event's post-gain level), the bestiary record,
+// the ascetic seal check (which needs the counters this event just bumped), then the per-source/repo XP tallies.
 const scanEvents = (ctx: IReduceContext): IEventScan => {
   const state: IScanState = {
     xpRaw: 0,
@@ -453,6 +491,7 @@ const scanEvents = (ctx: IReduceContext): IEventScan => {
     byRepo: {},
     bossTriggers: [],
     quacksEarnedTs: null,
+    bestiary: createBestiaryScan(),
     prevLevel: levelFor(0, ctx.config.difficulty),
     prevTier: 0,
     pendingFail: new Set(),
@@ -463,7 +502,20 @@ const scanEvents = (ctx: IReduceContext): IEventScan => {
   for (const event of ctx.sorted) {
     const { gained, newLevel } = applyXpAndMilestones({ state, ctx, event });
     recordEventStats(state, event);
+    const bossDefeatedBefore = state.bossDefeated;
+    const bossFledBefore = state.bossFled;
     rollBossAndDuck({ state, ctx, event, newLevel });
+    recordBestiaryEvent({
+      scan: state.bestiary,
+      realm: realmFor({
+        line: ctx.lineAt(event.ts),
+        tier: tierForLevel(newLevel),
+        branch: ctx.branchAt(event.ts),
+      }),
+      isAction: event.type === EventType.Action,
+      bossDefeated: state.bossDefeated - bossDefeatedBefore,
+      bossFled: state.bossFled - bossFledBefore,
+    });
     sealAsceticIfEarned(state, newLevel);
     tally({
       groups: state.bySource,
@@ -667,6 +719,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     streak,
     class: classState,
     inventory,
+    bestiary: buildBestiary(scan.bestiary),
     recent: scan.recent,
   };
   if (profile?.name) {
@@ -697,6 +750,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     inventory,
     earnedTitles: collectEarnedTitles(registry, achievements.earned),
     lootTable: ctx.lootTable,
+    conqueredRealms: scan.bestiary.conqueredOrder,
   });
   const codex = buildCodex({ registry, earned: achievements.earned });
   return {

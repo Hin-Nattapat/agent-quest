@@ -3,6 +3,7 @@ import type { IClassState, SecretLine } from "./classes";
 import type { IInventoryItem, ICosmetics } from "./loot";
 import type { EventType } from "./events";
 import type { ITimelineEntry } from "./timeline";
+import { type IBestiaryState } from "./bestiary";
 
 export interface IGroupStat {
   xp: number;
@@ -54,6 +55,7 @@ export interface IState {
   name?: string;
   class?: IClassState;
   inventory?: IInventoryItem[];
+  bestiary?: IBestiaryState;
   cosmetics?: ICosmetics;
   unlocked_secret_classes?: SecretLine[];
   last_event?: { ts: string; type: EventType; source: string };

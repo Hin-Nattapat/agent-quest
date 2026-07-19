@@ -18,9 +18,10 @@ const PortraitFrame = (props: IProps) => {
   const total = state.xp_in_level + state.xp_to_next;
   // Real class sprite (south/front-facing) instead of the mage emoji, matching the Hero panel.
   const face = heroPortrait(klass);
+  const frame = state.cosmetics?.frame ?? null;
 
   return (
-    <div className="portrait-frame">
+    <div className={`portrait-frame${frame ? ` frame-${frame}` : ""}`}>
       <div className="portrait">
         <span
           className={`sprite portrait-face${face ? " has-art" : ""}`}

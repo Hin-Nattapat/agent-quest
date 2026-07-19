@@ -1,3 +1,4 @@
+import type { IBestiaryState } from "../../../core/bestiary";
 import { ActivityState } from "../activity";
 import { SceneTheme } from "../scene";
 import { hasOverworldBg } from "../overworld-bg";
@@ -8,6 +9,7 @@ import { CompanionFacing } from "../companion";
 import OverworldHero from "./overworld-hero";
 import GuildNpc from "./guild-npc";
 import CompanionSprite from "./companion-sprite";
+import GuildTrophies from "./guild-trophies";
 
 // Decorative guild NPCs standing on the open floor in % of the locked stage. Each shows its imported
 // south-facing idle loop when present, else the emoji placeholder behind the same seam.
@@ -25,10 +27,11 @@ interface IProps {
   activity: ActivityState;
   icon: string;
   companion: string | null;
+  bestiary: IBestiaryState | undefined;
 }
 
 const OverworldRoom = (props: IProps) => {
-  const { line, tier, branch, activity, icon, companion } = props;
+  const { line, tier, branch, activity, icon, companion, bestiary } = props;
   const roaming = activity !== ActivityState.Rest;
   const resting = !roaming;
   const pose = useWander(roaming);
@@ -64,6 +67,7 @@ const OverworldRoom = (props: IProps) => {
       style={{ transform: `translate(${xPx - 20}px, ${yPx + 6}px)` }}
     />
   );
+  const trophies = <GuildTrophies conquered={bestiary?.conquered ?? []} />;
   const zzz = resting ? (
     <div className="guild-zzz" style={{ left: `${pose.xPct}%`, top: `${pose.yPct}%` }}>
       💤
@@ -88,6 +92,7 @@ const OverworldRoom = (props: IProps) => {
               yPct={npc.yPct}
             />
           ))}
+          {trophies}
           {hero}
           {companionSprite}
           {zzz}
@@ -110,6 +115,7 @@ const OverworldRoom = (props: IProps) => {
       <div className="guild-chest" aria-hidden="true">
         🧰
       </div>
+      {trophies}
       {hero}
       {companionSprite}
       {zzz}

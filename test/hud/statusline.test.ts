@@ -95,7 +95,13 @@ test("shows the fire streak when current_days >= 1, hidden at 0", () => {
 test("loot cosmetics + rate limits render; null rates are omitted", () => {
   const s = {
     ...state({ level: 5, xp_in_level: 0, xp_to_next: 100 }),
-    cosmetics: { title: "Codeweaver", theme_color: "36", name_color: null },
+    cosmetics: {
+      title: "Codeweaver",
+      theme_color: "36",
+      name_color: null,
+      companion: null,
+      frame: null,
+    },
     inventory: [{ id: "x", rarity: "rare", count: 3 }],
   } as any;
   const out = renderHud({
@@ -159,6 +165,7 @@ test("name + title are wrapped in the name-color ANSI when equipped", () => {
       theme_color: null,
       name_color: "1;38;2;255;54;255",
       companion: null,
+      frame: null,
     },
   });
   const out = renderHud({ state: tinted, tail });
@@ -171,6 +178,7 @@ test("name + title are wrapped in the name-color ANSI when equipped", () => {
       theme_color: null,
       name_color: null,
       companion: null,
+      frame: null,
     },
   });
   const plainOut = renderHud({ state: plain, tail });
@@ -187,6 +195,7 @@ test("statusline appends the duck when a companion is equipped", () => {
       theme_color: null,
       name_color: null,
       companion: "sir_quacks",
+      frame: null,
     },
   });
   const out = renderHud({ state: withCompanion, tail });

@@ -5,6 +5,7 @@ import { reduceToFile } from "../core/reduce";
 import { ClassLine, SecretLine, SECRET_TREE } from "../core/classes";
 import { chooseClass, respecClass, chooseBranch } from "../core/advance";
 import { LOOT_TABLE, LootKind } from "../core/loot";
+import { REALM_LABELS, CONQUEST_THRESHOLDS, REALM_TOTAL } from "../core/bestiary";
 import { existsSync } from "fs";
 import { join } from "path";
 
@@ -46,7 +47,12 @@ const setClass = (profile: IProfile, line: string): string => {
 
 const setBranch = (profile: IProfile, branch: string): string => {
   const state = reduceToFile(HOME);
-  const r = chooseBranch({ profile, branch, level: state.level });
+  const r = chooseBranch({
+    profile,
+    branch,
+    level: state.level,
+    ts: new Date().toISOString(),
+  });
   if (!r.ok) {
     fail(r.error ?? "");
   }
@@ -199,6 +205,51 @@ const secrets = (): string => {
   }).join("\n");
 };
 
+const codex = (): string => {
+  const bestiary = reduceToFile(HOME).bestiary;
+  const realms = bestiary?.realms ?? {};
+  const conqueredCount = bestiary?.conquered.length ?? 0;
+  const lines: string[] = [
+    `Realm Conquest  ${conqueredCount}/${bestiary?.total ?? REALM_TOTAL}`,
+  ];
+  for (const [theme, label] of Object.entries(REALM_LABELS)) {
+    const r = realms[theme];
+    if (!r) {
+      continue;
+    }
+    const t = CONQUEST_THRESHOLDS[theme];
+    if (r.conquered) {
+      lines.push(
+        `✦ ${label} — CONQUERED  (${r.encounters} fights · ${r.boss_defeated} bosses)`,
+      );
+    } else {
+      lines.push(
+        `◇ ${label} — ${r.encounters}/${t.encounters} fights · ${r.boss_defeated}/${t.bosses} bosses`,
+      );
+    }
+  }
+  const undiscovered = REALM_TOTAL - Object.keys(realms).length;
+  if (undiscovered > 0) {
+    lines.push(`? ???  ·  ${undiscovered} undiscovered`);
+  }
+  return lines.join("\n");
+};
+
+const equipFrame = (profile: IProfile, id: string): string => {
+  if (id === "none") {
+    delete profile.frame;
+    persist(profile);
+    return "Frame unequipped.";
+  }
+  const conquered = new Set(reduceToFile(HOME).bestiary?.conquered ?? []);
+  if (!conquered.has(id)) {
+    fail(`Realm "${id}" is not conquered.`);
+  }
+  profile.frame = id;
+  persist(profile);
+  return `Equipped frame: ${REALM_LABELS[id] ?? id}.`;
+};
+
 const ensureEngineDeployed = (): void => {
   if (existsSync(join(HOME, "adapters"))) {
     return;
@@ -253,6 +304,8 @@ Cosmetics & deeds
   namecolor <id>       equip a name color   namecolors   list owned colors
   companion <id|none>  equip a companion
   secrets              list unlocked secret classes
+  codex                realm conquest progress
+  frame <realm|none>   equip a conquered realm's frame
 
   aq --help            show this help`;
 
@@ -309,6 +362,12 @@ const main = (): void => {
       break;
     case "secrets":
       out = secrets();
+      break;
+    case "codex":
+      out = codex();
+      break;
+    case "frame":
+      out = equipFrame(profile, args[0] ?? "");
       break;
     case "xyzzy":
       out = xyzzy(profile);

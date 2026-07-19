@@ -82,11 +82,14 @@ interface IChooseBranchArgs {
   profile: IProfile;
   branch: string;
   level: number;
+  ts?: string;
 }
 
-// T4 branch pick (Lv.50+, main line, not locked). Sets branch.
+// T4 branch pick (Lv.50+, main line, not locked). Sets branch, and — same earn-time history as
+// adopt() — records a branch epoch so the reducer can attribute bestiary realms per event instead
+// of by the single current branch (a respec must not erase a prior branch's realm counts).
 export const chooseBranch = (props: IChooseBranchArgs): IAdvanceResult => {
-  const { profile, branch, level } = props;
+  const { profile, branch, level, ts } = props;
   if (branch !== "a" && branch !== "b") {
     return { ok: false, error: `Branch must be "a" or "b".` };
   }
@@ -102,6 +105,15 @@ export const chooseBranch = (props: IChooseBranchArgs): IAdvanceResult => {
   if (profile.branch) {
     return { ok: false, error: "Branch already chosen (locked)." };
   }
+  if ((profile.history?.length ?? 0) === 0 && profile.line != null) {
+    profile.history = [{ ts: HISTORY_START, line: profile.line }];
+  }
   profile.branch = branch;
+  if (ts != null) {
+    profile.history = [
+      ...(profile.history ?? []),
+      { ts, line: profile.line as TLine, branch },
+    ];
+  }
   return { ok: true };
 };

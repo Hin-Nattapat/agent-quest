@@ -37,6 +37,7 @@ export interface ICosmetics {
   theme_color: string | null;
   name_color: string | null;
   companion: string | null;
+  frame: string | null;
 }
 
 export const LOOT_TABLE: Record<string, ILootItem> = {
@@ -326,14 +327,27 @@ export const rollInventory = (props: IRollInventoryArgs): IInventoryItem[] => {
 };
 
 interface IResolveCosmeticsArgs {
-  profile: { title?: string; theme?: string; name_color?: string; companion?: string };
+  profile: {
+    title?: string;
+    theme?: string;
+    name_color?: string;
+    companion?: string;
+    frame?: string;
+  };
   inventory: IInventoryItem[];
   earnedTitles?: Record<string, string>;
   lootTable?: Record<string, ILootItem>;
+  conqueredRealms?: string[];
 }
 
 export const resolveCosmetics = (props: IResolveCosmeticsArgs): ICosmetics => {
-  const { profile, inventory, earnedTitles = {}, lootTable = LOOT_TABLE } = props;
+  const {
+    profile,
+    inventory,
+    earnedTitles = {},
+    lootTable = LOOT_TABLE,
+    conqueredRealms = [],
+  } = props;
   const owned = new Set(inventory.map(i => i.id));
   const lootTitle =
     profile.title &&
@@ -355,10 +369,13 @@ export const resolveCosmetics = (props: IResolveCosmeticsArgs): ICosmetics => {
     lootTable[profile.companion]?.kind === LootKind.Companion
       ? profile.companion
       : null;
+  const frameId =
+    profile.frame && conqueredRealms.includes(profile.frame) ? profile.frame : null;
   return {
     title: lootTitle ?? earnedTitle,
     theme_color: themeItem?.kind === LootKind.Theme ? (themeItem.value ?? null) : null,
     name_color: nameItem?.kind === LootKind.NameColor ? (nameItem.value ?? null) : null,
     companion: companionId,
+    frame: frameId,
   };
 };

@@ -622,6 +622,74 @@ body {
   color: var(--gold-soft);
 }
 
+/* ── conquest portrait frames (state.cosmetics.frame, Task 3) ──
+   One rule per realm theme, border + soft glow approximately keyed to each realm's palette
+   so an equipped frame reads as "a piece of that realm" around the portrait. */
+.frame-grassland {
+  border: 2px solid #4a7a3a;
+  box-shadow: 0 0 8px #4a7a3a66;
+}
+.frame-forest {
+  border: 2px solid #1f4d2a;
+  box-shadow: 0 0 8px #1f4d2a66;
+}
+.frame-dungeon {
+  border: 2px solid #8a5a2e;
+  box-shadow: 0 0 8px #8a5a2e66;
+}
+.frame-skyforge_aether {
+  border: 2px solid #8a6bc9;
+  box-shadow: 0 0 8px #8a6bc966;
+}
+.frame-circuit_catacombs {
+  border: 2px solid #39d97a;
+  box-shadow: 0 0 8px #39d97a66;
+}
+.frame-aurora_flux {
+  border: 2px solid #3ac9b0;
+  box-shadow: 0 0 8px #3ac9b066;
+}
+.frame-geometric_sanctum {
+  border: 2px solid #3a7a82;
+  box-shadow: 0 0 8px #3a7a8266;
+}
+.frame-quantum_rift {
+  border: 2px solid #e8735f;
+  box-shadow: 0 0 8px #e8735f66;
+}
+.frame-noir_crime_scene {
+  border: 2px solid #c9455a;
+  box-shadow: 0 0 8px #c9455a66;
+}
+.frame-oracles_athenaeum {
+  border: 2px solid #d4a24a;
+  box-shadow: 0 0 8px #d4a24a66;
+}
+.frame-conductors_nexus {
+  border: 2px solid #c9971f;
+  box-shadow: 0 0 8px #c9971f66;
+}
+.frame-grand_concert_vault {
+  border: 2px solid #a67a2e;
+  box-shadow: 0 0 8px #a67a2e66;
+}
+.frame-midnight_roost {
+  border: 2px solid #4a5aa0;
+  box-shadow: 0 0 8px #4a5aa066;
+}
+.frame-silent_summit {
+  border: 2px solid #9a9c7e;
+  box-shadow: 0 0 8px #9a9c7e66;
+}
+.frame-glitch_pit {
+  border: 2px solid #2f9e42;
+  box-shadow: 0 0 8px #2f9e4266;
+}
+.frame-fools_mirage {
+  border: 2px solid #c9a0dc;
+  box-shadow: 0 0 8px #c9a0dc88;
+}
+
 /* ── area/zone tag (overlay top-right of scene) ── */
 .area-tag {
   position: absolute;
@@ -1665,6 +1733,132 @@ body {
   cursor: default;
 }
 
+/* codex tabs */
+.codex-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.codex-tab {
+  flex: 1;
+  padding: 5px 8px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  background: var(--panel-2);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+  transition:
+    color 120ms ease-out,
+    border-color 120ms ease-out;
+}
+.codex-tab:hover {
+  color: var(--text);
+}
+.codex-tab.active {
+  color: var(--gold-soft);
+  border-color: var(--gold);
+}
+
+/* realm badge map */
+.badge-map {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 3px;
+  min-height: 44px;
+  text-align: center;
+  border-radius: 3px;
+  border: 2px solid var(--ink);
+}
+.badge-icon {
+  font-size: 15px;
+}
+.badge-label {
+  font-size: 8px;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.badge-conquered {
+  background: var(--panel-2);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-soft);
+}
+.badge-conquered .badge-label {
+  color: var(--gold-soft);
+}
+.badge-progress {
+  background: var(--panel-2);
+  border-color: var(--dim);
+}
+.badge-progress .badge-label {
+  color: var(--dim);
+}
+/* Undiscovered realms: near-black and dimmed so the "?" reads as a locked slot, not a bug. */
+.badge-unknown {
+  background: var(--panel-dark);
+  border-color: var(--panel-dark);
+  opacity: 0.55;
+}
+.badge-unknown .badge-icon {
+  color: var(--dim);
+}
+
+/* bestiary list (per-realm rows under the badge map) */
+.bestiary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bestiary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 7px;
+  background: var(--panel-2);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+}
+.bestiary-sprite {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+  background: var(--panel-dark);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+}
+.bestiary-name {
+  color: var(--gold-soft);
+  font-size: 11px;
+  flex: 1;
+}
+.bestiary-counts {
+  color: var(--dim);
+  font-size: 9px;
+  white-space: nowrap;
+}
+.bestiary-unknown {
+  justify-content: center;
+  color: var(--dim);
+  text-align: center;
+}
+
 /* codex deeds */
 .deed-list {
   list-style: none;
@@ -2240,6 +2434,21 @@ body.reduce-motion *::after {
   top: 0;
   width: 22px;
   height: 22px;
+}
+/* Conquered-realm pedestals along the guild walls, filled in conquest order (GuildTrophies).
+   Placeholder icon box; real item art replaces the icon via a frames-lookup later. */
+.guild-trophy {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  background: rgba(40, 34, 20, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 3px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 .guild-zzz {
   position: absolute;

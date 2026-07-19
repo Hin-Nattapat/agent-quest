@@ -101,19 +101,20 @@ test("sourceBreakdown: shares sorted desc by xp, integer pct, 0 when no xp", () 
   ]);
 });
 
-test("groupInventory buckets by kind in fixed order with equipped first", () => {
+test("groupInventory buckets by kind, equipped first, then rarity descending", () => {
   const inv = [
     { id: "azure", rarity: "rare", count: 1, name: "Azure", kind: "name_color" },
     { id: "rookie_title", rarity: "common", count: 1, name: "Rookie", kind: "title" },
     {
-      id: "matrix",
-      rarity: "epic",
+      id: "forest_theme",
+      rarity: "common",
       count: 1,
-      name: "Matrix",
+      name: "Forest",
       kind: "theme",
       equipped: true,
     },
-    { id: "forest_theme", rarity: "common", count: 1, name: "Forest", kind: "theme" },
+    { id: "matrix", rarity: "epic", count: 1, name: "Matrix", kind: "theme" },
+    { id: "plasma_ink", rarity: "legendary", count: 1, name: "Plasma", kind: "theme" },
     {
       id: "sir_quacks",
       rarity: "legendary",
@@ -125,7 +126,12 @@ test("groupInventory buckets by kind in fixed order with equipped first", () => 
   const groups = groupInventory(inv);
   expect(groups.map(g => g.kind)).toEqual(["title", "theme", "name_color", "companion"]);
   expect(groups[0].label).toBe("Titles");
-  expect(groups[1].items.map(i => i.id)).toEqual(["matrix", "forest_theme"]);
+  // equipped common floats above unequipped legendary; the rest sort legendary -> epic.
+  expect(groups[1].items.map(i => i.id)).toEqual([
+    "forest_theme",
+    "plasma_ink",
+    "matrix",
+  ]);
 });
 
 test("groupInventory hides empty kinds and folds unknown kinds into Other", () => {

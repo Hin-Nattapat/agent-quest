@@ -149,9 +149,19 @@ export const groupInventory = (inv: IInventoryItem[]): IInventoryGroup[] => {
     list.push(item);
     byKind.set(known, list);
   }
+  // Wire rarity strings (same seam rationale as the kind keys above). Unknown rarities sink last.
+  const RARITY_RANK: Record<string, number> = {
+    legendary: 0,
+    epic: 1,
+    rare: 2,
+    common: 3,
+  };
+  const rank = (item: IInventoryItem): number => RARITY_RANK[item.rarity] ?? 9;
   const equippedFirst = (items: IInventoryItem[]): IInventoryItem[] => {
-    const equipped = items.filter(i => i.equipped);
-    const rest = items.filter(i => !i.equipped);
+    const byRarity = (a: IInventoryItem, b: IInventoryItem): number =>
+      rank(a) - rank(b) || (a.name ?? a.id).localeCompare(b.name ?? b.id);
+    const equipped = items.filter(i => i.equipped).sort(byRarity);
+    const rest = items.filter(i => !i.equipped).sort(byRarity);
     return [...equipped, ...rest];
   };
   const groups: IInventoryGroup[] = [];

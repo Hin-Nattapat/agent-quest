@@ -398,3 +398,42 @@ test("aq aura equips an unlocked aura, rejects locked, unequips with none", asyn
   const bad = await aq(fresh, "aura", "ember");
   expect(bad.code).toBe(1);
 });
+
+test("aq chronicle prints recent weeks newest first", async () => {
+  const home = makeHome();
+  const lines = [
+    `{"ts":"2026-07-13T10:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"read","repo":"cq"}`,
+    `{"ts":"2026-07-20T10:00:00Z","source":"claude-code","session_id":"s","type":"action","action":"read","repo":"cq"}`,
+  ];
+  mkdirSync(join(home, "journal"), { recursive: true });
+  writeFileSync(join(home, "journal", "s.ndjson"), lines.join("\n") + "\n");
+  const out = await aq(home, "chronicle");
+  expect(out.code).toBe(0);
+  const w30 = out.stdout.indexOf("W30");
+  const w29 = out.stdout.indexOf("W29");
+  expect(w30).toBeGreaterThanOrEqual(0);
+  expect(w29).toBeGreaterThan(w30); // newest first
+  expect(out.stdout).toContain("XP ");
+  expect(out.stdout).toContain("1 fights");
+});
+
+test("aq chronicle with no journal shows an empty-state message", async () => {
+  const home = makeHome();
+  const out = await aq(home, "chronicle");
+  expect(out.code).toBe(0);
+  expect(out.stdout).toContain("No chronicle yet — go adventure.");
+});
+
+test("aq chronicle clamps the count argument to 1..12", async () => {
+  const home = makeHome();
+  mkdirSync(join(home, "journal"), { recursive: true });
+  const lines = Array.from({ length: 20 }, (_, i) => {
+    const d = new Date(Date.UTC(2026, 0, 1) + i * 7 * 86_400_000).toISOString();
+    return `{"ts":"${d}","source":"claude-code","session_id":"s","type":"action","action":"read","repo":"cq"}`;
+  });
+  writeFileSync(join(home, "journal", "s.ndjson"), lines.join("\n") + "\n");
+  const over = await aq(home, "chronicle", "99");
+  const under = await aq(home, "chronicle", "0");
+  expect(over.stdout.split("XP ").length - 1).toBe(12); // clamped to max
+  expect(under.stdout.split("XP ").length - 1).toBe(1); // clamped to min
+});

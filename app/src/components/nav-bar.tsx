@@ -9,6 +9,7 @@ const BUTTONS: { id: PanelId; label: string }[] = [
   { id: PanelId.Talents, label: "Talents" },
   { id: PanelId.Items, label: "Items" },
   { id: PanelId.Codex, label: "Codex" },
+  { id: PanelId.Chronicle, label: "Chronicle" },
 ];
 
 const NavBar = (props: IProps) => {

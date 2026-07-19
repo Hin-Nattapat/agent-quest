@@ -236,6 +236,60 @@ const codex = (): string => {
   return lines.join("\n");
 };
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+// "2026-07-13" + 6 days -> "Jul 13–19" (or "Jul 28 – Aug 3" across a month edge).
+const weekRange = (start: string): string => {
+  const [y, m, d] = start.split("-").map(Number);
+  const startDate = new Date(Date.UTC(y, m - 1, d));
+  const endDate = new Date(Date.UTC(y, m - 1, d + 6));
+  const sm = MONTHS[startDate.getUTCMonth()];
+  const em = MONTHS[endDate.getUTCMonth()];
+  if (sm === em) {
+    return `${sm} ${startDate.getUTCDate()}–${endDate.getUTCDate()}`;
+  }
+  return `${sm} ${startDate.getUTCDate()} – ${em} ${endDate.getUTCDate()}`;
+};
+
+const chronicle = (countArg: string): string => {
+  const parsed = Number.parseInt(countArg, 10);
+  const count = Number.isNaN(parsed) ? 4 : Math.min(Math.max(parsed, 1), 12);
+  const weeks = (reduceToFile(HOME).chronicle?.weeks ?? []).slice(0, count);
+  if (weeks.length === 0) {
+    return "No chronicle yet — go adventure.";
+  }
+  return weeks
+    .map(w => {
+      const levels =
+        w.level_start === w.level_end
+          ? `Lv.${w.level_end}`
+          : `Lv.${w.level_start}→${w.level_end}`;
+      const label = w.week.split("-")[1];
+      const head = `── ${label} · ${weekRange(w.start)} ──  ${levels}`;
+      const line1 = `  XP ${w.xp} · ${w.actions} fights · ${w.bosses_defeated} bosses · ${w.active_days} active days`;
+      const realm = w.top_realm ? (REALM_LABELS[w.top_realm] ?? w.top_realm) : "—";
+      const peak = w.busiest_day
+        ? ` · peak: ${w.busiest_day.date} +${w.busiest_day.xp}xp`
+        : "";
+      const line2 = `  realm: ${realm}${peak}`;
+      return [head, line1, line2].join("\n");
+    })
+    .join("\n");
+};
+
 const equipFrame = (profile: IProfile, id: string): string => {
   if (id === "none") {
     delete profile.frame;
@@ -322,6 +376,7 @@ Cosmetics & deeds
   companion <id|none>  equip a companion
   secrets              list unlocked secret classes
   codex                realm conquest progress
+  chronicle [n]        weekly summary (default 4)
   frame <realm|none>   equip a conquered realm's frame
   aura <id|none>       equip a paragon aura
 
@@ -383,6 +438,9 @@ const main = (): void => {
       break;
     case "codex":
       out = codex();
+      break;
+    case "chronicle":
+      out = chronicle(args[0] ?? "");
       break;
     case "frame":
       out = equipFrame(profile, args[0] ?? "");

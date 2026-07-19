@@ -5,6 +5,7 @@ import { PanelId } from "../panels";
 import HeroPanel from "./hero-panel";
 import ItemsPanel from "./items-panel";
 import CodexPanel from "./codex-panel";
+import ChroniclePanel from "../chronicle/chronicle-panel";
 import TalentsPanel from "./talents-panel";
 import UsagePanel from "./usage-panel";
 import SettingsPanel from "./settings-panel";
@@ -21,6 +22,7 @@ const TITLES: Record<PanelId, string> = {
   [PanelId.Talents]: "Talents",
   [PanelId.Items]: "Items",
   [PanelId.Codex]: "Codex",
+  [PanelId.Chronicle]: "Chronicle",
   [PanelId.Usage]: "Usage",
   [PanelId.Settings]: "Settings",
 };
@@ -64,6 +66,7 @@ const PanelOverlay = (props: IProps) => {
           <ItemsPanel state={state} dispatch={dispatch} />
         ) : null}
         {activePanel === PanelId.Codex ? <CodexPanel state={state} /> : null}
+        {activePanel === PanelId.Chronicle ? <ChroniclePanel state={state} /> : null}
         {activePanel === PanelId.Talents ? (
           <TalentsPanel state={state} dispatch={dispatch} />
         ) : null}

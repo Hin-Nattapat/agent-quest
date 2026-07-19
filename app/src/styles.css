@@ -2483,3 +2483,47 @@ body.reduce-motion *::after {
     transform: translate(14px, -72px);
   }
 }
+.chronicle-panel {
+  display: grid;
+  gap: 8px;
+}
+.week-card {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px;
+}
+.week-card-hero {
+  border-color: #d4af37;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.25);
+}
+.wc-head {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.wc-levels {
+  margin-left: auto;
+  color: #d4af37;
+}
+.wc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 6px 0;
+  opacity: 0.9;
+}
+.wc-realm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wc-boss {
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+.wc-peak {
+  margin-left: auto;
+  opacity: 0.7;
+  font-size: 0.9em;
+}

@@ -431,11 +431,22 @@ T4 · Archfool
 a playful illusionist coder with a sly knowing smirk, lithe nimble build, fair skin, tousled two-tone hair, adult character (not a child), slightly stylized proportions about 3 heads tall, full body head-to-toe, centered, clean 1px black outline —
 dressed as an archfool, the grand mirage: a resplendent harlequin regalia with a golden jester-crown and a card-topped scepter, a dazzling carnival of mirror-illusion duplicates and a storm of swirling playing-card confetti, mesmerizing iridescent rainbow palette
 ```
-**??? — Sir Quacks-a-lot** (easter egg)
+**??? — Sir Quacks-a-lot** (easter egg · companion cosmetic — โครงเดียวกับ hero: identity + dressed as)
+
+base:
+
 ```
-a heroic rubber duck (not human) wearing tiny knight armor and a small cape, holding a toothpick sword, standing proud, full body head-to-toe, centered, clean 1px black outline, legendary joke cosmetic
+a heroic little rubber duck knight (not human), a small round glossy yellow rubber-duck body standing upright on two webbed feet, a flat orange bill and calm proud eyes, slightly stylized proportions, full body head-to-toe, centered, clean 1px black outline —
+dressed as a legendary toy knight: a tiny polished silver knight helmet with an open visor on its head, a small silver chest plate over the round belly, a short red cape draped from the shoulders, holding a toothpick sword raised proudly in one wing, standing tall and noble, bright yellow with silver-and-red accents, legendary joke cosmetic
 ```
-gen ที่ **32×32** · animation เดียว **idle** เท่านั้น (~9 เฟรม, ลอยยวบเบาๆ/gentle floating bob) · ทิศ **east + south** เท่านั้น · import: `bun tools/import-art.ts <export> --as companion:sir_quacks`
+
+idle (anim เดียวที่ต้องมี · Start Frame = idle + "Keep first frame" ✓ · ~9 เฟรม):
+
+```
+bobbing gently up and down in place as if floating on calm invisible water, almost motionless otherwise, a slow gentle breathing loop, the short red cape swaying softly and the toothpick sword held steady and proud, keeping its glossy yellow duck body, silver knight armor and colors unchanged
+```
+
+gen ที่ **32×32** · ทิศที่ใช้จริง **east + south** เท่านั้น (ไม่มี walk/attack — เป็ดลอยตาม ไม่สู้) · import: `bun tools/import-art.ts <export> --as companion:sir_quacks`
 
 ### 4.5.1 หมายเหตุ gen สายลับ
 

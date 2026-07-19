@@ -43,6 +43,12 @@ import {
   type IBestiaryScan,
 } from "./bestiary";
 import { paragonFor } from "./paragon";
+import {
+  createChronicleScan,
+  recordChronicleEvent,
+  buildChronicle,
+  type IChronicleScan,
+} from "./chronicle";
 
 export type TReducedState = Omit<IState, "updated_at">;
 
@@ -309,6 +315,7 @@ interface IEventScan {
   bossTriggers: ITrigger[];
   quacksEarnedTs: string | null;
   bestiary: IBestiaryScan;
+  chronicle: IChronicleScan;
 }
 
 // Scan-internal bookkeeping no later phase needs: level/tier watermarks for milestone detection,
@@ -493,6 +500,7 @@ const scanEvents = (ctx: IReduceContext): IEventScan => {
     bossTriggers: [],
     quacksEarnedTs: null,
     bestiary: createBestiaryScan(),
+    chronicle: createChronicleScan(),
     prevLevel: levelFor(0, ctx.config.difficulty),
     prevTier: 0,
     pendingFail: new Set(),
@@ -501,21 +509,37 @@ const scanEvents = (ctx: IReduceContext): IEventScan => {
     bossOrdinal: 0,
   };
   for (const event of ctx.sorted) {
+    const levelBefore = state.prevLevel;
     const { gained, newLevel } = applyXpAndMilestones({ state, ctx, event });
     recordEventStats(state, event);
     const bossDefeatedBefore = state.bossDefeated;
     const bossFledBefore = state.bossFled;
     rollBossAndDuck({ state, ctx, event, newLevel });
+    const bossDefeatedDelta = state.bossDefeated - bossDefeatedBefore;
+    const bossFledDelta = state.bossFled - bossFledBefore;
+    const realm = realmFor({
+      line: ctx.lineAt(event.ts),
+      tier: tierForLevel(newLevel),
+      branch: ctx.branchAt(event.ts),
+    });
     recordBestiaryEvent({
       scan: state.bestiary,
-      realm: realmFor({
-        line: ctx.lineAt(event.ts),
-        tier: tierForLevel(newLevel),
-        branch: ctx.branchAt(event.ts),
-      }),
+      realm,
       isAction: event.type === EventType.Action,
-      bossDefeated: state.bossDefeated - bossDefeatedBefore,
-      bossFled: state.bossFled - bossFledBefore,
+      bossDefeated: bossDefeatedDelta,
+      bossFled: bossFledDelta,
+    });
+    recordChronicleEvent({
+      scan: state.chronicle,
+      dateKey: eventLocalDate(event.ts),
+      gained,
+      eventType: event.type,
+      sessionId: event.session_id,
+      realm,
+      bossDefeated: bossDefeatedDelta,
+      bossFled: bossFledDelta,
+      levelBefore,
+      newLevel,
     });
     sealAsceticIfEarned(state, newLevel);
     tally({
@@ -722,6 +746,7 @@ export const reduce = (props: IReduceArgs): TReducedState => {
     inventory,
     bestiary: buildBestiary(scan.bestiary),
     paragon: paragonFor({ xpTotal: xp_total, difficulty: config.difficulty }),
+    chronicle: buildChronicle(scan.chronicle),
     recent: scan.recent,
   };
   if (profile?.name) {

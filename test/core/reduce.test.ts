@@ -754,3 +754,29 @@ test("paragon interprets overflow XP past the level cap", () => {
   expect(capped.paragon).toBeDefined();
   expect(capped.paragon!.level).toBeGreaterThan(0); // step is tiny under this curve
 });
+
+test("chronicle buckets the journal into ISO weeks", () => {
+  const home = makeHome();
+  const mkAct = (ts: string) =>
+    ({
+      ts,
+      source: "claude-code",
+      session_id: "s",
+      type: "action",
+      action: "read",
+      repo: "cq",
+    }) as any;
+  const events = [
+    mkAct("2026-07-13T10:00:00Z"),
+    mkAct("2026-07-15T10:00:00Z"),
+    mkAct("2026-07-20T10:00:00Z"), // next ISO week
+  ];
+  const state = reduce({ events, config: loadConfig(home), today: "2026-07-20" });
+  const weeks = state.chronicle?.weeks ?? [];
+  expect(weeks.length).toBe(2);
+  expect(weeks[0].week > weeks[1].week).toBe(true); // newest first
+  expect(weeks[1].actions).toBe(2);
+  expect(weeks[0].actions).toBe(1);
+  expect(weeks[1].sessions).toBe(1);
+  expect(weeks[1].level_start).toBe(1);
+});

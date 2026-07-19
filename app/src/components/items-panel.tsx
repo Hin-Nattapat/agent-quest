@@ -1,19 +1,13 @@
 import type { IState } from "../../../core/state";
 import { ActionType, ClientActionName, EquipKind, type TClientAction } from "../actions";
+import { groupInventory } from "../view";
 
 interface IProps {
   state: IState;
   dispatch: (action: TClientAction) => void;
 }
 
-const KIND_ICON: Record<string, string> = {
-  title: "👑",
-  theme: "🎨",
-  skin: "👕",
-  name_color: "✒️",
-};
-
-// Inventory title/theme/name-color items are equippable; skins have no equip path in core.
+// Inventory title/theme/name-color/companion items are equippable; skins have no equip path in core.
 const equipKindOf = (kind: string | undefined): EquipKind | null => {
   if (kind === "title") {
     return EquipKind.Title;
@@ -30,6 +24,7 @@ const equipKindOf = (kind: string | undefined): EquipKind | null => {
 const ItemsPanel = (props: IProps) => {
   const { state, dispatch } = props;
   const inv = state.inventory ?? [];
+  const groups = groupInventory(inv);
 
   return (
     <div className="panel-body items-panel">
@@ -37,38 +32,45 @@ const ItemsPanel = (props: IProps) => {
       {inv.length === 0 ? (
         <div className="panel-empty">No loot yet…</div>
       ) : (
-        <div className="item-grid">
-          {inv.map(item => {
-            const ek = equipKindOf(item.kind);
-            return (
-              <div
-                key={item.id}
-                className={`item-slot rarity-${item.rarity}${item.equipped ? " equipped" : ""}`}
-              >
-                <span className="item-icon">
-                  {KIND_ICON[item.kind ?? "title"] ?? "❔"}
-                </span>
-                <span className="item-name">{item.name ?? item.id}</span>
-                {ek ? (
-                  <button
-                    type="button"
-                    className={`item-equip${item.equipped ? " is-equipped" : ""}`}
-                    onClick={() =>
-                      dispatch({
-                        type: ActionType.Action,
-                        name: ClientActionName.Equip,
-                        kind: ek,
-                        id: item.id,
-                      })
-                    }
+        groups.map(group => (
+          <section key={group.kind} className="item-section">
+            <div className="item-section-head">
+              <span aria-hidden="true">{group.icon}</span>
+              <span>{group.label}</span>
+              <span className="item-section-count">{group.items.length}</span>
+            </div>
+            <div className="item-grid">
+              {group.items.map(item => {
+                const ek = equipKindOf(item.kind);
+                return (
+                  <div
+                    key={item.id}
+                    className={`item-slot rarity-${item.rarity}${item.equipped ? " equipped" : ""}`}
                   >
-                    {item.equipped ? "Equipped" : "Equip"}
-                  </button>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
+                    <span className="item-icon">{group.icon}</span>
+                    <span className="item-name">{item.name ?? item.id}</span>
+                    {ek ? (
+                      <button
+                        type="button"
+                        className={`item-equip${item.equipped ? " is-equipped" : ""}`}
+                        onClick={() =>
+                          dispatch({
+                            type: ActionType.Action,
+                            name: ClientActionName.Equip,
+                            kind: ek,
+                            id: item.id,
+                          })
+                        }
+                      >
+                        {item.equipped ? "Equipped" : "Equip"}
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ))
       )}
     </div>
   );

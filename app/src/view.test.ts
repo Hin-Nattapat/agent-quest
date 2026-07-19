@@ -8,6 +8,7 @@ import {
   cmdLabel,
   byCountDesc,
   sourceBreakdown,
+  groupInventory,
 } from "./view";
 import { TimelineKind } from "../../core/events";
 import type { IState } from "../../core/state";
@@ -98,4 +99,46 @@ test("sourceBreakdown: shares sorted desc by xp, integer pct, 0 when no xp", () 
     { source: "a", xp: 0, pct: 0 },
     { source: "b", xp: 0, pct: 0 },
   ]);
+});
+
+test("groupInventory buckets by kind, equipped first, then rarity descending", () => {
+  const inv = [
+    { id: "azure", rarity: "rare", count: 1, name: "Azure", kind: "name_color" },
+    { id: "rookie_title", rarity: "common", count: 1, name: "Rookie", kind: "title" },
+    {
+      id: "forest_theme",
+      rarity: "common",
+      count: 1,
+      name: "Forest",
+      kind: "theme",
+      equipped: true,
+    },
+    { id: "matrix", rarity: "epic", count: 1, name: "Matrix", kind: "theme" },
+    { id: "plasma_ink", rarity: "legendary", count: 1, name: "Plasma", kind: "theme" },
+    {
+      id: "sir_quacks",
+      rarity: "legendary",
+      count: 1,
+      name: "Sir Quacks-a-lot",
+      kind: "companion",
+    },
+  ] as any;
+  const groups = groupInventory(inv);
+  expect(groups.map(g => g.kind)).toEqual(["title", "theme", "name_color", "companion"]);
+  expect(groups[0].label).toBe("Titles");
+  // equipped common floats above unequipped legendary; the rest sort legendary -> epic.
+  expect(groups[1].items.map(i => i.id)).toEqual([
+    "forest_theme",
+    "plasma_ink",
+    "matrix",
+  ]);
+});
+
+test("groupInventory hides empty kinds and folds unknown kinds into Other", () => {
+  const groups = groupInventory([
+    { id: "x", rarity: "common", count: 1, kind: "mystery" },
+  ] as any);
+  expect(groups.length).toBe(1);
+  expect(groups[0].label).toBe("Other");
+  expect(groups[0].icon).toBe("❔");
 });

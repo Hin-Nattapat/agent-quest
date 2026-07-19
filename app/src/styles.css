@@ -1656,6 +1656,21 @@ body {
 }
 
 /* items grid */
+.item-section + .item-section {
+  margin-top: 14px;
+}
+.item-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--gold-soft, #b59a4e);
+  letter-spacing: 0.04em;
+}
+.item-section-count {
+  opacity: 0.6;
+  font-size: 0.9em;
+}
 .item-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
